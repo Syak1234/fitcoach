@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   
+    <string name="app_name">FitCoach</string>
+    <string name="facebook_app_id">1476526586637991</string>
+    <string name="fb_login_protocol_scheme">fb1476526586637991</string>
+    <string name="facebook_client_token">2507f93f5fa318119cabd99a661e2cb2</string>
+
+    
+</resources>
