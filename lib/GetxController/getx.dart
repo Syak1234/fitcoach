@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/utility/no_internet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,12 +9,22 @@ import 'package:get/get.dart';
 class Getx extends GetxController {
   RxInt isCom_select_Option = 0.obs;
   var selectedDays = 5.obs;
+  RxInt pagesIndex = 0.obs;
   // RxDouble barValue = 0.1.obs;
   var selectedPreferences = <String>[].obs;
   RxString address = "".obs;
   late Connectivity _connectivity;
   late Stream<ConnectivityResult> _connectivityStream;
   late StreamSubscription<ConnectivityResult> _subscription;
+
+  var isFeetAndInches = false.obs;
+  var feet = 0.obs;
+  var inches = 0.obs;
+  var cm = 0.obs;
+
+  bool get isValidHeight => isFeetAndInches.value
+      ? (feet.value > 0 || inches.value > 0)
+      : cm.value > 0;
   // @override
   // void onClose() {
   //   decresebarValue();
@@ -40,11 +51,10 @@ class Getx extends GetxController {
   }
 
   void _handleConnectivityChange(ConnectivityResult result) {
-    print(result);
     if (result == ConnectivityResult.none) {
-      Get.to(() => NoInternetScreen());
-    } else {
-      // Get.back();
-    }
+      Get.toNamed(
+        AppRoutes.internetcheck,
+      );
+    } else {}
   }
 }

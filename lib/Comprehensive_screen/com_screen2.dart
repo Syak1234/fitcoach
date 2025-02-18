@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen3.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -187,7 +188,9 @@ class _ComScreen2State extends State<ComScreen2> {
           ? null
           : () {
               // getx.incresebarValue();
-              Get.to(() => ComScreen3(), transition: Transition.rightToLeft);
+              Get.toNamed(
+                AppRoutes.comScreen3,
+              );
             },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,14 +1,15 @@
 import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
-import 'package:fitcoach/profile_screen/finger_print_setup.dart';
+import 'package:fitcoach/profile_setting/profile_screen/finger_print_setup.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
-import '../Comprehensive_screen/com_screen2.dart';
+import '../../Comprehensive_screen/com_screen2.dart';
 
 class ProfileScreen2 extends StatefulWidget {
   @override
@@ -385,12 +386,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => FingerprintSetup(),
-                          transition: Transition.rightToLeft);
-                      // Handle Continue button press
-                      // print("Selected Option: ${getx.isCom_select_Option.value}");
-                    },
+                    onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(
@@ -401,8 +397,9 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Icon(Icons.save, color: AppColors.textLight),
                         Text(
-                          "Continue",
+                          "Save Settings",
                           style: TextStyle(
                             color: AppColors.textLight,
                             fontSize: 16,
@@ -410,7 +407,6 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                           ),
                         ),
                         SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, color: AppColors.textLight),
                       ],
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -223,8 +224,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          Get.off(() => SignInScreen(),
-                              transition: Transition.rightToLeft);
+                          Get.toNamed(
+                            AppRoutes.login,
+                          );
                         },
                         child: RichText(
                           text: TextSpan(

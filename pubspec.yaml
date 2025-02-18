@@ -50,6 +50,15 @@ dependencies:
   shared_preferences: ^2.5.1
   flutter_facebook_auth: ^7.1.1
   badges: ^3.1.2
+  intl:
+
+  sqflite: 2.4.1
+  path_provider:
+  fl_chart: ^0.70.2
+  url_launcher: ^6.3.1
+
+  stacked:
+ 
 
 dev_dependencies:
   flutter_test:

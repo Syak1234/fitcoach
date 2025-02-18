@@ -1,3 +1,4 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:fitcoach/welcome_screen/wel_screen5.dart';
@@ -110,8 +111,9 @@ class WelcomeScreen4 extends StatelessWidget {
                           // isSelected: true,
 
                           onPressed: () {
-                            Get.to(() => WelcomeScreen5(),
-                                transition: Transition.rightToLeft);
+                            Get.toNamed(
+                              AppRoutes.welcomeScreen5,
+                            );
                           },
                           icon: const Icon(Icons.arrow_forward,
                               color: AppColors.textDark)),

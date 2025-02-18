@@ -1,8 +1,9 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../home_and_fitnessallUi/dashboard/dashboard.dart';
+import '../../home_and_fitnessallUi/dashboard/dashboard.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -92,8 +93,9 @@ class WelcomeScreen extends StatelessWidget {
             // color: AppColors.textDark,
             child: ElevatedButton(
               onPressed: () {
-                Get.to(() => HomeScreen());
-                // Action for "Get Started"
+                Get.toNamed(
+                  AppRoutes.bottomDashboard,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.backgroundDark,

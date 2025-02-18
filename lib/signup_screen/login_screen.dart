@@ -5,6 +5,7 @@ import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/forget_screen/forget_screen.dart';
 import 'package:fitcoach/functionality/facebook_sign_auth.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/signup_screen.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -151,9 +152,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         onPressed: () {
                           Userdetails userdetails =
                               Userdetails(email: ' ', name: ' ', userimg: ' ');
-                          Get.offAll(
-                              () => ComScreen1(userdetails: userdetails));
-                          // Get.to(() => ComScreen1());
+
+                          Get.toNamed(
+                            AppRoutes.fingerprintSetup,
+                          );
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -199,8 +201,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   email: user!.email.toString(),
                                   name: user!.displayName.toString(),
                                   userimg: user!.photoURL.toString());
-                              Get.offAll(
-                                  () => ComScreen1(userdetails: userdetails));
+                              Get.toNamed(
+                                AppRoutes.fingerprintSetup,
+                              );
                             }
                             // user!.email.toString();
                           },
@@ -233,8 +236,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   userimg: facebookdata!['picture']['data']
                                           ['url'] ??
                                       ' ');
-                              Get.offAll(
-                                  () => ComScreen1(userdetails: userdetails));
+                              Get.toNamed(
+                                AppRoutes.fingerprintSetup,
+                              );
                             }
                           },
                           child: Container(
@@ -256,8 +260,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          Get.off(() => SignUpScreen(),
-                              transition: Transition.rightToLeft);
+                          Get.toNamed(
+                            AppRoutes.signup,
+                          );
                         },
                         child: RichText(
                           text: TextSpan(
@@ -281,8 +286,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          Get.to(() => ResetPasswordScreen(),
-                              transition: Transition.rightToLeft);
+                          Get.toNamed(
+                            AppRoutes.forgetpasword,
+                          );
                         },
                         child: Text(
                           'Forgot Password',

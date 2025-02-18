@@ -1,5 +1,6 @@
 import 'package:fitcoach/GetxController/getx.dart';
-import 'package:fitcoach/profile_screen/profile_screen1.dart';
+import 'package:fitcoach/profile_setting/profile_screen/profile_screen1.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,8 @@ class _ComScreen10State extends State<ComScreen10> {
           ),
         ],
       ),
+     
+     
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
@@ -116,8 +119,11 @@ class _ComScreen10State extends State<ComScreen10> {
               // Continue button
               ElevatedButton(
                 onPressed: () {
-                  Get.to(() => ProfileScreen1(),
-                      transition: Transition.rightToLeft);
+                  Get.toNamed(
+                    AppRoutes.login,
+                  );
+                  // Get.to(() => ProfileScreen1(),
+                  //     transition: Transition.rightToLeft);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.backgroundDark,

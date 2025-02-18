@@ -1,3 +1,4 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/welcome_screen/wel_screen1.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,10 @@ class _SpalshState extends State<Spalsh> {
 
     // Navigate to next page after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Get.off(() => WelcomeScreen1());
+      // Get.off(() => WelcomeScreen1());
+      Get.offNamed(
+        AppRoutes.welcomeScreen1,
+      );
     });
   }
 

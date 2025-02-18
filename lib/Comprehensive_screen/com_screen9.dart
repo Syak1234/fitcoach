@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen10.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -157,8 +158,9 @@ class _ComScreen9State extends State<ComScreen9> {
                 // Continue button
                 ElevatedButton(
                   onPressed: () {
-                    Get.to(() => ComScreen10(),
-                        transition: Transition.rightToLeft);
+                    Get.toNamed(
+                      AppRoutes.comScreen10,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,

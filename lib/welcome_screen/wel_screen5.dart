@@ -1,3 +1,4 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -112,8 +113,11 @@ class WelcomeScreen5 extends StatelessWidget {
                           // isSelected: true,
 
                           onPressed: () {
-                            Get.to(() => SignInScreen(),
-                                transition: Transition.rightToLeft);
+                            
+
+                            Get.toNamed(
+                              AppRoutes.comScreen1,
+                            );
                           },
                           icon: const Icon(Icons.arrow_forward,
                               color: AppColors.textDark)),

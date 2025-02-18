@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen6.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -86,8 +87,9 @@ class _ComScreen5State extends State<ComScreen5> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.to(() => ComScreen6(),
-                            transition: Transition.rightToLeft);
+                        Get.toNamed(
+                          AppRoutes.comScreen6,
+                        );
                       }, // Add functionality for "No"
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.gray10,
@@ -119,8 +121,9 @@ class _ComScreen5State extends State<ComScreen5> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.to(() => ComScreen6(),
-                            transition: Transition.rightToLeft);
+                        Get.toNamed(
+                          AppRoutes.comScreen6,
+                        );
                       }, // Add functionality for "Yes"
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.backgroundDark,

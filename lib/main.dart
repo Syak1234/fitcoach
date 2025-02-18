@@ -14,8 +14,14 @@
 // import 'package:fitcoach/profile_screen/profile_screen2.dart';
 // import 'package:fitcoach/GetxController/getx.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
+
+import 'package:fitcoach/profile_setting/account_setting/linked_device.dart';
+import 'package:fitcoach/profile_setting/notification/notificationUi.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/spalsh_screen/spalsh.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/utility/step_trackerUi.dart';
 // import 'package:fitcoach/utility/no_internet.dart';
 // import 'package:fitcoach/utility/no_internet.dart';
 // import 'package:fitcoach/utility/page_not_found.dart';
@@ -77,7 +83,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Spalsh(),
+      home: StepsTakenScreen(),
+      // initialRoute: AppRoutes.splash,
+      // getPages: AppRoutes.pages,
     );
   }
 }

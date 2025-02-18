@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen2.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,7 @@ import '../GetxController/getx.dart';
 // import 'getx.dart';
 
 class ComScreen1 extends StatefulWidget {
-  Userdetails userdetails;
-  ComScreen1({required this.userdetails});
+  ComScreen1();
 
   @override
   State<ComScreen1> createState() => _ComScreen1State();
@@ -116,10 +116,9 @@ class _ComScreen1State extends State<ComScreen1> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // getx.incresebarValue();
-                    Get.to(() => ComScreen2(),
-                        transition: Transition.rightToLeft);
-                    // Handle Continue button press
+                    Get.toNamed(
+                      AppRoutes.comScreen2,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,

@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen4.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -211,7 +212,9 @@ class _ComScreen3State extends State<ComScreen3> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () {
-        Get.to(() => ComScreen4(), transition: Transition.rightToLeft);
+        Get.toNamed(
+          AppRoutes.height,
+        );
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,

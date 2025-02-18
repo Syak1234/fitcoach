@@ -1,3 +1,4 @@
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/welcome_screen/wel_screen3.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,6 @@ class WelcomeScreen2 extends StatelessWidget {
                         },
                         icon: const Icon(Icons.arrow_back,
                             color: AppColors.textDark)),
-                 
 
                     // Right Button
 
@@ -128,14 +128,12 @@ class WelcomeScreen2 extends StatelessWidget {
                         // isSelected: true,
 
                         onPressed: () {
-                          Get.to(() => WelcomeScreen3(),
-                              transition: Transition.rightToLeft);
+                          Get.toNamed(
+                            AppRoutes.welcomeScreen3,
+                          );
                         },
                         icon: const Icon(Icons.arrow_forward,
                             color: AppColors.textDark)),
-                  
-                  
-                  
                   ],
                 ),
               ),

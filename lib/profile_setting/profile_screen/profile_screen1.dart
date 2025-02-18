@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:fitcoach/profile_screen/profile_screen2.dart';
+import 'package:fitcoach/profile_setting/profile_screen/profile_screen2.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // If needed for icons or vector images
@@ -217,7 +218,9 @@ Widget _buildContinueButton() {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
     ),
     onPressed: () {
-      Get.to(() => ProfileScreen2(), transition: Transition.rightToLeft);
+      Get.toNamed(
+        AppRoutes.profileScreen2,
+      );
     },
     child: const Row(
       mainAxisAlignment: MainAxisAlignment.center,

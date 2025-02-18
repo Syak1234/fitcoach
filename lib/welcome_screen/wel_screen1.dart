@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../routes/app_routes.dart';
+
 class WelcomeScreen1 extends StatelessWidget {
   const WelcomeScreen1({super.key});
 
@@ -96,8 +98,9 @@ class WelcomeScreen1 extends StatelessWidget {
                         borderRadius: BorderRadius.circular(21)),
                   ),
                   onPressed: () {
-                    Get.to(() => WelcomeScreen2(),
-                        transition: Transition.rightToLeft);
+                    Get.toNamed(
+                      AppRoutes.welcomeScreen2,
+                    );
                   },
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,

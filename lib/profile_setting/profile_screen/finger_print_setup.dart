@@ -1,5 +1,6 @@
 import 'package:fitcoach/GetxController/getx.dart';
-import 'package:fitcoach/profile_screen/welcomeScreen.dart';
+import 'package:fitcoach/profile_setting/profile_screen/welcomeScreen.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
             ? 'Authentication successful!'
             : 'Authentication failed!';
       });
-      Get.to(() => WelcomeScreen(), transition: Transition.rightToLeft);
+      Get.toNamed(
+        AppRoutes.welcomeScreen,
+      );
     } catch (e) {
       setState(() {
         _authMessage = 'Authentication error';
@@ -169,8 +172,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
                     borderRadius: BorderRadius.circular(21)),
               ),
               onPressed: () {
-                Get.to(() => WelcomeScreen(),
-                    transition: Transition.rightToLeft);
+                Get.toNamed(
+                  AppRoutes.welcomeScreen,
+                );
                 // Skip functionality
               },
               child: const Row(
