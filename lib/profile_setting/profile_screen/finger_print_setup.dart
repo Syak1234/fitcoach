@@ -68,7 +68,6 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: AppColors.textDark,
       appBar: AppBar(
         backgroundColor: AppColors.backgroundLight,
         elevation: 0,
@@ -84,7 +83,8 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
           style: TextStyle(color: AppColors.textDark, fontSize: 18),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        // Wrapping the body in SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -105,39 +105,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            // Fingerprint Scanner Illustration
-
             Image.asset(
-              'assets/profile/img5.jpg',
-
-              // color: AppColors.backgroundDark,
+              'assets/profile/img5.jpg', // Fingerprint Scanner Image
             ),
-            // Stack(
-            //   alignment: Alignment.center,
-            //   children: [
-            //     Container(
-            //       height: 200,
-            //       width: 200,
-            //       decoration: BoxDecoration(
-            //         borderRadius: BorderRadius.circular(100),
-            //         gradient: const LinearGradient(
-            //           colors: [AppColors.textDark, Colors.orange],
-            //           stops: [0.8, 1],
-            //           begin: Alignment.topCenter,
-            //           end: Alignment.bottomCenter,
-            //         ),
-            //       ),
-            //       child: const Center(
-            //         child: Icon(
-            //           Icons.fingerprint,
-            //           size: 120,
-            //           color: AppColors.textDark,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-
             const SizedBox(height: 20),
             if (_authMessage != '')
               Padding(
@@ -160,10 +130,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
                   ),
                 ),
               ),
-
             const SizedBox(height: 40),
 
-            // Scan Button
+            // Skip Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.orange10,
@@ -175,7 +144,6 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
                 Get.toNamed(
                   AppRoutes.welcomeScreen,
                 );
-                // Skip functionality
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -196,10 +164,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
               ),
             ),
 
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
 
+            // Scan Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.backgroundDark,
@@ -223,7 +190,7 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
                   Icon(Icons.arrow_forward, color: AppColors.textLight),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

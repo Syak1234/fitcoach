@@ -1,7 +1,9 @@
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:stacked/stacked.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 // class StepsViewModel extends BaseViewModel {}
 
@@ -22,29 +24,30 @@ class StepsViewModel extends BaseViewModel {
 }
 
 class StepsUI extends StatelessWidget {
-  final StepsViewModel model;
-  StepsUI({required this.model});
+  // final StepsViewModel model;
+  StepsUI();
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
       children: [
-        for (int i = 0; i < model.percentages.length; i++)
-          Padding(
-            padding: EdgeInsets.all(i * 25), // Dynamic margin for each layer
-            child: Container(
-              width: 350 - (i * 10),
-              height: 350 - (i * 10),
-              // margin: EdgeInsets.all(0), // Extra margin to prevent overlap
-              child: CircularProgressIndicator(
-                value: model.percentages[i],
-                strokeWidth: 20,
-                backgroundColor: AppColors.backgroundLight,
-                valueColor: AlwaysStoppedAnimation<Color>(model.layerColors[i]),
-              ),
-            ),
-          ),
+        RadialBarChartScreen(),
+        // for (int i = 0; i < model.percentages.length; i++)
+        //   Padding(
+        //     padding: EdgeInsets.all(i * 25), // Dynamic margin for each layer
+        //     child: Container(
+        //       width: 350 - (i * 10),
+        //       height: 350 - (i * 10),
+        //       // margin: EdgeInsets.all(0), // Extra margin to prevent overlap
+        //       child: CircularProgressIndicator(
+        //         value: model.percentages[i],
+        //         strokeWidth: 20,
+        //         backgroundColor: AppColors.backgroundLight,
+        //         valueColor: AlwaysStoppedAnimation<Color>(model.layerColors[i]),
+        //       ),
+        //     ),
+        //   ),
         Positioned(
           child: Container(
             width: 50,
@@ -67,6 +70,56 @@ class StepsUI extends StatelessWidget {
   }
 }
 
+class RadialBarChartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final List<ChartData> chartData = [
+      ChartData(1926, 250, '100%', AppColors.blue60),
+      ChartData(
+        1925,
+        450,
+        '100%',
+        AppColors.gray80,
+      ),
+      ChartData(
+        1924,
+        600,
+        '100%',
+        AppColors.primaryorange,
+      ),
+    ];
+    return Center(
+        child: Container(
+            child: SfCircularChart(series: <RadialBarSeries<ChartData, int>>[
+      RadialBarSeries<ChartData, int>(
+        radius: '120%',
+        useSeriesColor: true,
+        gap: '10%',
+        trackOpacity: 0.1,
+        // cornerStyle: CornerStyle.bothCurve,
+        dataSource: chartData,
+        pointRadiusMapper: (ChartData data, _) => data.opacity,
+        pointColorMapper: (ChartData data, _) => data.color,
+        xValueMapper: (ChartData data, _) => data.x,
+        yValueMapper: (ChartData sales, _) => sales.y,
+      )
+    ])));
+  }
+}
+
+class ChartData {
+  ChartData(
+    this.x,
+    this.y,
+    this.opacity,
+    this.color,
+  );
+  final int x;
+  final double y;
+  final String opacity;
+  final Color color;
+}
+
 class StepsTakenScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -84,7 +137,9 @@ class StepsTakenScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
         actions: [
           IconButton(
@@ -103,10 +158,11 @@ class StepsTakenScreen extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  ViewModelBuilder<StepsViewModel>.reactive(
-                    viewModelBuilder: () => StepsViewModel(),
-                    builder: (context, model, child) => StepsUI(model: model),
-                  ),
+                  StepsUI(),
+                  // ViewModelBuilder<StepsViewModel>.reactive(
+                  //   viewModelBuilder: () => StepsViewModel(),
+                  //   builder: (context, model, child) => StepsUI(model: model),
+                  // ),
                   // Icon(
                   //   Icons.directions_walk,
                   //   size: 40,
@@ -128,6 +184,7 @@ class StepsTakenScreen extends StatelessWidget {
             "total steps",
             style: TextStyle(
               fontSize: 16,
+              fontWeight: FontWeight.bold,
               color: AppColors.gray,
             ),
           ),

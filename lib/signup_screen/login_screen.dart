@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/forget_screen/forget_screen.dart';
 import 'package:fitcoach/functionality/facebook_sign_auth.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
@@ -150,12 +151,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         onPressed: () {
-                          Userdetails userdetails =
-                              Userdetails(email: ' ', name: ' ', userimg: ' ');
-
-                          Get.toNamed(
-                            AppRoutes.fingerprintSetup,
-                          );
+                          // Userdetails userdetails =
+                          //     Userdetails(email: ' ', name: ' ', userimg: ' ');
+                          loginApi(context, _emailController.text, _passwordController.text);
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

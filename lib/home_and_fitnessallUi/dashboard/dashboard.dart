@@ -4,6 +4,7 @@ import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:get/get.dart';
@@ -22,6 +23,28 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.gray10,
       appBar: customAppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Fitness Metrics',
+                  style: TextStyle(
+                      fontSize: AppFontSize.mediumfontSize - 10,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.gray80),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            FitnessMetricsWidget()
+          ],
+        ),
+      ),
     );
   }
 
@@ -31,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Format the current date as "JUN 25, 2025"
     String formattedDate = DateFormat('MMM dd, yyyy').format(now);
     return PreferredSize(
-      preferredSize: const Size.fromHeight(200),
+      preferredSize: const Size.fromHeight(170),
       child: Stack(
         children: [
           // Background Image
@@ -170,3 +193,168 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+class FitnessMetricsWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildMetricCard(
+            title: 'Steps',
+            value: '2000 ',
+            subvalue: 'steps today',
+            color: AppColors.primaryorange,
+            icon: Icons.add,
+            child: _buildStepChart(),
+            onTap: () {
+              Get.toNamed(AppRoutes.stepUi);
+            },
+          ),
+          const SizedBox(width: 8),
+          _buildMetricCard(
+              title: 'Hydration',
+              value: '781',
+              subvalue: 'ml',
+              color: AppColors.primaryBlue,
+              icon: Icons.water_drop,
+              child: _buildHydrationChart(),
+              onTap: () {},
+              context: context),
+          const SizedBox(width: 8),
+          _buildMetricCard(
+              title: 'Calories',
+              value: '1578',
+              subvalue: 'kcal',
+              color: AppColors.gray80,
+              icon: Icons.local_fire_department,
+              child: _buildCaloriesChart(),
+              context: context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricCard(
+      {required String title,
+      required String value,
+      required String subvalue,
+      required Color color,
+      required IconData icon,
+      required Widget child,
+      context,
+      void Function()? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 194,
+        width: 154,
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(32),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                Icon(icon, color: Colors.white, size: 18),
+              ],
+            ),
+            SizedBox(height: 8),
+            Center(
+              child: Container(
+                child: child,
+                height: 100,
+                width: 150,
+              ),
+            ),
+            SizedBox(height: 8),
+            RichText(
+              text: TextSpan(
+                  children: [
+                    TextSpan(
+                        text: subvalue,
+                        style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: AppFontSize.mediumfontSize - 15))
+                  ],
+                  text: value,
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppFontSize.mediumfontSize - 5,
+                  )),
+
+              // value,
+
+              // style: TextStyle(
+              // color: Colors.white,
+              // fontWeight: FontWeight.bold,
+              // fontSize: AppFontSize.mediumfontSize - 10),
+              // overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Widget _buildStepChart() {
+  return Image.asset(
+    'assets/utility/stepsChart.png',
+    fit: BoxFit.fill,
+  );
+}
+
+Widget _buildHydrationChart() {
+  return Image.asset(
+    'assets/utility/hydrationChart.png',
+    fit: BoxFit.fill,
+  );
+}
+
+Widget _buildCaloriesChart() {
+  return Image.asset(
+    'assets/utility/caloriesChart.png',
+    fit: BoxFit.fill,
+  );
+}
+
+//   Widget _buildLineChart() {
+//     return LineChart(
+//       LineChartData(
+//         backgroundColor: Colors.transparent,
+//         lineBarsData: [
+//           LineChartBarData(
+//             spots: [
+//               FlSpot(0, 1),
+//               FlSpot(1, 2.5),
+//               FlSpot(2, 2),
+//               FlSpot(3, 3),
+//               FlSpot(4, 2.8),
+//             ],
+//             isCurved: true,
+//             colors: [Colors.white],
+//             dotData: FlDotData(show: false),
+//           )
+//         ],
+//         borderData: FlBorderData(show: false),
+//         gridData: FlGridData(show: false),
+//         titlesData: FlTitlesData(show: false),
+//       ),
+//     );
+//   }
+// }

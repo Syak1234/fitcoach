@@ -1,3 +1,4 @@
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -204,7 +205,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          await signUp(
+                              context,
+                              _emailController.text,
+                              _passwordController.text,
+                              _confirmPasswordController.text);
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

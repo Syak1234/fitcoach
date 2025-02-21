@@ -49,4 +49,5 @@ flutter {
 
 dependencies{
     implementation 'com.facebook.android:facebook-login:latest.release'
+    implementation "androidx.health.connect:connect-client:1.0.0-alpha01"
 }

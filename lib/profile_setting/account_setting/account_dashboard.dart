@@ -19,7 +19,13 @@ class AccountDashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionTitle('General'),
-            _buildSettingsItem(Icons.notifications, 'Notifications'),
+            _buildSettingsItem(
+              Icons.notifications,
+              'Notifications',
+              ontap: () {
+                Get.toNamed(AppRoutes.notification);
+              },
+            ),
             _buildSettingsItem(
               Icons.person,
               'Personal Information',
@@ -168,8 +174,6 @@ class AccountDashboard extends StatelessWidget {
     );
   }
 
- 
- 
   Widget _buildSectionTitle(String title,
       {bool beta = false, bool warning = false}) {
     return Padding(
