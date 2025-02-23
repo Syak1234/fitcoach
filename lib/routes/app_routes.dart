@@ -23,6 +23,7 @@ import 'package:fitcoach/profile_setting/profile_screen/welcomeScreen.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:fitcoach/signup_screen/signup_screen.dart';
 import 'package:fitcoach/spalsh_screen/spalsh.dart';
+import 'package:fitcoach/utility/hydrationUi.dart';
 import 'package:fitcoach/utility/no_internet.dart';
 import 'package:fitcoach/utility/page_not_found.dart';
 import 'package:fitcoach/utility/step_trackerUi.dart';
@@ -71,6 +72,7 @@ class AppRoutes {
 
   static const notification = "/NotificationsScreen";
   static const stepUi = "/StepsTakenScreen";
+  static const hydrationScreen = "/HydrationScreen";
 
   // Define routes here
   static final pages = [
@@ -283,6 +285,11 @@ class AppRoutes {
     GetPage(
       name: stepUi,
       page: () => StepsTakenScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: hydrationScreen,
+      page: () => HydrationScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

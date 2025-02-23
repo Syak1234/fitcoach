@@ -1,57 +1,75 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatefulWidget {
+class StepCount1 extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _StepCount1State createState() => _StepCount1State();
 }
 
-class _MyAppState extends State<MyApp> {
+class _StepCount1State extends State<StepCount1> {
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
   String _status = '?';
-  int _steps = 0;
   int _initialSteps = 0;
   int _todaySteps = 0;
+  int _minutesWalked = 0;
+  Map<String, int> _stepHistory = {}; // Store step count date-wise
+  String _selectedDate = DateTime.now().toIso8601String().substring(0, 10);
+
+  final double stepLength = 0.75; // Average step length in meters
+  final double caloriesPerStep = 0.04; // Approximate calories per step
+  final double stepsPerMinute = 100; // Approximate walking speed
 
   @override
   void initState() {
     super.initState();
-    _loadInitialStepCount();
+    _loadStepHistory();
     initPlatformState();
   }
 
-  Future<void> _loadInitialStepCount() async {
+  Future<void> _loadStepHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? savedSteps = prefs.getInt("initial_steps");
-    String? lastDate = prefs.getString("last_saved_date");
-    String today = DateTime.now().toIso8601String().substring(0, 10);
+    String? stepData = prefs.getString("step_history");
 
-    if (savedSteps == null || lastDate != today) {
-      // Reset initial step count if the date changed
-      prefs.setInt("initial_steps", _steps);
-      prefs.setString("last_saved_date", today);
-      _initialSteps = _steps;
-    } else {
-      _initialSteps = savedSteps;
+    if (stepData != null) {
+      _stepHistory = Map<String, int>.from(json.decode(stepData));
     }
+
     setState(() {
-      _todaySteps = _steps - _initialSteps;
+      _todaySteps = _stepHistory[_selectedDate] ?? 0;
+      _minutesWalked = (_todaySteps / stepsPerMinute).toInt();
     });
   }
 
-  void onStepCount(StepCount event) {
+  Future<void> _saveStepHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("step_history", json.encode(_stepHistory));
+  }
+
+  void onStepCount(StepCount event) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int currentSteps = event.steps;
+
+    // Get stored initial step count for today
+    int? savedInitialSteps = prefs.getInt("initial_steps_$_selectedDate");
+
+    if (savedInitialSteps == null) {
+      // Save the first step count of the day
+      await prefs.setInt("initial_steps_$_selectedDate", currentSteps);
+      savedInitialSteps = currentSteps;
+    }
+
     setState(() {
-      _steps = event.steps;
-      _todaySteps = _steps - _initialSteps;
+      _initialSteps = savedInitialSteps!;
+      _todaySteps = currentSteps - _initialSteps;
+      _minutesWalked = (_todaySteps / stepsPerMinute).toInt();
+      _stepHistory[_selectedDate] = _todaySteps;
     });
+
+    _saveStepHistory();
   }
 
   void onPedestrianStatusChanged(PedestrianStatus event) {
@@ -81,42 +99,73 @@ class _MyAppState extends State<MyApp> {
 
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError((error) {
-      setState(() => _steps = 0);
+      setState(() => _todaySteps = 0);
     });
-
-    if (!mounted) return;
   }
+
+  void _selectDate(String date) {
+    setState(() {
+      _selectedDate = date;
+      _todaySteps = _stepHistory[date] ?? 0;
+      _minutesWalked = (_todaySteps / stepsPerMinute).toInt();
+    });
+  }
+
+  double get distanceInKm => (_todaySteps * stepLength) / 1000;
+  double get caloriesBurned => _todaySteps * caloriesPerStep;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Pedometer Example')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Steps Today', style: TextStyle(fontSize: 30)),
-              Text('$_todaySteps', style: TextStyle(fontSize: 60)),
-              SizedBox(height: 50),
-              Text('Total Steps', style: TextStyle(fontSize: 30)),
-              Text('$_steps', style: TextStyle(fontSize: 40)),
-              SizedBox(height: 50),
-              Text('Pedestrian Status', style: TextStyle(fontSize: 30)),
-              Icon(
-                _status == 'walking'
-                    ? Icons.directions_walk
-                    : _status == 'stopped'
-                        ? Icons.accessibility_new
-                        : Icons.error,
-                size: 100,
-              ),
-              Text(
-                _status,
-                style: TextStyle(fontSize: 30, color: _status == 'walking' || _status == 'stopped' ? Colors.black : Colors.red),
-              ),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pedometer Example')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Steps on $_selectedDate', style: TextStyle(fontSize: 25)),
+            Text('$_todaySteps', style: TextStyle(fontSize: 50)),
+            SizedBox(height: 10),
+            Text('Distance: ${distanceInKm.toStringAsFixed(2)} km',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Calories: ${caloriesBurned.toStringAsFixed(2)} kcal',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Minutes Walked: $_minutesWalked min',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2024, 1, 1),
+                  lastDate: DateTime.now(),
+                );
+
+                if (pickedDate != null) {
+                  _selectDate(pickedDate.toIso8601String().substring(0, 10));
+                }
+              },
+              child: Text("Select Date"),
+            ),
+            SizedBox(height: 50),
+            Text('Pedestrian Status', style: TextStyle(fontSize: 25)),
+            Icon(
+              _status == 'walking'
+                  ? Icons.directions_walk
+                  : _status == 'stopped'
+                      ? Icons.accessibility_new
+                      : Icons.error,
+              size: 100,
+            ),
+            Text(
+              _status,
+              style: TextStyle(
+                  fontSize: 25,
+                  color: _status == 'walking' || _status == 'stopped'
+                      ? Colors.black
+                      : Colors.red),
+            ),
+          ],
         ),
       ),
     );

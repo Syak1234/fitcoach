@@ -5,6 +5,7 @@ import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart'
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
+import 'package:fitcoach/utility/step_trackerUi.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:get/get.dart';
@@ -195,22 +196,25 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class FitnessMetricsWidget extends StatelessWidget {
+  final StepsController controller = Get.put(StepsController());
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildMetricCard(
-            title: 'Steps',
-            value: '2000 ',
-            subvalue: 'steps today',
-            color: AppColors.primaryorange,
-            icon: Icons.add,
-            child: _buildStepChart(),
-            onTap: () {
-              Get.toNamed(AppRoutes.stepUi);
-            },
+          Obx(
+            () => _buildMetricCard(
+              title: 'Steps',
+              value: controller.todaySteps.value.toString(),
+              subvalue: ' steps today',
+              color: AppColors.primaryorange,
+              icon: Icons.add,
+              child: _buildStepChart(),
+              onTap: () {
+                Get.toNamed(AppRoutes.stepUi);
+              },
+            ),
           ),
           const SizedBox(width: 8),
           _buildMetricCard(
@@ -220,7 +224,9 @@ class FitnessMetricsWidget extends StatelessWidget {
               color: AppColors.primaryBlue,
               icon: Icons.water_drop,
               child: _buildHydrationChart(),
-              onTap: () {},
+              onTap: () {
+                Get.toNamed(AppRoutes.hydrationScreen);
+              },
               context: context),
           const SizedBox(width: 8),
           _buildMetricCard(

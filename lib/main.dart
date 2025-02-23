@@ -15,13 +15,16 @@
 // import 'package:fitcoach/GetxController/getx.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
+import 'package:fitcoach/calculatehealth/step_count2.dart';
 
 import 'package:fitcoach/profile_setting/account_setting/linked_device.dart';
 import 'package:fitcoach/profile_setting/notification/notificationUi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/signup_screen.dart';
 import 'package:fitcoach/spalsh_screen/spalsh.dart';
+import 'package:fitcoach/test/test4.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/utility/hydrationUi.dart';
 import 'package:fitcoach/utility/step_trackerUi.dart';
 // import 'package:fitcoach/utility/no_internet.dart';
 // import 'package:fitcoach/utility/no_internet.dart';
@@ -39,6 +42,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'calculatehealth/step_counter.dart';
 import 'home_and_fitnessallUi/dashboard/dashboard.dart';
 
 // import 'Comprehensive_screen/com_screen7.dart';
@@ -84,7 +88,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: SignUpScreen(),
+      // home: StepsTakenScreen(),
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
     );

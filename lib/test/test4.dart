@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 
@@ -48,7 +50,7 @@ class _HealthDataScreenState extends State<HealthDataScreen> {
   Future<void> _fetchHealthData() async {
     // Define the time range for the data
     final now = DateTime.now();
-    final yesterday = now.subtract(Duration(days: 1));
+    final yesterday = now.subtract(Duration(days: 360));
 
     // Fetch heart rate data
     List<HealthDataPoint> heartRateData = await health.getHealthDataFromTypes(
@@ -60,6 +62,9 @@ class _HealthDataScreenState extends State<HealthDataScreen> {
         endTime: now);
 
     // Fetch steps data
+    //  DateTime now = DateTime.now();
+    // DateTime oneMonthAgo = now.subtract(Duration(days: 30));
+
     List<HealthDataPoint> stepsData = await health.getHealthDataFromTypes(
       startTime: yesterday,
       endTime: now,
@@ -76,6 +81,7 @@ class _HealthDataScreenState extends State<HealthDataScreen> {
     setState(() {
       healthData = [...heartRateData, ...stepsData, ...caloriesData];
     });
+    log(healthData[0].value.toString());
   }
 
   @override
