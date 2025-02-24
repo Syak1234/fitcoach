@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fitcoach/Comprehensive_screen/com_screen4.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
@@ -6,6 +8,7 @@ import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ruler_picker/flutter_ruler_picker.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:ruler_picker/ruler_picker.dart';
 
 class ComScreen3 extends StatefulWidget {
@@ -24,6 +27,15 @@ class _ComScreen3State extends State<ComScreen3> {
   void initState() {
     super.initState();
     _rulerPickerController = RulerPickerController(value: currentWeight);
+  }
+
+  Future<void> _savePreferences(String type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(type, currentWeight.toDouble());
+
+    final a = prefs.getDouble(type) ?? '';
+    log(a.toString());
+    
   }
 
   void toggleUnit(bool toKg) {
@@ -212,6 +224,7 @@ class _ComScreen3State extends State<ComScreen3> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () {
+        _savePreferences(isKg ? 'kg' : 'lbs');
         Get.toNamed(
           AppRoutes.height,
         );

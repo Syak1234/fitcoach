@@ -1,13 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitcoach/Comprehensive_screen/com_screen2.dart';
-import 'package:fitcoach/modelClass/userDetails.dart';
+import 'dart:developer';
+
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
-import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../GetxController/getx.dart';
-// import 'getx.dart';
+import '../theme/font_Size.dart';
 
 class ComScreen1 extends StatefulWidget {
   ComScreen1();
@@ -18,21 +18,32 @@ class ComScreen1 extends StatefulWidget {
 
 class _ComScreen1State extends State<ComScreen1> {
   final Getx getx = Get.put(Getx());
+  final List<String> options = [
+    "I wanna lose weight",
+    "I wanna get bulks",
+    "I wanna gain endurance",
+    "Just trying out the app! 👍"
+  ];
 
-  // Initialize the controller
+  Future<void> _saveSelection(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fitness_goal', options[index]);
+    log(index.toString());
+  }
+
+  @override
+  void initState() {
+    _saveSelection(0);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Background color
       appBar: AppBar(
         backgroundColor: AppColors.textLight,
         elevation: 0,
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back_ios, color: AppColors.textDark),
-        //   onPressed: () {
-        //     Get.back();
-        //   },
-        // ),
         title: Text(
           "Assessment",
           style: TextStyle(
@@ -59,15 +70,6 @@ class _ComScreen1State extends State<ComScreen1> {
           () => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // SizedBox(height: 20),
-              // Progress Bar
-              // LinearProgressIndicator(
-              //   borderRadius: BorderRadius.circular(10),
-              //   value: Get.find<Getx>().barValue.value, // Set progress value
-              //   backgroundColor: Colors.grey,
-              //   minHeight: 8,
-              //   color: AppColors.primaryorange,
-              // ),
               Center(
                 child: Text(
                   "What’s your fitness\ngoal/target?",
@@ -80,45 +82,48 @@ class _ComScreen1State extends State<ComScreen1> {
                 ),
               ),
               SizedBox(height: 30),
-              // Options
               OptionTile(
                 icon: Icons.monitor_weight,
-                text: "I wanna lose weight",
+                text: options[0],
                 isSelected: getx.isCom_select_Option.value == 0,
-                onTap: () => getx.isCom_select_Option.value = 0,
+                onTap: () {
+                  getx.isCom_select_Option.value = 0;
+                  _saveSelection(0);
+                },
               ),
-              // OptionTile(
-              //   icon: Icons.smart_toy_outlined,
-              //   text: "I wanna try AI Coach",
-              //   isSelected: getx.isCom_select_Option.value == 1,
-              //   onTap: () => getx.isCom_select_Option.value = 1,
-              // ),
               OptionTile(
                 icon: Icons.fitness_center,
-                text: "I wanna get bulks",
+                text: options[1],
                 isSelected: getx.isCom_select_Option.value == 1,
-                onTap: () => getx.isCom_select_Option.value = 1,
+                onTap: () {
+                  getx.isCom_select_Option.value = 1;
+                  _saveSelection(1);
+                },
               ),
               OptionTile(
                 icon: Icons.directions_run,
-                text: "I wanna gain endurance",
+                text: options[2],
                 isSelected: getx.isCom_select_Option.value == 2,
-                onTap: () => getx.isCom_select_Option.value = 2,
+                onTap: () {
+                  getx.isCom_select_Option.value = 2;
+                  _saveSelection(2);
+                },
               ),
               OptionTile(
                 icon: Icons.emoji_emotions_outlined,
-                text: "Just trying out the app! 👍",
+                text: options[3],
                 isSelected: getx.isCom_select_Option.value == 3,
-                onTap: () => getx.isCom_select_Option.value = 3,
+                onTap: () {
+                  getx.isCom_select_Option.value = 3;
+                  _saveSelection(3);
+                },
               ),
               SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.toNamed(
-                      AppRoutes.comScreen2,
-                    );
+                    Get.toNamed(AppRoutes.comScreen2);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -140,6 +141,10 @@ class StepsController extends GetxController {
 
   Map<String, int> stepHistory = {};
   String selectedDate = DateTime.now().toIso8601String().substring(0, 10);
+  // String selectedDate = DateTime.now()
+  //     .subtract(Duration(days: ))
+  //     .toIso8601String()
+  //     .substring(0, 10);
 
   final double stepLength = 0.75;
   final double caloriesPerStep = 0.04;
@@ -155,6 +160,7 @@ class StepsController extends GetxController {
   }
 
   Future<void> _loadStepHistory() async {
+    log(selectedDate.toString());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? stepData = prefs.getString("step_history");
     if (stepData != null) {

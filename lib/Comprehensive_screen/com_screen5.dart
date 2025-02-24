@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComScreen5 extends StatefulWidget {
   @override
@@ -12,6 +13,11 @@ class ComScreen5 extends StatefulWidget {
 }
 
 class _ComScreen5State extends State<ComScreen5> {
+  Future<void> _savePreferences(String type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('isFitnessExp', type);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +93,7 @@ class _ComScreen5State extends State<ComScreen5> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        _savePreferences('No');
                         Get.toNamed(
                           AppRoutes.comScreen6,
                         );
@@ -121,6 +128,7 @@ class _ComScreen5State extends State<ComScreen5> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        _savePreferences('YES');
                         Get.toNamed(
                           AppRoutes.comScreen6,
                         );

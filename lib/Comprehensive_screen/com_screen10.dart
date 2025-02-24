@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComScreen10 extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class ComScreen10 extends StatefulWidget {
 
 class _ComScreen10State extends State<ComScreen10> {
   String selectedOption = "Great";
+  RxString sleepHours = "7-8 hours".obs;
 
   final List<Map<String, String>> sleepOptions = [
     {
@@ -41,6 +43,11 @@ class _ComScreen10State extends State<ComScreen10> {
       "icon": 'assets/comprehensive/icon10.png'
     },
   ];
+
+  Future<void> _savePreferences(String hours) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('sleep', hours);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +81,6 @@ class _ComScreen10State extends State<ComScreen10> {
           ),
         ],
       ),
-     
-     
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
@@ -119,6 +124,7 @@ class _ComScreen10State extends State<ComScreen10> {
               // Continue button
               ElevatedButton(
                 onPressed: () {
+                  _savePreferences(sleepHours.value);
                   Get.toNamed(
                     AppRoutes.login,
                   );
@@ -156,6 +162,7 @@ class _ComScreen10State extends State<ComScreen10> {
       String label, String hours, bool isSelected, String icon) {
     return GestureDetector(
       onTap: () {
+        sleepHours.value = hours;
         setState(() {
           selectedOption = label;
         });

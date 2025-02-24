@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fitcoach/Comprehensive_screen/com_screen9.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
@@ -5,6 +7,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComScreen8 extends StatefulWidget {
   const ComScreen8({super.key});
@@ -14,10 +17,19 @@ class ComScreen8 extends StatefulWidget {
 }
 
 class _ComScreen8State extends State<ComScreen8> {
+  final Getx controller = Get.put(Getx());
+  Future<void> _savePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('excercise_pref', controller.selectedPreferences);
+    final a = prefs.getStringList(
+      'excercise_pref',
+    );
+
+    log(a.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Getx controller = Get.put(Getx());
-
     // Exercise Options
     final List<Map<String, dynamic>> exercises = [
       {'name': 'Jogging', 'icon': Icons.directions_run},
@@ -154,6 +166,7 @@ class _ComScreen8State extends State<ComScreen8> {
             ElevatedButton(
               onPressed: () {
                 if (controller.selectedPreferences.isNotEmpty) {
+                  _savePreferences();
                   Get.toNamed(
                     AppRoutes.comScreen9,
                   );

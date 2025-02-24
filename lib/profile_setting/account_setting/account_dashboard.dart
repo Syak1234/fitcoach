@@ -1,13 +1,32 @@
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/app_colors.dart';
 
-class AccountDashboard extends StatelessWidget {
+class AccountDashboard extends StatefulWidget {
   AccountDashboard({super.key});
+
+  @override
+  State<AccountDashboard> createState() => _AccountDashboardState();
+}
+
+class _AccountDashboardState extends State<AccountDashboard> {
   RxBool ischange = false.obs;
+  Getx getx = Get.put(Getx());
+  @override
+  void initState() {
+    callData();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  callData() async {
+    ischange.value = await getx.isBioMatricEnable();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +72,15 @@ class AccountDashboard extends StatelessWidget {
                 Icons.fingerprint,
                 'Enable Biometric',
                 switchValue: ischange.value,
-                onChanged: (p0) {
-                  ischange.value = p0;
+                onChanged: (p0) async {
+                  if (p0 == true) {
+                    ischange.value = await getx.authBioMatric();
+                  } else {
+                    SharedPreferences sp =
+                        await SharedPreferences.getInstance();
+                    sp.setBool("isAuthentication", false);
+                    ischange.value = p0;
+                  }
                 },
               ),
             ),

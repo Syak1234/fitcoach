@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wheel_picker/wheel_picker.dart';
 
 class ComScreen4 extends StatefulWidget {
@@ -15,6 +16,14 @@ class ComScreen4 extends StatefulWidget {
 class _ComScreen4State extends State<ComScreen4> {
   final daysOfWeek = List.generate(120, (index) => index + 1);
   int selectedIndex = 15; // Keeps track of the selected index
+
+  Future<void> _savePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('age', selectedIndex.toString());
+
+    // final a = prefs.getDouble(type) ?? '';
+    // log(a.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,33 +139,34 @@ class _ComScreen4State extends State<ComScreen4> {
       ),
     );
   }
-}
 
-Widget _buildContinueButton() {
-  return ElevatedButton(
-    onPressed: () {
-      Get.toNamed(
-        AppRoutes.comScreen5,
-      );
-      // Get.to(() => ProfileScreen1(),
-      //     transition: Transition.rightToLeft);
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.backgroundDark,
-      minimumSize: const Size(double.infinity, 55),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-    ),
-    child: const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("Continue",
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textLight)),
-        SizedBox(width: 8),
-        Icon(Icons.arrow_forward, color: AppColors.textLight),
-      ],
-    ),
-  );
+  Widget _buildContinueButton() {
+    return ElevatedButton(
+      onPressed: () {
+        _savePreferences();
+        Get.toNamed(
+          AppRoutes.comScreen5,
+        );
+        // Get.to(() => ProfileScreen1(),
+        //     transition: Transition.rightToLeft);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.backgroundDark,
+        minimumSize: const Size(double.infinity, 55),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Continue",
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textLight)),
+          SizedBox(width: 8),
+          Icon(Icons.arrow_forward, color: AppColors.textLight),
+        ],
+      ),
+    );
+  }
 }

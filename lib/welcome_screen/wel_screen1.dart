@@ -132,7 +132,11 @@ class WelcomeScreen1 extends StatelessWidget {
                       ),
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.login,
+                            );
+                          },
                           child: const Text(
                             "Sign In",
                             style: TextStyle(

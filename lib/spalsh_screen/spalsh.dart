@@ -1,9 +1,14 @@
+import 'dart:developer';
+
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/welcome_screen/wel_screen1.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Spalsh extends StatefulWidget {
   const Spalsh({super.key});
@@ -13,17 +18,50 @@ class Spalsh extends StatefulWidget {
 }
 
 class _SpalshState extends State<Spalsh> {
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   // Navigate to next page after 3 seconds
+
+  // }
+
+  late SharedPreferences sp;
+  final LocalAuthentication _localAuth = LocalAuthentication();
+  // bool _isBiometricAvailable = false;
   @override
   void initState() {
+    getData();
+    // TODO: implement initState
     super.initState();
+  }
 
-    // Navigate to next page after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      // Get.off(() => WelcomeScreen1());
-      Get.offNamed(
-        AppRoutes.welcomeScreen1,
-      );
+  getData() async {
+    Future.delayed(const Duration(seconds: 3), () async {
+      final isAuthentication = await Getx().isBioMatricEnable();
+      log(isAuthentication.toString());
+      if (isAuthentication) {
+        _authenticateWithFingerprint();
+      } else {
+        // Get.off(() => WelcomeScreen1());
+        Get.offNamed(
+          AppRoutes.welcomeScreen1,
+        );
+      }
     });
+  }
+
+  Future<void> _authenticateWithFingerprint() async {
+    try {
+      // SharedPreferences sp = await SharedPreferences.getInstance();
+      bool authenticated = await Getx().authBioMatric();
+
+      authenticated
+          ? Get.toNamed(AppRoutes.login)
+          : Get.toNamed(AppRoutes.welcomeScreen1);
+    } catch (e) {
+      Get.toNamed(AppRoutes.welcomeScreen1);
+    }
   }
 
   @override

@@ -268,6 +268,7 @@ class FitnessMetricsWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
+                  overflow: TextOverflow.ellipsis,
                   title,
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
@@ -285,6 +286,7 @@ class FitnessMetricsWidget extends StatelessWidget {
             ),
             SizedBox(height: 8),
             RichText(
+              overflow: TextOverflow.ellipsis,
               text: TextSpan(
                   children: [
                     TextSpan(

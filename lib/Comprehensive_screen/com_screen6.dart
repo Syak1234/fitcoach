@@ -4,6 +4,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../GetxController/getx.dart';
 
@@ -36,6 +37,11 @@ class _ComScreen6State extends State<ComScreen6> {
     },
   ];
   String? selectedDiet;
+
+  Future<void> _savePreferences(String type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('diet', type);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +208,7 @@ class _ComScreen6State extends State<ComScreen6> {
               ElevatedButton(
                 onPressed: selectedDiet != null
                     ? () {
+                        _savePreferences(selectedDiet.toString());
                         Get.toNamed(
                           AppRoutes.comScreen7,
                         );

@@ -31,6 +31,7 @@ class _SignInScreenState extends State<SignInScreen> {
   Getx getx = Get.put(Getx());
   User? user;
   Map<String, dynamic>? facebookdata = {};
+  GlobalKey<FormState> gk = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,237 +70,244 @@ class _SignInScreenState extends State<SignInScreen> {
                   vertical: MediaQuery.of(context).size.height *
                       0.1, // Dynamic spacing
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // SizedBox(height: 80),
-                    Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.local_hospital,
-                              color: AppColors.primaryorange, size: 40),
-                          SizedBox(height: 10),
-                          Text(
-                            'Sign In To Fitcoach',
-                            style: TextStyle(
-                              color: AppColors.textDark,
-                              fontSize: AppFontSize.mediumfontSize,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Let's personalize your fitness with Fitcoach",
-                            style: TextStyle(
-                              color: AppColors.grayOpacity,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 60),
-                    Text(
-                      'Email Address',
-                      style: TextStyle(
-                        color: AppColors.textDark,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    _buildTextField(
-                      controller: _emailController,
-                      hintText: 'Email Address',
-                      icon: Icons.email,
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Password',
-                      style: TextStyle(
-                        color: AppColors.textDark,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    _buildTextField(
-                      controller: _passwordController,
-                      hintText: 'Password',
-                      icon: Icons.lock,
-                      obscureText: !_passwordVisible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _passwordVisible = !_passwordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.backgroundDark,
-                          minimumSize: Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        onPressed: () {
-                          // Userdetails userdetails =
-                          //     Userdetails(email: ' ', name: ' ', userimg: ' ');
-                          loginApi(context, _emailController.text, _passwordController.text);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: Form(
+                  key: gk,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SizedBox(height: 80),
+                      Center(
+                        child: Column(
                           children: [
+                            Icon(Icons.local_hospital,
+                                color: AppColors.primaryorange, size: 40),
+                            SizedBox(height: 10),
                             Text(
-                              'Sign In',
+                              'Sign In To Fitcoach',
                               style: TextStyle(
-                                color: AppColors.textLight,
+                                color: AppColors.textDark,
+                                fontSize: AppFontSize.mediumfontSize,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
                               ),
                             ),
-                            SizedBox(width: 10),
-                            Icon(Icons.arrow_forward,
-                                color: AppColors.textLight),
+                            SizedBox(height: 5),
+                            Text(
+                              "Let's personalize your fitness with Fitcoach",
+                              style: TextStyle(
+                                color: AppColors.grayOpacity,
+                                fontSize: 14,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ),
-                    SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Container(
-                        //     decoration: BoxDecoration(
-                        //         border: Border.all(
-                        //             color: Colors.grey.withOpacity(0.4)),
-                        //         // color: Colors.grey.withOpacity(0.3),
-                        //         borderRadius: BorderRadius.circular(15)),
-                        //     padding: EdgeInsets.all(12),
-                        //     child: Image.asset(
-                        //       'assets/signup_img/instagram_1384031.png',
-                        //       width: 20,
-                        //       color: AppColors.textDark,
-                        //     )),
-                        SizedBox(width: 20),
-                        InkWell(
-                          onTap: () async {
-                            user = await google_auth.signInWithGoogle();
-
-                            if (user!.email!.isNotEmpty) {
-                              Userdetails userdetails = Userdetails(
-                                  email: user!.email.toString(),
-                                  name: user!.displayName.toString(),
-                                  userimg: user!.photoURL.toString());
-                              Get.toNamed(
-                                AppRoutes.fingerprintSetup,
-                              );
-                            }
-                            // user!.email.toString();
-                          },
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.grey.withOpacity(0.4)),
-                                  // color: Colors.grey.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(15)),
-                              padding: EdgeInsets.all(12),
-                              child: Image.asset(
-                                'assets/signup_img/google.png',
-                                width: 20,
-                                // color: AppColors.textDark,
-                              )),
+                      SizedBox(height: 60),
+                      Text(
+                        'Email Address',
+                        style: TextStyle(
+                          color: AppColors.textDark,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(width: 20),
-                        InkWell(
-                          onTap: () async {
-                            // await facebook_auth.getFacebookUserData();
-                            facebookdata = await facebook_auth
-                                .handleFacebookSignIn(context);
+                      ),
+                      SizedBox(height: 5),
+                      _buildTextField(
+                        controller: _emailController,
+                        hintText: 'Email Address',
+                        icon: Icons.email,
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Password',
+                        style: TextStyle(
+                          color: AppColors.textDark,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      _buildTextField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        icon: Icons.lock,
+                        obscureText: !_passwordVisible,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Center(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.backgroundDark,
+                            minimumSize: Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () {
+                            // Userdetails userdetails =
+                            //     Userdetails(email: ' ', name: ' ', userimg: ' ');
 
-                            if (facebookdata != null) {
-                              print("User Data: $facebookdata");
-                              log(facebookdata!['picture']['data']['url']);
-                              Userdetails userdetails = Userdetails(
-                                  email: facebookdata!['email'] ?? ' ',
-                                  name: facebookdata!['name'] ?? ' ',
-                                  userimg: facebookdata!['picture']['data']
-                                          ['url'] ??
-                                      ' ');
-                              Get.toNamed(
-                                AppRoutes.fingerprintSetup,
-                              );
+                            if (gk.currentState!.validate()) {
+                              loginApi(context, _emailController.text,
+                                  _passwordController.text);
                             }
                           },
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.grey.withOpacity(0.4)),
-                                  // color: Colors.grey.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(15)),
-                              padding: EdgeInsets.all(12),
-                              child: Image.asset(
-                                'assets/signup_img/facebook.png',
-                                width: 20,
-                                // color: AppColors.textDark,
-                              )),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 50),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(
-                            AppRoutes.signup,
-                          );
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Don't have an account? ",
-                            style: TextStyle(color: Colors.grey),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextSpan(
-                                text: 'Sign Up',
+                              Text(
+                                'Sign In',
                                 style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.primaryorange,
-                                  color: AppColors.primaryorange,
+                                  color: AppColors.textLight,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
                               ),
+                              SizedBox(width: 10),
+                              Icon(Icons.arrow_forward,
+                                  color: AppColors.textLight),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(
-                            AppRoutes.forgetpasword,
-                          );
-                        },
-                        child: Text(
-                          'Forgot Password',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.primaryorange,
-                            color: AppColors.primaryorange,
+                      SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Container(
+                          //     decoration: BoxDecoration(
+                          //         border: Border.all(
+                          //             color: Colors.grey.withOpacity(0.4)),
+                          //         // color: Colors.grey.withOpacity(0.3),
+                          //         borderRadius: BorderRadius.circular(15)),
+                          //     padding: EdgeInsets.all(12),
+                          //     child: Image.asset(
+                          //       'assets/signup_img/instagram_1384031.png',
+                          //       width: 20,
+                          //       color: AppColors.textDark,
+                          //     )),
+                          SizedBox(width: 20),
+                          InkWell(
+                            onTap: () async {
+                              user = await google_auth.signInWithGoogle();
+
+                              if (user!.email!.isNotEmpty) {
+                                Userdetails userdetails = Userdetails(
+                                    email: user!.email.toString(),
+                                    name: user!.displayName.toString(),
+                                    userimg: user!.photoURL.toString());
+                                Get.toNamed(
+                                  AppRoutes.fingerprintSetup,
+                                );
+                              }
+                              // user!.email.toString();
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.4)),
+                                    // color: Colors.grey.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(15)),
+                                padding: EdgeInsets.all(12),
+                                child: Image.asset(
+                                  'assets/signup_img/google.png',
+                                  width: 20,
+                                  // color: AppColors.textDark,
+                                )),
+                          ),
+                          SizedBox(width: 20),
+                          InkWell(
+                            onTap: () async {
+                              // await facebook_auth.getFacebookUserData();
+                              facebookdata = await facebook_auth
+                                  .handleFacebookSignIn(context);
+
+                              if (facebookdata != null) {
+                                print("User Data: $facebookdata");
+                                log(facebookdata!['picture']['data']['url']);
+                                Userdetails userdetails = Userdetails(
+                                    email: facebookdata!['email'] ?? ' ',
+                                    name: facebookdata!['name'] ?? ' ',
+                                    userimg: facebookdata!['picture']['data']
+                                            ['url'] ??
+                                        ' ');
+                                Get.toNamed(
+                                  AppRoutes.fingerprintSetup,
+                                );
+                              }
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.4)),
+                                    // color: Colors.grey.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(15)),
+                                padding: EdgeInsets.all(12),
+                                child: Image.asset(
+                                  'assets/signup_img/facebook.png',
+                                  width: 20,
+                                  // color: AppColors.textDark,
+                                )),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 50),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.signup,
+                            );
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              text: "Don't have an account? ",
+                              style: TextStyle(color: Colors.grey),
+                              children: [
+                                TextSpan(
+                                  text: 'Sign Up',
+                                  style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.primaryorange,
+                                    color: AppColors.primaryorange,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                  ],
+                      SizedBox(height: 10),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.forgetpasword,
+                            );
+                          },
+                          child: Text(
+                            'Forgot Password',
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.primaryorange,
+                              color: AppColors.primaryorange,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -317,7 +325,14 @@ class _SignInScreenState extends State<SignInScreen> {
     Widget? suffixIcon,
     Color borderColor = AppColors.primaryorange,
   }) {
-    return TextField(
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Can't be blank";
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       controller: controller,
       obscureText: obscureText,
       style: TextStyle(color: AppColors.textDark),

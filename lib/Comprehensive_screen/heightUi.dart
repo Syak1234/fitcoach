@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../GetxController/getx.dart';
 import '../routes/app_routes.dart';
@@ -15,6 +18,24 @@ class HeightSelectionScreen extends StatelessWidget {
   final TextEditingController feetController = TextEditingController();
   final TextEditingController inchesController = TextEditingController();
   final TextEditingController cmController = TextEditingController();
+
+  // Save height in cm to SharedPreferences
+  Future<void> _saveHeightToPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    int heightInCm;
+
+    if (controller.isFeetAndInches.value) {
+      // Convert feet & inches to cm
+      heightInCm =
+          ((controller.feet.value * 30.48) + (controller.inches.value * 2.54))
+              .round();
+    } else {
+      heightInCm = controller.cm.value;
+    }
+
+    await prefs.setInt("user_height_cm", heightInCm);
+    log("Saved height: $heightInCm cm");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,12 +142,9 @@ class HeightSelectionScreen extends StatelessWidget {
             Obx(
               () => ElevatedButton(
                 onPressed: controller.isValidHeight
-                    ? () {
-                        Get.toNamed(
-                          AppRoutes.comScreen4,
-                        );
-                        // Get.to(() => ProfileScreen1(),
-                        //     transition: Transition.rightToLeft);
+                    ? () async {
+                        await _saveHeightToPreferences();
+                        Get.toNamed(AppRoutes.comScreen4);
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
@@ -171,7 +189,7 @@ class HeightSelectionScreen extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 40),
-                    maxLength: 1, // Allow only 1 digit
+                    maxLength: 1,
                     decoration: InputDecoration(
                       counterText: "",
                       border: OutlineInputBorder(borderSide: BorderSide.none),
@@ -226,24 +244,22 @@ class HeightSelectionScreen extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Centimeter Input
                 SizedBox(
                   width: 100,
                   child: TextFormField(
                     controller: cmController,
                     focusNode: cmFocusNode,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 40),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderSide: BorderSide.none),
                       hintText: '0',
                       hintStyle: TextStyle(fontSize: 40, color: AppColors.gray),
                     ),
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 40),
                     onChanged: (value) {
                       if (value.isNotEmpty) {
-                        int cmValue = int.tryParse(value) ?? 0;
-                        controller.cm.value = cmValue;
+                        controller.cm.value = int.tryParse(value) ?? 0;
                       }
                     },
                   ),

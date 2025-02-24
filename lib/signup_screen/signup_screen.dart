@@ -17,6 +17,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  GlobalKey<FormState> gk = GlobalKey();
+
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   bool _passwordsMatch = true;
@@ -66,194 +68,201 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   vertical: MediaQuery.of(context).size.height *
                       0.1, // Dynamic spacing
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.local_hospital,
-                              color: AppColors.primaryorange, size: 40),
-                          SizedBox(height: 10),
-                          Text(
-                            'Sign Up For Free',
-                            style: TextStyle(
-                                color: AppColors.textDark,
-                                fontSize: AppFontSize.mediumfontSize,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Quickly make your account in 1 minute',
-                            style: TextStyle(
-                                color: AppColors.grayOpacity, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 60),
-                    Row(
-                      children: [
-                        Text(
-                          'Email Address',
-                          style: TextStyle(
-                              color: AppColors.textDark,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    _buildTextField(
-                        controller: _emailController,
-                        hintText: 'Email Address',
-                        icon: Icons.email),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Text(
-                          'Password',
-                          style: TextStyle(
-                              color: AppColors.textDark,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    _buildTextField(
-                      controller: _passwordController,
-                      hintText: 'Password',
-                      icon: Icons.lock,
-                      obscureText: !_passwordVisible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                            _passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.grey),
-                        onPressed: () => setState(
-                            () => _passwordVisible = !_passwordVisible),
-                      ),
-                      onChanged: (_) => _checkPasswords(),
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Text(
-                          'Confirm Password',
-                          style: TextStyle(
-                              color: AppColors.textDark,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    _buildTextField(
-                      controller: _confirmPasswordController,
-                      hintText: 'Confirm Password',
-                      icon: Icons.lock,
-                      obscureText: !_confirmPasswordVisible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                            _confirmPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.grey),
-                        onPressed: () => setState(() =>
-                            _confirmPasswordVisible = !_confirmPasswordVisible),
-                      ),
-                      borderColor: _passwordsMatch ? Colors.grey : Colors.red,
-                      onChanged: (_) => _checkPasswords(),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    if (!_passwordsMatch)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          decoration: BoxDecoration(
-                            color: AppColors.red10,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.error, color: AppColors.red, size: 20),
-                              SizedBox(width: 10),
-                              Text('ERROR: Passwords Don\'t Match!',
-                                  style: TextStyle(
-                                      color: AppColors.textDark,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    SizedBox(height: 30),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.backgroundDark,
-                          minimumSize: Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        onPressed: () async {
-                          await signUp(
-                              context,
-                              _emailController.text,
-                              _passwordController.text,
-                              _confirmPasswordController.text);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: Form(
+                  key: gk,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
                           children: [
-                            Text('Sign Up',
-                                style: TextStyle(
-                                    color: AppColors.textLight,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16)),
-                            SizedBox(width: 10),
-                            Icon(Icons.arrow_forward,
-                                color: AppColors.textLight),
+                            Icon(Icons.local_hospital,
+                                color: AppColors.primaryorange, size: 40),
+                            SizedBox(height: 10),
+                            Text(
+                              'Sign Up For Free',
+                              style: TextStyle(
+                                  color: AppColors.textDark,
+                                  fontSize: AppFontSize.mediumfontSize,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Quickly make your account in 1 minute',
+                              style: TextStyle(
+                                  color: AppColors.grayOpacity, fontSize: 14),
+                            ),
                           ],
                         ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(
-                            AppRoutes.login,
-                          );
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'Already have an account? ',
+                      SizedBox(height: 60),
+                      Row(
+                        children: [
+                          Text(
+                            'Email Address',
                             style: TextStyle(
-                                color:
-                                    const Color.fromARGB(255, 141, 139, 139)),
+                                color: AppColors.textDark,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      _buildTextField(
+                          controller: _emailController,
+                          hintText: 'Email Address',
+                          icon: Icons.email),
+                      SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Text(
+                            'Password',
+                            style: TextStyle(
+                                color: AppColors.textDark,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      _buildTextField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        icon: Icons.lock,
+                        obscureText: !_passwordVisible,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey),
+                          onPressed: () => setState(
+                              () => _passwordVisible = !_passwordVisible),
+                        ),
+                        onChanged: (_) => _checkPasswords(),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Text(
+                            'Confirm Password',
+                            style: TextStyle(
+                                color: AppColors.textDark,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      _buildTextField(
+                        controller: _confirmPasswordController,
+                        hintText: 'Confirm Password',
+                        icon: Icons.lock,
+                        obscureText: !_confirmPasswordVisible,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                              _confirmPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.grey),
+                          onPressed: () => setState(() =>
+                              _confirmPasswordVisible =
+                                  !_confirmPasswordVisible),
+                        ),
+                        borderColor: _passwordsMatch ? Colors.grey : Colors.red,
+                        onChanged: (_) => _checkPasswords(),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (!_passwordsMatch)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: AppColors.red10,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.error,
+                                    color: AppColors.red, size: 20),
+                                SizedBox(width: 10),
+                                Text('ERROR: Passwords Don\'t Match!',
+                                    style: TextStyle(
+                                        color: AppColors.textDark,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 30),
+                      Center(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.backgroundDark,
+                            minimumSize: Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (gk.currentState!.validate()) {
+                              await signUp(
+                                  context,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                  _confirmPasswordController.text);
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextSpan(
-                                  text: 'Sign In',
+                              Text('Sign Up',
                                   style: TextStyle(
-                                    color: AppColors.primaryorange,
-                                  )),
+                                      color: AppColors.textLight,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                              SizedBox(width: 10),
+                              Icon(Icons.arrow_forward,
+                                  color: AppColors.textLight),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                  ],
+                      SizedBox(height: 30),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.login,
+                            );
+                          },
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Already have an account? ',
+                              style: TextStyle(
+                                  color:
+                                      const Color.fromARGB(255, 141, 139, 139)),
+                              children: [
+                                TextSpan(
+                                    text: 'Sign In',
+                                    style: TextStyle(
+                                      color: AppColors.primaryorange,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -272,7 +281,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Color borderColor = AppColors.primaryorange,
     Function(String)? onChanged,
   }) {
-    return TextField(
+    return TextFormField(
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Can't be blank";
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       controller: controller,
       obscureText: obscureText,
       onChanged: onChanged,

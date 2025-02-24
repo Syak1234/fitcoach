@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComScreen2 extends StatefulWidget {
   const ComScreen2({super.key});
@@ -15,7 +16,11 @@ class ComScreen2 extends StatefulWidget {
 
 class _ComScreen2State extends State<ComScreen2> {
   String? selectedGender;
-  // final Getx getx = Get.find<Getx>();
+
+  Future<void> _saveGender(String gender) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_gender', gender);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +61,6 @@ class _ComScreen2State extends State<ComScreen2> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20),
-              // Progress Bar
-
               Center(
                 child: const Text(
                   "What is your gender?",
@@ -74,8 +77,6 @@ class _ComScreen2State extends State<ComScreen2> {
               _buildGenderOption("Female",
                   "assets/comprehensive/comprehensive2.png", Icons.female),
               const SizedBox(height: 50),
-              // _buildSkipOption(),
-              // const Spacer(),
               const SizedBox(height: 10),
               buildContinueButton(),
               const SizedBox(height: 20),
@@ -93,13 +94,13 @@ class _ComScreen2State extends State<ComScreen2> {
         setState(() {
           selectedGender = gender;
         });
+        _saveGender(gender);
       },
       child: Column(
         children: [
           Container(
             height: 150,
             decoration: BoxDecoration(
-              // color: Colors.grey.withOpacity(0.5),
               borderRadius: BorderRadius.circular(12),
               border: isSelected
                   ? Border.all(color: AppColors.primaryorange, width: 2)
@@ -119,7 +120,6 @@ class _ComScreen2State extends State<ComScreen2> {
                   width: double.infinity,
                   height: 150,
                   decoration: BoxDecoration(
-                    // color: AppColors.gray10,
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -156,6 +156,33 @@ class _ComScreen2State extends State<ComScreen2> {
     );
   }
 
+  Widget buildContinueButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.backgroundDark,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+      ),
+      onPressed: selectedGender == null
+          ? null
+          : () {
+              Get.toNamed(AppRoutes.comScreen3);
+            },
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Continue",
+              style: TextStyle(
+                  color: AppColors.textLight,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
+          SizedBox(width: 8),
+          Icon(Icons.arrow_forward, color: AppColors.textLight),
+        ],
+      ),
+    );
+  }
+
   Widget buildSkipOption() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
@@ -176,34 +203,34 @@ class _ComScreen2State extends State<ComScreen2> {
       ),
     );
   }
-
-  Widget buildContinueButton() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.backgroundDark,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
-      ),
-      onPressed: selectedGender == null
-          ? null
-          : () {
-              // getx.incresebarValue();
-              Get.toNamed(
-                AppRoutes.comScreen3,
-              );
-            },
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Continue",
-              style: TextStyle(
-                  color: AppColors.textLight,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold)),
-          SizedBox(width: 8),
-          Icon(Icons.arrow_forward, color: AppColors.textLight),
-        ],
-      ),
-    );
-  }
 }
+//   Widget buildContinueButton() {
+//     return ElevatedButton(
+//       style: ElevatedButton.styleFrom(
+//         backgroundColor: AppColors.backgroundDark,
+//         minimumSize: const Size(double.infinity, 50),
+//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+//       ),
+//       onPressed: selectedGender == null
+//           ? null
+//           : () {
+//               // getx.incresebarValue();
+//               Get.toNamed(
+//                 AppRoutes.comScreen3,
+//               );
+//             },
+//       child: const Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Text("Continue",
+//               style: TextStyle(
+//                   color: AppColors.textLight,
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.bold)),
+//           SizedBox(width: 8),
+//           Icon(Icons.arrow_forward, color: AppColors.textLight),
+//         ],
+//       ),
+//     );
+//   }
+// }

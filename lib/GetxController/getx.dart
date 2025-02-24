@@ -5,6 +5,8 @@ import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/utility/no_internet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Getx extends GetxController {
   RxInt isCom_select_Option = 0.obs;
@@ -25,11 +27,7 @@ class Getx extends GetxController {
   bool get isValidHeight => isFeetAndInches.value
       ? (feet.value > 0 || inches.value > 0)
       : cm.value > 0;
-  // @override
-  // void onClose() {
-  //   decresebarValue();
-  //   super.onClose();
-  // }
+  final LocalAuthentication localAuth = LocalAuthentication();
 
   @override
   void onInit() {
@@ -56,5 +54,37 @@ class Getx extends GetxController {
         AppRoutes.internetcheck,
       );
     } else {}
+  }
+
+  late SharedPreferences sp;
+  Future<bool> isBioMatricEnable() async {
+    sp = await SharedPreferences.getInstance();
+    final data = sp.getBool('isAuthentication') ?? false;
+    return data;
+  }
+
+  authBioMatric() async {
+    bool auth = false;
+    sp = await SharedPreferences.getInstance();
+    try {
+      auth = await localAuth.authenticate(
+        authMessages: [],
+        localizedReason: 'Authenticate using Face ID, fingerprint, or PIN.',
+        options: const AuthenticationOptions(
+          sensitiveTransaction: true,
+          stickyAuth: true,
+          useErrorDialogs: true, // Shows system authentication dialog
+          biometricOnly: false, // Allows Face ID, fingerprint, and PIN/password
+        ),
+      );
+    } catch (e) {
+      auth = false;
+    } finally {
+      sp.setBool('isAuthentication', auth);
+
+      print(auth);
+      // ignore: control_flow_in_finally
+      return auth;
+    }
   }
 }

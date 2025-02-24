@@ -6,6 +6,7 @@ import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FingerprintSetup extends StatefulWidget {
   const FingerprintSetup({Key? key}) : super(key: key);
@@ -41,14 +42,11 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
 
   // Authenticate using biometrics
   Future<void> _authenticateWithFingerprint() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
     try {
-      bool authenticated = await _localAuth.authenticate(
-        localizedReason: 'Scan your fingerprint to proceed.',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
+      bool authenticated =await Getx().authBioMatric();
+
+      sp.setBool("isAuthentication", authenticated);
 
       setState(() {
         _authMessage = authenticated
@@ -62,6 +60,7 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
       setState(() {
         _authMessage = 'Authentication error';
       });
+      sp.setBool("isAuthentication", false);
     }
   }
 
@@ -140,7 +139,9 @@ class _FingerprintSetupState extends State<FingerprintSetup> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(21)),
               ),
-              onPressed: () {
+              onPressed: () async {
+                SharedPreferences sp = await SharedPreferences.getInstance();
+                sp.setBool("isAuthentication", false);
                 Get.toNamed(
                   AppRoutes.welcomeScreen,
                 );

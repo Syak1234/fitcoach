@@ -4,6 +4,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../GetxController/getx.dart';
 
@@ -15,6 +16,11 @@ class ComScreen7 extends StatefulWidget {
 }
 
 class _ComScreen7State extends State<ComScreen7> {
+  Future<void> _savePreferences(String days) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('work_day_commit', days);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Getx controller = Get.put(Getx());
@@ -147,6 +153,7 @@ class _ComScreen7State extends State<ComScreen7> {
             // Continue Button
             ElevatedButton(
               onPressed: () {
+                _savePreferences(controller.selectedDays.value.toString());
                 Get.toNamed(
                   AppRoutes.comScreen8,
                 );

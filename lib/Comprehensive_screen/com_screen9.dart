@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComScreen9 extends StatefulWidget {
   @override
@@ -42,6 +43,11 @@ class _ComScreen9State extends State<ComScreen9> {
   void dispose() {
     textController.dispose();
     super.dispose();
+  }
+
+  Future<void> _savePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('kcal_goal_perday', calorieGoal.value.toString());
   }
 
   @override
@@ -158,6 +164,7 @@ class _ComScreen9State extends State<ComScreen9> {
                 // Continue button
                 ElevatedButton(
                   onPressed: () {
+                    _savePreferences();
                     Get.toNamed(
                       AppRoutes.comScreen10,
                     );

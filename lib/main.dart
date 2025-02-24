@@ -41,6 +41,8 @@ import 'package:fitcoach/utility/step_trackerUi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'calculatehealth/step_counter.dart';
 import 'home_and_fitnessallUi/dashboard/dashboard.dart';
@@ -55,8 +57,15 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  
 
   @override
   Widget build(BuildContext context) {
