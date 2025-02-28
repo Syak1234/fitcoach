@@ -122,7 +122,8 @@ class _AccountDashboardState extends State<AccountDashboard> {
   }
 
   PreferredSizeWidget customAppBar() {
-    return PreferredSize(
+    return 
+    PreferredSize(
       preferredSize: const Size.fromHeight(120),
       child: Stack(
         children: [

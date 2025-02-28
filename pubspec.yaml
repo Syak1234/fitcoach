@@ -60,6 +60,7 @@ dependencies:
   url_launcher: ^6.3.1
 
   stacked:
+  lucide_icons: ^0.257.0
  
 
 dev_dependencies:
