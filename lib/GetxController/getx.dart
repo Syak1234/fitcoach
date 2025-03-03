@@ -18,6 +18,7 @@ class Getx extends GetxController {
   late Connectivity _connectivity;
   late Stream<ConnectivityResult> _connectivityStream;
   late StreamSubscription<ConnectivityResult> _subscription;
+  RxList mealItemList = [].obs;
 
   var isFeetAndInches = false.obs;
   var feet = 0.obs;

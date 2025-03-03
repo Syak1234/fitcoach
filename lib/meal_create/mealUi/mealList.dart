@@ -9,29 +9,14 @@ class CreateMealScreen extends StatelessWidget {
   final TextEditingController mealNameController = TextEditingController();
   final List<String> mealItems = <String>[];
 
+  CreateMealScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: customAppBar(),
-      // AppBar(
-      //   backgroundColor: Colors.white,
-      //   title: Text('Create Meal',
-      //       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-      //   centerTitle: true,
-      //   leading: IconButton(
-      //     icon: Icon(Icons.arrow_back, color: Colors.black),
-      //     onPressed: () => Navigator.pop(context),
-      //   ),
-      //   // actions: [
-      //   //   IconButton(
-      //   //     icon: Icon(Icons.help_outline, color: Colors.black),
-      //   //     onPressed: () {},
-      //   //   )
-      //   // ],
-      //   elevation: 0,
-      // ),
-
+      appBar: customAppBar(context),
+     
       body: SingleChildScrollView(
         child: Container(
           // height: MediaQuery.sizeOf(context).height,
@@ -69,7 +54,8 @@ class CreateMealScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () => _addMealItem(context),
+                        onPressed: () =>
+                            Get.toNamed(AppRoutes.foodSearchScreen),
                         child: Text('+ ADD MEAL ITEM',
                             style: TextStyle(
                                 fontSize: AppFontSize.mediumfontSize - 12,
@@ -115,7 +101,7 @@ class CreateMealScreen extends StatelessWidget {
                           //     ? null
                           // :
                           () {
-                        Get.toNamed(AppRoutes.comScreen3);
+                        Get.toNamed(AppRoutes.nutritionSummaryScreen);
                       },
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -167,7 +153,47 @@ class CreateMealScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget customAppBar() {
+  void _showCustomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.backgroundLight,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          title: const Text(
+            "Delete?",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            "Are you sure you want to delete the food",
+            textAlign: TextAlign.justify,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                backgroundColor: AppColors.red,
+                foregroundColor: AppColors.textLight,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  PreferredSizeWidget customAppBar(context) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(110),
       child: Stack(
@@ -212,6 +238,17 @@ class CreateMealScreen extends StatelessWidget {
                           children: [
                             Icon(Icons.arrow_back,
                                 color: AppColors.textLight, size: 18),
+                            const SizedBox(width: 6),
+                          ],
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _showCustomDialog(context);
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: AppColors.red, size: 18),
                             const SizedBox(width: 6),
                           ],
                         ),

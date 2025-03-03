@@ -1,24 +1,53 @@
+import 'dart:developer';
+
+import 'package:clipboard/clipboard.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
 
-class NutritionSummaryScreen extends StatelessWidget {
+class NutritionSummaryScreen extends StatefulWidget {
+  @override
+  State<NutritionSummaryScreen> createState() => _NutritionSummaryScreenState();
+}
+
+class _NutritionSummaryScreenState extends State<NutritionSummaryScreen> {
+  late double fat = 0.0;
+  double carbohydrates = 0.0;
+  double proteins = 0.0;
+  double kcal = 0.0;
+  String servingSize = '';
+  String dataSource = "";
+  String productname = "";
+  double proteinPercentage = 0.0;
+
+  double fatPercentage = 0.0;
+  double carbohydratePercentage = 0.0;
+  @override
+  void initState() {
+    log(Get.arguments.toString());
+    proteins = double.parse(Get.arguments['protein']);
+    fat = double.parse(Get.arguments['fat']);
+    carbohydrates = double.parse(Get.arguments['carbohydrates']);
+    kcal = double.parse(Get.arguments['kcal']);
+    servingSize = Get.arguments['servingSize'];
+    dataSource = Get.arguments['dataSource'];
+    productname = Get.arguments['name'];
+    proteinPercentage =
+        double.tryParse(Get.arguments['proteinPercentage'] ?? "0") ?? 0;
+    fatPercentage = double.tryParse(Get.arguments['fatPercentage'] ?? "0") ?? 0;
+    carbohydratePercentage =
+        double.tryParse(Get.arguments['carbohydratePercentage'] ?? "0") ?? 0;
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: customAppBar(),
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   elevation: 0,
-      //   leading: Icon(Icons.arrow_back, color: Colors.black),
-      //   title: Text(
-      //     'Baby Spinach, Raw',
-      //     style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-      //   ),
-      //   actions: [Icon(Icons.more_vert, color: Colors.black)],
-      // ),
+     
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.sizeOf(context).height - 180,
@@ -44,7 +73,7 @@ class NutritionSummaryScreen extends StatelessWidget {
                         border: Border.all(color: Colors.grey.shade400),
                       ),
                       child: TextFormField(
-                        initialValue: '100',
+                        initialValue: servingSize.toString(),
                         decoration: InputDecoration(
                           border: InputBorder.none, // Removes default underline
                           isDense: true, // Reduces default padding
@@ -77,7 +106,7 @@ class NutritionSummaryScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Data Source: NDPA',
+                      'Data Source: $dataSource',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -88,15 +117,11 @@ class NutritionSummaryScreen extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Nutritional information per 100 g',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    )
-                  ],
+                Center(
+                  child: Text(
+                    'Nutritional information per $servingSize g',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 SizedBox(
                   height: 10,
@@ -116,20 +141,21 @@ class NutritionSummaryScreen extends StatelessWidget {
                           PieChartData(
                             sections: [
                               PieChartSectionData(
-                                  color: AppColors.primaryBlue, value: 33),
+                                  color: AppColors.primaryBlue, value: fat),
                               PieChartSectionData(
-                                  color: Colors.green, value: 44),
+                                  color: Colors.green, value: carbohydrates),
                               PieChartSectionData(
-                                  color: AppColors.primaryorange, value: 23),
+                                  color: AppColors.primaryorange,
+                                  value: proteins),
                             ],
                           ),
                         ),
                       ),
-                      Text('22 kcal',
+                      Text('$kcal kcal',
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold)),
                       Text(
-                        'Protein (33%) - 2.9g\nNet Carbs (44%) - 1.0g\nFat (23%) - 0.6g',
+                        'Protein ($proteinPercentage%) - $proteins g\nNet Carbs ($carbohydratePercentage%) - $carbohydrates g\nFat ($fatPercentage%) - $fat g',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 16, color: Colors.grey.shade600),
@@ -223,19 +249,29 @@ class NutritionSummaryScreen extends StatelessWidget {
 
                   Row(
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "⭐ Baby Spinach, Raw",
-                            style: TextStyle(
-                              color: AppColors.textLight,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                      SizedBox(
+                        width: MediaQuery.sizeOf(context).width - 20,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                FlutterClipboard.copy(productname)
+                                    .then((value) => print('copied'));
+                              },
+                              child: Text(
+                                "⭐ $productname",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.textLight,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                        ],
+                            const SizedBox(height: 4),
+                          ],
+                        ),
                       ),
                     ],
                   ),

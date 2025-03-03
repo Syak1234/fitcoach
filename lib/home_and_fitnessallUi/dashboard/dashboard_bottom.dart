@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/meal_create/mealUi/customMealsScreen.dart';
+import 'package:fitcoach/meal_create/mealUi/mealList.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,12 @@ class DashboardBottom extends StatefulWidget {
 }
 
 class _DashboardBottomState extends State<DashboardBottom> {
-  List pages = [HomeScreen(), Container(), Container(), AccountDashboard()];
+  List pages = [
+    HomeScreen(),
+    Container(),
+    CustomMealsScreen(),
+    AccountDashboard()
+  ];
   @override
   void initState() {
     // TODO: implement initState

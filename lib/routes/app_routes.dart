@@ -12,6 +12,10 @@ import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
 import 'package:fitcoach/forget_screen/forget_screen.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard_bottom.dart';
+import 'package:fitcoach/meal_create/mealUi/customMealsScreen.dart';
+import 'package:fitcoach/meal_create/mealUi/mealInfoUi.dart';
+import 'package:fitcoach/meal_create/mealUi/mealList.dart';
+import 'package:fitcoach/meal_create/mealUi/searchMealItem.dart';
 import 'package:fitcoach/profile_setting/account_setting/about_us.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/profile_setting/account_setting/linked_device.dart';
@@ -73,6 +77,11 @@ class AppRoutes {
   static const notification = "/NotificationsScreen";
   static const stepUi = "/StepsTakenScreen";
   static const hydrationScreen = "/HydrationScreen";
+
+  static const createMealScreen = "/CreateMealScreen";
+  static const foodSearchScreen = "/FoodSearchScreen";
+  static const nutritionSummaryScreen = "/NutritionSummaryScreen";
+  static const customfoodscreen = "/CustomMealsScreen";
 
   // Define routes here
   static final pages = [
@@ -290,6 +299,28 @@ class AppRoutes {
     GetPage(
       name: hydrationScreen,
       page: () => HydrationScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+
+    /*Meal screen*/
+    GetPage(
+      name: customfoodscreen,
+      page: () => CustomMealsScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: createMealScreen,
+      page: () => CreateMealScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: foodSearchScreen,
+      page: () => FoodSearchScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: nutritionSummaryScreen,
+      page: () => NutritionSummaryScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

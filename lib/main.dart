@@ -17,13 +17,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'calculatehealth/step_counter.dart';
 import 'home_and_fitnessallUi/dashboard/dashboard.dart';
+import 'meal_create/mealUi/customMealsScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  OpenFoodAPIConfiguration.userAgent = UserAgent(
+    name: 'Fitcoach',
+  );
   runApp(MyApp());
 }
 
@@ -65,7 +70,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: NutritionSummaryScreen(),
+      // home: CustomMealsScreen(),
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
     );
