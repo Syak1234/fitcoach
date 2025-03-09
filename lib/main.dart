@@ -13,6 +13,8 @@ import 'package:fitcoach/test/test4.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/utility/hydrationUi.dart';
 import 'package:fitcoach/utility/step_trackerUi.dart';
+import 'package:fitcoach/workout/workout_homeScreen.dart';
+import 'package:fitcoach/workout/workout_logset.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -70,7 +72,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: CustomMealsScreen(),
+      // home: WorkoutLogSetScreen(),
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
     );

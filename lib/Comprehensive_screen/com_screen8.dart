@@ -196,6 +196,8 @@ class _ComScreen8State extends State<ComScreen8> {
                 ],
               ),
             ),
+            
+            
             const SizedBox(height: 20),
           ],
         ),

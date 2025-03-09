@@ -36,6 +36,8 @@ import 'package:fitcoach/welcome_screen/wel_screen2.dart';
 import 'package:fitcoach/welcome_screen/wel_screen3.dart';
 import 'package:fitcoach/welcome_screen/wel_screen4.dart';
 import 'package:fitcoach/welcome_screen/wel_screen5.dart';
+import 'package:fitcoach/workout/workout_homeScreen.dart';
+import 'package:fitcoach/workout/workout_logset.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -82,6 +84,9 @@ class AppRoutes {
   static const foodSearchScreen = "/FoodSearchScreen";
   static const nutritionSummaryScreen = "/NutritionSummaryScreen";
   static const customfoodscreen = "/CustomMealsScreen";
+
+  static const workoutLogSet = "/WorkoutLogSetScreen";
+  static const workOutScreen = "/WorkoutScreen";
 
   // Define routes here
   static final pages = [
@@ -321,6 +326,18 @@ class AppRoutes {
     GetPage(
       name: nutritionSummaryScreen,
       page: () => NutritionSummaryScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    )
+    /*Workout screen*/
+    ,
+    GetPage(
+      name: workOutScreen,
+      page: () => WorkoutScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: workoutLogSet,
+      page: () => WorkoutLogSetScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];
