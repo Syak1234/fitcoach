@@ -1,3 +1,4 @@
+import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen10.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen2.dart';
@@ -82,6 +83,8 @@ class AppRoutes {
   static const foodSearchScreen = "/FoodSearchScreen";
   static const nutritionSummaryScreen = "/NutritionSummaryScreen";
   static const customfoodscreen = "/CustomMealsScreen";
+
+  static const commmunityScreen1 = '/CommunityScreen1';
 
   // Define routes here
   static final pages = [
@@ -321,6 +324,11 @@ class AppRoutes {
     GetPage(
       name: nutritionSummaryScreen,
       page: () => NutritionSummaryScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: commmunityScreen1,
+      page: () => CommunityScreen1(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

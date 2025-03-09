@@ -157,8 +157,7 @@ class _ComScreen2State extends State<ComScreen2> {
   }
 
   Widget buildContinueButton() {
-    return
-     ElevatedButton(
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.backgroundDark,
         minimumSize: const Size(double.infinity, 50),

@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
+import 'package:fitcoach/CommunityAndResource/community_screen2.dart';
 import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
 import 'package:fitcoach/calculatehealth/step_count2.dart';
 import 'package:fitcoach/meal_create/mealUi/mealInfoUi.dart';
@@ -70,8 +72,8 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: CustomMealsScreen(),
-      initialRoute: AppRoutes.splash,
+      home: CommunityPostScreen(),
+      // initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
     );
   }
