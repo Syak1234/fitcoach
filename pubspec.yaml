@@ -65,6 +65,10 @@ dependencies:
   stacked:
   lucide_icons: ^0.257.0
   video_player: ^2.9.3
+  responsive_builder: ^0.7.1
+  chewie: ^1.10.0
+  cloud_firestore: ^5.6.5
+  firebase_storage: ^12.4.4
  
 
 dev_dependencies:
@@ -98,6 +102,7 @@ flutter:
     - assets/utility/
     - assets/homeScreen/
     - assets/community_and_resource/
+    - assets/workoutimg/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

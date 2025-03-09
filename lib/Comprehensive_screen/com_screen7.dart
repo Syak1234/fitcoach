@@ -177,6 +177,7 @@ class _ComScreen7State extends State<ComScreen7> {
                 ],
               ),
             ),
+            
             const SizedBox(height: 20),
           ],
         ),

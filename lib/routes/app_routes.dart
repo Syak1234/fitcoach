@@ -1,4 +1,6 @@
 import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
+import 'package:fitcoach/CommunityAndResource/community_screen2.dart';
+import 'package:fitcoach/CommunityAndResource/community_screen3.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen10.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen2.dart';
@@ -37,6 +39,8 @@ import 'package:fitcoach/welcome_screen/wel_screen2.dart';
 import 'package:fitcoach/welcome_screen/wel_screen3.dart';
 import 'package:fitcoach/welcome_screen/wel_screen4.dart';
 import 'package:fitcoach/welcome_screen/wel_screen5.dart';
+import 'package:fitcoach/workout/workout_homeScreen.dart';
+import 'package:fitcoach/workout/workout_logset.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -85,6 +89,10 @@ class AppRoutes {
   static const customfoodscreen = "/CustomMealsScreen";
 
   static const commmunityScreen1 = '/CommunityScreen1';
+  static const commmunityScreen2 = '/CommunityScreen2';
+  static const commmunityScreen3 = '/CommunityScreen3';
+  static const workoutLogSet = "/WorkoutLogSetScreen";
+  static const workOutScreen = "/WorkoutScreen";
 
   // Define routes here
   static final pages = [
@@ -325,10 +333,32 @@ class AppRoutes {
       name: nutritionSummaryScreen,
       page: () => NutritionSummaryScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
+    )
+    /*Workout screen*/
+    ,
+    GetPage(
+      name: workOutScreen,
+      page: () => WorkoutScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: workoutLogSet,
+      page: () => WorkoutLogSetScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
     GetPage(
       name: commmunityScreen1,
       page: () => CommunityScreen1(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: commmunityScreen2,
+      page: () => PostsScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: commmunityScreen3,
+      page: () => CommunityPostScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

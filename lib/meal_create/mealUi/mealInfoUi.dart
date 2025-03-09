@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -47,7 +48,6 @@ class _NutritionSummaryScreenState extends State<NutritionSummaryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: customAppBar(),
-     
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.sizeOf(context).height - 180,
@@ -165,7 +165,21 @@ class _NutritionSummaryScreenState extends State<NutritionSummaryScreen> {
                 ),
                 Spacer(),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    createMealApi(context,
+                        mealname: "Meal1",
+                        protein: proteins.toString(),
+                        fat: fat.toString(),
+                        carbohydrates: carbohydrates.toString(),
+                        kcal: kcal.toString(),
+                        carbohydratePercentage:
+                            carbohydratePercentage.toString(),
+                        fatPercentage: fatPercentage.toString(),
+                        proteinPercentage: proteinPercentage.toString(),
+                        name: productname,
+                        dataSource: dataSource,
+                        servingSize: servingSize);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,
                     shape: RoundedRectangleBorder(

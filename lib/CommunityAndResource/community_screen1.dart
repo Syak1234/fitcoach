@@ -1,10 +1,16 @@
+import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-class CommunityScreen1 extends StatelessWidget {
+class CommunityScreen1 extends StatefulWidget {
+  @override
+  State<CommunityScreen1> createState() => _CommunityScreen1State();
+}
+
+class _CommunityScreen1State extends State<CommunityScreen1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +52,7 @@ class CommunityScreen1 extends StatelessWidget {
 
             // Button
 
-            buildExploreCommunityButton(),
+            buildExploreCommunityButton(context),
           ],
         ),
       ),
@@ -54,7 +60,7 @@ class CommunityScreen1 extends StatelessWidget {
   }
 }
 
-Widget buildExploreCommunityButton() {
+Widget buildExploreCommunityButton(BuildContext context) {
   return Container(
     width: double.infinity,
     margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -66,7 +72,14 @@ Widget buildExploreCommunityButton() {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      onPressed: () {},
+      onPressed: () async {
+        await createUser(context, "113", "tester1", "test@gmail.com")
+            .then((value) {
+          if (value) {
+            Get.toNamed(AppRoutes.commmunityScreen2);
+          }
+        });
+      },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
