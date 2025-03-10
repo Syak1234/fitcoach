@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Getx extends GetxController {
   RxInt isCom_select_Option = 0.obs;
   var selectedDays = 5.obs;
+
   RxInt pagesIndex = 0.obs;
   // RxDouble barValue = 0.1.obs;
   var selectedPreferences = <String>[].obs;
@@ -19,6 +20,7 @@ class Getx extends GetxController {
   late Stream<ConnectivityResult> _connectivityStream;
   late StreamSubscription<ConnectivityResult> _subscription;
   RxList mealItemList = [].obs;
+  RxList userPostId = [].obs;
 
   var isFeetAndInches = false.obs;
   var feet = 0.obs;

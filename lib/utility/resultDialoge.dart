@@ -1,3 +1,4 @@
+import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 Widget resultDialog({
@@ -13,20 +14,19 @@ Widget resultDialog({
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
     backgroundColor: Colors.white,
     child: Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             decoration: BoxDecoration(
-              color: iconBackgroundColor,
-              shape: BoxShape.circle,
-            ),
+                color: iconBackgroundColor,
+                borderRadius: BorderRadius.all(Radius.circular(16))),
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               icon,
               color: Colors.black,
-              size: 30.0,
+              size: 50.0,
             ),
           ),
           const SizedBox(height: 20.0),
@@ -42,32 +42,59 @@ Widget resultDialog({
             message,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 16.0,
+              fontSize: 14.0,
               color: Colors.grey,
             ),
           ),
           const SizedBox(height: 20.0),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: AppColors.backgroundDark,
+              minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
+                  borderRadius: BorderRadius.circular(19)),
             ),
             onPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(buttonText, style: const TextStyle(color: Colors.white)),
-                const SizedBox(width: 8.0),
-                const Icon(Icons.arrow_right_alt, color: Colors.white),
+                Text(title,
+                    style: TextStyle(
+                        color: AppColors.textLight,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold)),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward, color: AppColors.textLight),
               ],
             ),
           ),
         ],
       ),
+    ),
+  );
+}
+
+Widget buildContinueButton(VoidCallback onTap, String title) {
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: AppColors.backgroundDark,
+      minimumSize: const Size(double.infinity, 50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+    ),
+    onPressed: () {
+      onTap();
+    },
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(title,
+            style: TextStyle(
+                color: AppColors.textLight,
+                fontSize: 14,
+                fontWeight: FontWeight.bold)),
+        SizedBox(width: 8),
+        Icon(Icons.arrow_forward, color: AppColors.textLight),
+      ],
     ),
   );
 }

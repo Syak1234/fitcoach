@@ -1,6 +1,8 @@
 import 'package:chewie/chewie.dart';
 import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/utility/resultDialoge.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -179,7 +181,13 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                         ],
                       ),
                       SizedBox(height: 10),
-                      TextField(
+                      TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty || value == "") {
+                            return "caption can't be empty";
+                          }
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         maxLines: 5,
                         maxLength: 300,
                         controller: captionController,
@@ -210,8 +218,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
-                          hintText:
-                              "EVERYONE STAY CALM!!! You won't believe this. I had an AI chat with Coach S yest...",
+                          hintText: "Write your Caption here...",
                         ),
                       )
                     ],
@@ -221,7 +228,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                 Text('Post Type',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Row(
+                Wrap(
                   children: [
                     GestureDetector(
                       onTap: _pickVideo,
@@ -301,8 +308,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12),
-                          hintText:
-                              "EVERYONE STAY CALM!!! You won't believe this. I had an AI chat with Coach S yest...",
+                          hintText: "Write your Post here...",
                         ),
                       )),
                 if (_selectedImage == null &&
@@ -333,7 +339,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () {
-        submitPostinfo(captionController.text, "111");
+        if (captionController.text != "") {
+          submitPostinfo(captionController.text, "111", "tester dass");
+        }
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -350,7 +358,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     );
   }
 
-  submitPostinfo(String caption, String userid) {
+  submitPostinfo(String caption, String userid, String username) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -373,16 +381,31 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       postType = 'text';
     }
 
-    createPost(userid, postType, caption, _textPost ?? "").then((value) {
+    createPost(userid, postType, caption, _textPost ?? "", username)
+        .then((value) {
       if (value!.isNotEmpty || value != "") {
-        if (postType == "video" || postType == "image") {
-          uploadFile(attachedFile!, postType, value).whenComplete(() {
-            Navigator.pop(context);
-          });
-        }
-      } else {
         Navigator.pop(context);
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => resultDialog(
+              buttonText: "See My Post",
+              context: context,
+              icon: Icons.check,
+              iconBackgroundColor: AppColors.green10,
+              message:
+                  "You have Successfull posted a post.\n Let's see now. Shall we?🙌🏻",
+              title: "Post Successfull",
+              onButtonPressed: () {
+                Navigator.pop(context);
+                Get.toNamed(AppRoutes.commmunityScreen2);
+              }),
+        );
       }
+      // else {
+      //   Navigator.pop(context);
+      // }
     });
   }
 }
@@ -395,16 +418,17 @@ Widget _buildPostTypeButton(String iconpath, String label, bool isSelected) {
         borderRadius: BorderRadius.circular(18),
         border:
             Border.all(color: Colors.grey[400]!, width: isSelected ? 3 : 1)),
-    child: Row(
+    child: Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         SizedBox(
-            height: 25,
-            width: 25,
+            height: 20,
+            width: 20,
             child: Image.asset(
               iconpath,
               color: isSelected ? Colors.white : Colors.black87,
             )),
-        const SizedBox(width: 8),
+        const SizedBox(width: 3),
         Text(
           label,
           style: TextStyle(
