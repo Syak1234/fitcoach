@@ -73,7 +73,7 @@ Widget buildExploreCommunityButton(BuildContext context) {
         ),
       ),
       onPressed: () async {
-        await createUser(context, "114", "tester2", "test1@gmail.com")
+        await createUser(context, "150", "Sayak", "test1@gmail.com")
             .then((value) {
           if (value) {
             Get.toNamed(AppRoutes.commmunityScreen2);

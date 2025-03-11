@@ -204,8 +204,19 @@ class _SignInScreenState extends State<SignInScreen> {
                               if (user!.email!.isNotEmpty) {
                                 Userdetails userdetails = Userdetails(
                                     email: user!.email.toString(),
+                                    userId: user!.uid.toString(),
                                     name: user!.displayName.toString(),
-                                    userimg: user!.photoURL.toString());
+                                    userimg: user!.photoURL.toString() ?? '');
+
+                                SharedPrefHelper.setString(
+                                    'email', userdetails.email);
+                                SharedPrefHelper.setString(
+                                    'userId', userdetails.userId);
+                                SharedPrefHelper.setString(
+                                    'name', userdetails.name);
+                                SharedPrefHelper.setString(
+                                    'userimg', userdetails.userimg);
+
                                 Get.toNamed(
                                   AppRoutes.fingerprintSetup,
                                 );
@@ -238,6 +249,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 Userdetails userdetails = Userdetails(
                                     email: facebookdata!['email'] ?? ' ',
                                     name: facebookdata!['name'] ?? ' ',
+                                    userId: '',
                                     userimg: facebookdata!['picture']['data']
                                             ['url'] ??
                                         ' ');

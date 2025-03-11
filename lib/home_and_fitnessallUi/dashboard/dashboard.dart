@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -19,6 +20,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    getUserData();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  RxString name = "".obs;
+  RxString userImage = "".obs;
+  getUserData() async {
+    name.value = await SharedPrefHelper.getString('name') ?? '';
+    userImage.value = await SharedPrefHelper.getString('userimg') ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,117 +89,128 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // AppBar Content
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top Icons Row
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Date Icon + Date
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_month,
-                              color: AppColors.textLight, size: 18),
-                          const SizedBox(width: 6),
-                          Text(formattedDate,
-                              style: TextStyle(
-                                  color: AppColors.textLight.withOpacity(0.7),
-                                  fontSize: 14)),
-                        ],
-                      ),
+          Obx(
+            () => SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Icons Row
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Date Icon + Date
+                        Row(
+                          children: [
+                            const Icon(Icons.calendar_month,
+                                color: AppColors.textLight, size: 18),
+                            const SizedBox(width: 6),
+                            Text(formattedDate,
+                                style: TextStyle(
+                                    color: AppColors.textLight.withOpacity(0.7),
+                                    fontSize: 14)),
+                          ],
+                        ),
 
-                      // Notification Bell with Badge
-                      InkWell(
-                        onTap: () {
-                          Get.toNamed(AppRoutes.notification);
-                        },
-                        child: badges.Badge(
-                          position:
-                              badges.BadgePosition.topEnd(top: -4, end: -4),
-                          badgeContent: const Text("8",
-                              style: TextStyle(
-                                  color: AppColors.textLight, fontSize: 12)),
-                          badgeStyle: const badges.BadgeStyle(
-                            badgeColor: AppColors.primaryorange,
-                            padding: EdgeInsets.all(6),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.backgroundDark.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(12),
+                        // Notification Bell with Badge
+                        InkWell(
+                          onTap: () {
+                            Get.toNamed(AppRoutes.notification);
+                          },
+                          child: badges.Badge(
+                            position:
+                                badges.BadgePosition.topEnd(top: -4, end: -4),
+                            badgeContent: const Text("8",
+                                style: TextStyle(
+                                    color: AppColors.textLight, fontSize: 12)),
+                            badgeStyle: const badges.BadgeStyle(
+                              badgeColor: AppColors.primaryorange,
+                              padding: EdgeInsets.all(6),
                             ),
-                            child: const Icon(Icons.notifications,
-                                color: AppColors.textLight, size: 22),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.backgroundDark.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.notifications,
+                                  color: AppColors.textLight, size: 22),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // User Profile & Greeting
-                  Row(
-                    children: [
-                      // Profile Picture
-                      const CircleAvatar(
-                        radius: 28,
-                      ),
-                      const SizedBox(width: 12),
+                    // User Profile & Greeting
+                    Row(
+                      children: [
+                        // Profile Picture
+                        userImage.value != ""
+                            ? CircleAvatar(
+                                radius: 28,
+                                backgroundImage: NetworkImage(userImage.value),
+                              )
+                            : CircularProgressIndicator(),
+                        const SizedBox(width: 12),
 
-                      // Greeting Text
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Hello, Makise!",
-                            style: TextStyle(
-                              color: AppColors.textLight,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
+                        // Greeting Text
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 230,
+                              child: Text(
+                                "Hello, ${name.value}!",
+                                style: TextStyle(
+                                  color: AppColors.textLight,
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
 
-                          // Health and Pro Status
-                          Row(
-                            children: [
-                              const Icon(Icons.local_fire_department,
-                                  color: AppColors.primaryorange, size: 16),
-                              const SizedBox(width: 4),
-                              const Text("88% Healthy",
-                                  style: TextStyle(
-                                      color: AppColors.textLight,
-                                      fontSize: 14)),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.star,
-                                  color: AppColors.primaryBlue, size: 16),
-                              const SizedBox(width: 4),
-                              const Text("Pro",
-                                  style: TextStyle(
-                                      color: AppColors.textLight,
-                                      fontSize: 14)),
-                            ],
-                          ),
-                        ],
-                      ),
+                            const SizedBox(height: 4),
 
-                      const Spacer(),
+                            // Health and Pro Status
+                            Row(
+                              children: [
+                                const Icon(Icons.local_fire_department,
+                                    color: AppColors.primaryorange, size: 16),
+                                const SizedBox(width: 4),
+                                const Text("88% Healthy",
+                                    style: TextStyle(
+                                        color: AppColors.textLight,
+                                        fontSize: 14)),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.star,
+                                    color: AppColors.primaryBlue, size: 16),
+                                const SizedBox(width: 4),
+                                const Text("Pro",
+                                    style: TextStyle(
+                                        color: AppColors.textLight,
+                                        fontSize: 14)),
+                              ],
+                            ),
+                          ],
+                        ),
 
-                      // Forward Arrow Icon
-                      const Icon(Icons.arrow_forward_ios,
-                          color: AppColors.textLight, size: 18),
-                    ],
-                  ),
-                ],
+                        const Spacer(),
+
+                        // Forward Arrow Icon
+                        const Icon(Icons.arrow_forward_ios,
+                            color: AppColors.textLight, size: 18),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

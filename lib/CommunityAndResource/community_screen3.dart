@@ -117,9 +117,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -311,16 +311,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                           hintText: "Write your Post here...",
                         ),
                       )),
-                if (_selectedImage == null &&
-                    !_isTextPost &&
-                    _selectedVideo == null)
-                  SizedBox(
-                    height: 250,
-                  ),
-
-                // Spacer(),
                 SizedBox(
-                  height: 10,
+                  height: 150,
                 ),
                 buildContinueButton(),
               ],
@@ -340,7 +332,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       ),
       onPressed: () {
         if (captionController.text != "") {
-          submitPostinfo(captionController.text, "111", "tester dass");
+          submitPostinfo(captionController.text, "150", "Sayak");
         }
       },
       child: const Row(

@@ -32,6 +32,7 @@ class AuthService {
         log(user.displayName.toString());
         log(user.phoneNumber.toString());
         log(user.photoURL.toString());
+        log(user.uid.toString());
 // log(user!.phoneNumber.toString());
         if (result != null) {
           signOut();

@@ -12,7 +12,7 @@ class PostsScreen extends StatefulWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
-  String userid = "111";
+  String userid = "150";
   Getx getx = Get.put(Getx());
 
   @override
@@ -103,6 +103,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 final posts = snapshot.data!;
 
                 return ListView(
+                  reverse: true,
                   children: posts.map((post) {
                     return Padding(
                       padding: EdgeInsets.only(
@@ -114,16 +115,18 @@ class _PostsScreenState extends State<PostsScreen> {
                           top: 15,
                           bottom: 15),
                       child: PostCard(
-                        content: post["text"] ?? "",
-                        caption: post["caption"] ?? "No caption",
-                        likeIdList: post['LikedId'],
-                        imageUrl: "",
-                        postType: post['postType'],
-                        time: post['postTime'].toString(),
-                        username: post['username'] ?? "name not public",
-                        userId: post['userId'],
-                        postId: post['PostId'],
-                      ),
+                          content: post["text"] ?? "",
+                          caption: post["caption"] ?? "No caption",
+                          likeIdList: post['LikedId'],
+                          imageUrl: "",
+                          postType: post['postType'],
+                          time: post['postTime'].toString(),
+                          username: post['username'] ?? "name not public",
+                          userId: post['userId'],
+                          postId: post['PostId'],
+                          color: userid == post['userId'].toString()
+                              ? AppColors.primaryBlue
+                              : AppColors.primaryorange),
                     );
                   }).toList(),
                 );
@@ -175,7 +178,7 @@ class PostCard extends StatelessWidget {
   final List likeIdList;
   final String userId;
   final String postId;
-
+  final Color color;
   const PostCard({
     required this.username,
     required this.time,
@@ -186,6 +189,7 @@ class PostCard extends StatelessWidget {
     required this.likeIdList,
     required this.userId,
     required this.postId,
+    required this.color,
   });
 
   @override
@@ -210,7 +214,8 @@ class PostCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(username,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: color)),
                     Text(time, style: TextStyle(color: Colors.grey)),
                   ],
                 ),
@@ -255,7 +260,10 @@ class PostCard extends StatelessWidget {
                           }
                         },
                         child: likeIdList.contains(userId)
-                            ? Icon(Icons.favorite_outlined)
+                            ? Icon(
+                                Icons.favorite_outlined,
+                                color: AppColors.red,
+                              )
                             : Icon(Icons.favorite_border)),
                     SizedBox(width: 5),
                     Text('${likeIdList.length}'),
