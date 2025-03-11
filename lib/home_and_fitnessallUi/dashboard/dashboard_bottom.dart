@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/meal_create/mealUi/customMealsScreen.dart';
 import 'package:fitcoach/meal_create/mealUi/mealList.dart';
@@ -22,7 +23,7 @@ class _DashboardBottomState extends State<DashboardBottom> {
   List pages = [
     HomeScreen(),
     WorkoutScreen(),
-    Container(),
+    CommunityScreen1(),
     CustomMealsScreen(),
     AccountDashboard()
   ];

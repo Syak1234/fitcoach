@@ -1,37 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
-// import 'package:fitcoach/calculatehealth/step_count2.dart';
-// import 'package:fitcoach/meal_create/mealUi/mealInfoUi.dart';
-// import 'package:fitcoach/meal_create/mealUi/mealList.dart';
-// import 'package:fitcoach/meal_create/mealUi/searchMealItem.dart';
-// import 'package:fitcoach/profile_setting/account_setting/linked_device.dart';
-// import 'package:fitcoach/profile_setting/notification/notificationUi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
-// import 'package:fitcoach/signup_screen/signup_screen.dart';
-// import 'package:fitcoach/spalsh_screen/spalsh.dart';
-// import 'package:fitcoach/test/test4.dart';
 import 'package:fitcoach/theme/app_colors.dart';
-// import 'package:fitcoach/utility/hydrationUi.dart';
-// import 'package:fitcoach/utility/step_trackerUi.dart';
-// import 'package:fitcoach/workout/workout_homeScreen.dart';
-// import 'package:fitcoach/workout/workout_logset.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:local_auth/local_auth.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'calculatehealth/step_counter.dart';
-// import 'home_and_fitnessallUi/dashboard/dashboard.dart';
-// import 'meal_create/mealUi/customMealsScreen.dart';
+import 'CommunityAndResource/community_screen1.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   OpenFoodAPIConfiguration.userAgent = UserAgent(
     name: 'Fitcoach',
-
-    // system: ,
   );
   runApp(MyApp());
 }
@@ -74,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: WorkoutLogSetScreen(),
+      // home: CommunityScreen1(),
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
     );
