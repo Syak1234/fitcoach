@@ -1,3 +1,5 @@
+import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,9 @@ class PostsScreen extends StatefulWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
+  String userid = "111";
+  Getx getx = Get.put(Getx());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,11 +53,13 @@ class _PostsScreenState extends State<PostsScreen> {
                                   fontWeight: FontWeight.bold,
                                   fontSize: 23,
                                   color: AppColors.backgroundLight)),
-                          Text("25 posts",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: const Color.fromARGB(
-                                      255, 255, 255, 255))),
+                          Obx(
+                            () => Text("${getx.userPostId.length} posts",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: const Color.fromARGB(
+                                        255, 255, 255, 255))),
+                          ),
                         ],
                       ),
                       Spacer(),
@@ -78,38 +85,55 @@ class _PostsScreenState extends State<PostsScreen> {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(10),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: PostCard(
-                    username: 'Makise Kurisu',
-                    time: '3m ago',
-                    content:
-                        "Just crushed my morning workout - a killer HIIT session to kickstart the day! 🚀 Feeling the burn in the best way possible. 💦🔥 #HIITWorkout #HealthyEating",
-                    imageUrl:
-                        'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png',
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: PostCard(
-                    username: 'Makise Kurisu',
-                    time: '3m ago',
-                    content:
-                        "Morning vibes! Just completed a refreshing yoga session to start the day on a positive note. 🧘‍♀️ How do you like to kick off your mornings? #YogaLove #WellnessWednesday",
-                    imageUrl:
-                        'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png',
-                  ),
-                ),
-              ],
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: fetchPosts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No posts available.'));
+                }
+
+                final posts = snapshot.data!;
+
+                return ListView(
+                  children: posts.map((post) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                          left: userid == post['userId'].toString() ? 30 : 10,
+                          right: userid !=
+                                  post['username'].toString().toLowerCase()
+                              ? 20
+                              : 10,
+                          top: 15,
+                          bottom: 15),
+                      child: PostCard(
+                        content: post["text"] ?? "",
+                        caption: post["caption"] ?? "No caption",
+                        likeIdList: post['LikedId'],
+                        imageUrl: "",
+                        postType: post['postType'],
+                        time: post['postTime'].toString(),
+                        username: post['username'] ?? "name not public",
+                        userId: post['userId'],
+                        postId: post['PostId'],
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ),
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: const EdgeInsets.only(left: 10, bottom: 20, right: 10),
         child: buildContinueButton(),
       ),
     );
@@ -146,12 +170,22 @@ class PostCard extends StatelessWidget {
   final String time;
   final String content;
   final String imageUrl;
+  final String postType;
+  final String caption;
+  final List likeIdList;
+  final String userId;
+  final String postId;
 
   const PostCard({
     required this.username,
     required this.time,
     required this.content,
     required this.imageUrl,
+    required this.postType,
+    required this.caption,
+    required this.likeIdList,
+    required this.userId,
+    required this.postId,
   });
 
   @override
@@ -183,24 +217,48 @@ class PostCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10),
-            Text(content),
+            Text(caption),
             SizedBox(height: 10),
-            Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.gray),
-                    borderRadius: BorderRadius.all(Radius.circular(25))),
-                child: Image.network(imageUrl)),
+            postType != "text"
+                ? Container(
+                    height: 200,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.gray),
+                        borderRadius: BorderRadius.all(Radius.circular(25))),
+                    child: Image.network(imageUrl))
+                : Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: content != ""
+                            ? Border.all(color: AppColors.gray)
+                            : null,
+                        borderRadius: BorderRadius.all(Radius.circular(15))),
+                    child: Padding(
+                      padding: content != ""
+                          ? EdgeInsets.symmetric(vertical: 20, horizontal: 10)
+                          : EdgeInsets.symmetric(vertical: 0),
+                      child: Text("$content"),
+                    )),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.favorite_border),
+                    InkWell(
+                        onTap: () {
+                          if (likeIdList.contains(userId)) {
+                            removeLikeFromPost(postId, userId);
+                          } else {
+                            addLikeToPost(postId, userId);
+                          }
+                        },
+                        child: likeIdList.contains(userId)
+                            ? Icon(Icons.favorite_outlined)
+                            : Icon(Icons.favorite_border)),
                     SizedBox(width: 5),
-                    Text('5,874'),
+                    Text('${likeIdList.length}'),
                   ],
                 ),
                 SizedBox(
@@ -210,7 +268,7 @@ class PostCard extends StatelessWidget {
                   children: [
                     Icon(Icons.comment),
                     SizedBox(width: 5),
-                    Text('215'),
+                    Text('0'),
                   ],
                 ),
                 SizedBox(
@@ -220,7 +278,7 @@ class PostCard extends StatelessWidget {
                   children: [
                     Icon(Icons.share),
                     SizedBox(width: 5),
-                    Text('11'),
+                    Text('0'),
                   ],
                 ),
                 Spacer(),
