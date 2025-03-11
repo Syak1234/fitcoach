@@ -12,7 +12,6 @@ class PostsScreen extends StatefulWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
-  String userid = "150";
   Getx getx = Get.put(Getx());
 
   @override
@@ -48,7 +47,7 @@ class _PostsScreenState extends State<PostsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Makise Kurisu",
+                          Text(getx.userdetails[0].name,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 23,
@@ -103,14 +102,17 @@ class _PostsScreenState extends State<PostsScreen> {
                 final posts = snapshot.data!;
 
                 return ListView(
-                  reverse: true,
+                  reverse: false,
                   children: posts.map((post) {
                     return Padding(
                       padding: EdgeInsets.only(
-                          left: userid == post['userId'].toString() ? 30 : 10,
-                          right: userid !=
-                                  post['username'].toString().toLowerCase()
-                              ? 20
+                          left: getx.userdetails[0].userId ==
+                                  post['userId'].toString()
+                              ? 30
+                              : 10,
+                          right: getx.userdetails[0].userId !=
+                                  post['userId'].toString()
+                              ? 30
                               : 10,
                           top: 15,
                           bottom: 15),
@@ -124,7 +126,8 @@ class _PostsScreenState extends State<PostsScreen> {
                           username: post['username'] ?? "name not public",
                           userId: post['userId'],
                           postId: post['PostId'],
-                          color: userid == post['userId'].toString()
+                          color: getx.userdetails[0].userId ==
+                                  post['userId'].toString()
                               ? AppColors.primaryBlue
                               : AppColors.primaryorange),
                     );
@@ -253,13 +256,14 @@ class PostCard extends StatelessWidget {
                   children: [
                     InkWell(
                         onTap: () {
-                          if (likeIdList.contains(userId)) {
-                            removeLikeFromPost(postId, userId);
+                          if (likeIdList.contains(getx.userdetails[0].userId)) {
+                            removeLikeFromPost(
+                                postId, getx.userdetails[0].userId);
                           } else {
-                            addLikeToPost(postId, userId);
+                            addLikeToPost(postId, getx.userdetails[0].userId);
                           }
                         },
-                        child: likeIdList.contains(userId)
+                        child: likeIdList.contains(getx.userdetails[0].userId)
                             ? Icon(
                                 Icons.favorite_outlined,
                                 color: AppColors.red,

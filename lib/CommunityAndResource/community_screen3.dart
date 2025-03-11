@@ -228,32 +228,34 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                 Text('Post Type',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Wrap(
-                  children: [
-                    GestureDetector(
-                      onTap: _pickVideo,
-                      child: _buildPostTypeButton(
-                          "assets/community_and_resource/playicon.png",
-                          'Video',
-                          _selectedVideo != null),
-                    ),
-                    SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: _buildPostTypeButton(
-                          "assets/community_and_resource/galleryicon.png",
-                          'Gallery',
-                          _selectedImage != null),
-                    ),
-                    SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: _enableTextPost,
-                      child: _buildPostTypeButton(
-                          "assets/community_and_resource/texticon.png",
-                          'Text',
-                          _isTextPost),
-                    ),
-                  ],
+                SingleChildScrollView(
+                  child: Wrap(
+                    children: [
+                      GestureDetector(
+                        onTap: _pickVideo,
+                        child: _buildPostTypeButton(
+                            "assets/community_and_resource/playicon.png",
+                            'Video',
+                            _selectedVideo != null),
+                      ),
+                      SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: _buildPostTypeButton(
+                            "assets/community_and_resource/galleryicon.png",
+                            'Gallery',
+                            _selectedImage != null),
+                      ),
+                      SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _enableTextPost,
+                        child: _buildPostTypeButton(
+                            "assets/community_and_resource/texticon.png",
+                            'Text',
+                            _isTextPost),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 10,
@@ -332,7 +334,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       ),
       onPressed: () {
         if (captionController.text != "") {
-          submitPostinfo(captionController.text, "150", "Sayak");
+          submitPostinfo(captionController.text, getx.userdetails[0].userId,
+              getx.userdetails[0].name);
         }
       },
       child: const Row(
@@ -361,11 +364,11 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     String postType;
 
     if (_selectedVideo != null) {
-      postType = "video";
+      postType = "text";
 
       attachedFile = _selectedVideo!;
     } else if (_selectedImage != null) {
-      postType = 'image';
+      postType = 'text';
       attachedFile = _selectedImage!;
     } else if (_isTextPost && _textPost != null && _textPost!.isNotEmpty) {
       postType = 'text';
@@ -391,7 +394,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
               title: "Post Successfull",
               onButtonPressed: () {
                 Navigator.pop(context);
-                Get.toNamed(AppRoutes.commmunityScreen2);
+                Navigator.pop(context);
               }),
         );
       }

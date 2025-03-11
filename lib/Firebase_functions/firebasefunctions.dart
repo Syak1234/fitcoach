@@ -2,6 +2,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/utility/resultDialoge.dart';
 import 'dart:io';
@@ -16,7 +18,6 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final FirebaseStorage _storage = FirebaseStorage.instance;
 
 Getx getx = Get.put(Getx());
-String userid = '111';
 
 // Function to create user table (collection)
 Future<bool> createUser(
@@ -34,8 +35,15 @@ Future<bool> createUser(
       'fullName': fullName,
       'email': email,
     });
-
+    SharedPrefHelper.setString("userid", userId);
+    SharedPrefHelper.setString("username", fullName);
+    SharedPrefHelper.setString("useremail", email);
+    getx.userdetails.clear();
+    final userdata =
+        Userdetails(userId: userId, userimg: "", name: fullName, email: email);
+    getx.userdetails.add(userdata);
     success = true;
+
     Navigator.of(context).pop();
   } catch (e) {
     success = false;
@@ -132,7 +140,8 @@ Stream<List<Map<String, dynamic>>> fetchPosts() {
 
     // Now, we can filter the posts by userId (replace 'userid' with your actual variable)
     getx.userPostId.value = allPosts
-        .where((post) => post['userId'] == userid) // Filter by userId
+        .where((post) =>
+            post['userId'] == getx.userdetails[0].userId) // Filter by userId
         .map((post) => post['PostId'] as String) // Extract postId
         .toList();
 
