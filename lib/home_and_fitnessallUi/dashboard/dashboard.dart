@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -19,6 +20,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+Getx getx = Get.put(Getx());
+
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
@@ -32,6 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
   getUserData() async {
     name.value = await SharedPrefHelper.getString('name') ?? '';
     userImage.value = await SharedPrefHelper.getString('userimg') ?? '';
+
+    Userdetails userdetails = Userdetails(
+        email: await SharedPrefHelper.getString('email') ?? '',
+        userId: await SharedPrefHelper.getString('userId') ?? '',
+        name: await SharedPrefHelper.getString('name') ?? '',
+        userimg: await SharedPrefHelper.getString('userimg') ?? '');
+
+    if (getx.userdetails.length > 0) {
+      getx.userdetails.clear();
+    }
+
+    getx.userdetails.add(userdetails);
   }
 
   @override
