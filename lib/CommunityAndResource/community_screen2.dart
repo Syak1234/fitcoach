@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -48,11 +52,15 @@ class _PostsScreenState extends State<PostsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(getx.userdetails[0].username,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 23,
-                                  color: AppColors.backgroundLight)),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width / 2.2,
+                            child: Text(getx.userdetails[0].username,
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: AppColors.backgroundLight)),
+                          ),
                           Obx(
                             () => Text("${getx.userPostId.length} posts",
                                 style: TextStyle(
@@ -118,19 +126,21 @@ class _PostsScreenState extends State<PostsScreen> {
                           top: 15,
                           bottom: 15),
                       child: PostCard(
-                          content: post["text"] ?? "",
-                          caption: post["caption"] ?? "No caption",
-                          likeIdList: post['LikedId'] ?? [],
-                          imageUrl: "",
-                          postType: post['postType'],
-                          time: post['postTime'].toString(),
-                          username: post['username'] ?? "name not public",
-                          userId: post['userId'],
-                          postId: post['PostId'],
-                          color: getx.userdetails[0].userId ==
-                                  post['userId'].toString()
-                              ? AppColors.primaryBlue
-                              : AppColors.primaryorange),
+                        content: post["text"] ?? "",
+                        caption: post["caption"] ?? "No caption",
+                        likeIdList: post['LikedId'] ?? [],
+                        imageUrl: "",
+                        postType: post['postType'],
+                        time: post['postTime'].toString(),
+                        username: post['username'] ?? "name not public",
+                        userId: post['userId'] ?? "",
+                        postId: post['PostId'] ?? "",
+                        color: getx.userdetails[0].userId ==
+                                post['userId'].toString()
+                            ? AppColors.primaryBlue
+                            : AppColors.primaryorange,
+                        commentId: post['commentId'] ?? [],
+                      ),
                     );
                   }).toList(),
                 );
@@ -183,18 +193,19 @@ class PostCard extends StatelessWidget {
   final String userId;
   final String postId;
   final Color color;
-  const PostCard({
-    required this.username,
-    required this.time,
-    required this.content,
-    required this.imageUrl,
-    required this.postType,
-    required this.caption,
-    required this.likeIdList,
-    required this.userId,
-    required this.postId,
-    required this.color,
-  });
+  final List commentId;
+  const PostCard(
+      {required this.username,
+      required this.time,
+      required this.content,
+      required this.imageUrl,
+      required this.postType,
+      required this.caption,
+      required this.likeIdList,
+      required this.userId,
+      required this.postId,
+      required this.color,
+      required this.commentId});
 
   @override
   Widget build(BuildContext context) {
@@ -280,23 +291,54 @@ class PostCard extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Icon(Icons.comment),
-                    SizedBox(width: 5),
-                    Text('0'),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (context) =>
+                              CommentBottomSheet(postId: postId),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.comment),
+                          SizedBox(width: 5),
+                          Text(
+                              "${commentId.length ?? 0}"), // You can replace '0' with the comment count later
+                        ],
+                      ),
+                    ),
                   ],
                 ),
+
                 SizedBox(
                   width: 10,
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.share),
-                    SizedBox(width: 5),
-                    Text('0'),
-                  ],
-                ),
+
                 Spacer(),
-                Icon(Icons.bookmark_border),
+                InkWell(
+                  onTap: () {
+                    String shareText =
+                        "$caption\n\n$content\n \n\n Post shared from Fitcoach by ${getx.userdetails[0].username}";
+                    if (postType != "text") {
+                      shareText += "\n\nImage: $imageUrl";
+                    }
+                    Share.share(shareText);
+                  },
+                  child: Row(
+                    children: [
+                      Icon(Icons.share),
+                      SizedBox(width: 5),
+                      // Text('Share'),
+                    ],
+                  ),
+                ),
+                // Icon(Icons.bookmark_border),
               ],
             ),
           ],
@@ -333,4 +375,291 @@ String processTimestampString(String input) {
 
   // If no timestamp or no match, return original string
   return input;
+}
+
+class CommentBottomSheet extends StatefulWidget {
+  final String postId;
+
+  CommentBottomSheet({required this.postId});
+
+  @override
+  _CommentBottomSheetState createState() => _CommentBottomSheetState();
+}
+
+class _CommentBottomSheetState extends State<CommentBottomSheet> {
+  // Example data
+  TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom), // For keyboard
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: fetchComments(widget.postId),
+                builder: (context, snapshot) {
+                  log(snapshot.connectionState.toString());
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  log(snapshot.connectionState.toString());
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  if (!snapshot.hasData ||
+                      snapshot.data!.isEmpty ||
+                      snapshot.data!.length == 0) {
+                    return Center(child: Text('No Comments available.'));
+                  }
+
+                  final comments = snapshot.data!;
+
+                  return ListView(
+                    reverse: false,
+                    children: comments.map((comment) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            left: getx.userdetails[0].userId ==
+                                    comment['userId'].toString()
+                                ? 30
+                                : 10,
+                            right: getx.userdetails[0].userId !=
+                                    comment['userId'].toString()
+                                ? 30
+                                : 10,
+                            top: 15,
+                            bottom: 15),
+                        child: InkWell(
+                          onLongPress: () {
+                            if (getx.userdetails[0].userId ==
+                                comment['userId'].toString()) {
+                              showDeleteCommentDialog(
+                                context: context,
+                                commentId: comment['commentId'] ?? "",
+                                postId: comment['postID'] ?? "",
+                                deleteComment: deleteComment,
+                              );
+                            }
+                          },
+                          child: CommentCard(
+                              postId: comment["postID"] ?? "",
+                              content: comment["comment"] ?? "",
+                              // caption: post["caption"] ?? "No caption",
+                              likeIdList: comment['LikedId'] ?? [],
+                              imageUrl: "",
+                              // postType: post['postType'],
+                              time: comment['postTime'].toString(),
+                              username:
+                                  comment['username'] ?? "name not public",
+                              userId: comment['userId'] ?? "",
+                              commentId: comment['commentId'] ?? "",
+                              color: getx.userdetails[0].userId ==
+                                      comment['userId'].toString()
+                                  ? AppColors.primaryBlue
+                                  : AppColors.primaryorange),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Write a comment...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    if (_controller.text.trim().isNotEmpty) {
+                      createComment(
+                              getx.userdetails[0].userId,
+                              _controller.text,
+                              getx.userdetails[0].username,
+                              widget.postId)
+                          .then((val) {
+                        if (val != "") {
+                          Fluttertoast.showToast(
+                              msg: "Comment added successfully!");
+                          // Dismiss the keyboard
+                          _controller.clear();
+                        } else {
+                          Fluttertoast.showToast(msg: "Something went Wrong!");
+                          // Dismiss the keyboard
+                        }
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CommentCard extends StatelessWidget {
+  final String postId;
+  final String username;
+  final String time;
+  final String content;
+  final String imageUrl;
+
+  final List likeIdList;
+  final String userId;
+  final String commentId;
+  final Color color;
+  const CommentCard({
+    required this.postId,
+    required this.username,
+    required this.time,
+    required this.content,
+    required this.imageUrl,
+    required this.likeIdList,
+    required this.userId,
+    required this.commentId,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          color: const Color.fromARGB(255, 233, 228, 228)),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png'),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(username,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: color)),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Text(
+              content,
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(processTimestampString(time),
+                    style: TextStyle(color: Colors.grey)),
+                Spacer(),
+                Row(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          if (likeIdList.contains(getx.userdetails[0].userId)) {
+                            removeLikeFromComment(
+                                commentId, getx.userdetails[0].userId);
+                          } else {
+                            addLikeToComment(
+                                commentId, getx.userdetails[0].userId);
+                          }
+                        },
+                        child: likeIdList.contains(getx.userdetails[0].userId)
+                            ? Icon(
+                                Icons.favorite_outlined,
+                                color: AppColors.red,
+                              )
+                            : Icon(Icons.favorite_border)),
+                    SizedBox(width: 5),
+                    Text('${likeIdList.length}'),
+                  ],
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+
+                // Icon(Icons.bookmark_border),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> showDeleteCommentDialog({
+  required BuildContext context,
+  required String commentId,
+  required String postId,
+  required Future<bool> Function(String commentId, String postId) deleteComment,
+}) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Delete Comment'),
+      content: Text('Are you sure you want to delete this comment?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            bool success = await deleteComment(commentId, postId);
+            Navigator.of(context).pop();
+            if (success) {
+              Fluttertoast.showToast(msg: "Comment deleted!");
+            } else {
+              Fluttertoast.showToast(msg: "Failed to delete comment.");
+            }
+          },
+          child: Text('Delete', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
 }

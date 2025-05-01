@@ -26,8 +26,11 @@ class Getx extends GetxController {
   late StreamSubscription<ConnectivityResult> _subscription;
   RxList mealItemList = [].obs;
   RxList userPostId = [].obs;
+  RxList userCommentId = [].obs;
 
   RxString token = "".obs;
+
+  RxBool loader = false.obs;
 
   RxList<Userdetails> userdetails = <Userdetails>[].obs;
 

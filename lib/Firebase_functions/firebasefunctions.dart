@@ -73,6 +73,7 @@ Future<String?> createPost(String userId, String postType, String caption,
       'userId': userId,
       'username': username,
       'LikedId': [],
+      'commentId': [],
       'postType': postType,
       'caption': caption,
       'text': text,
@@ -109,6 +110,24 @@ Future<void> addLikeToPost(String postId, String userId) async {
   }
 }
 
+Future<void> addLikeToComment(String commentId, String userId) async {
+  try {
+    // Get the reference to the post document using postId
+    DocumentReference postRef =
+        FirebaseFirestore.instance.collection('comments').doc(commentId);
+
+    // Update the LikedId array field with the new userId
+    await postRef.update({
+      'LikedId':
+          FieldValue.arrayUnion([userId]), // Add userId to the LikedId array
+    });
+
+    print('User added to LikedId list successfully');
+  } catch (e) {
+    print('Error adding like: $e');
+  }
+}
+
 Future<void> removeLikeFromPost(String postId, String userId) async {
   try {
     // Get the reference to the post document using postId
@@ -127,26 +146,46 @@ Future<void> removeLikeFromPost(String postId, String userId) async {
   }
 }
 
+Future<void> removeLikeFromComment(String commentId, String userId) async {
+  try {
+    // Get the reference to the post document using postId
+    DocumentReference postRef =
+        FirebaseFirestore.instance.collection('comments').doc(commentId);
+
+    // Remove userId from the LikedId array field
+    await postRef.update({
+      'LikedId': FieldValue.arrayRemove(
+          [userId]), // Remove userId from the LikedId array
+    });
+
+    print('User removed from LikedId list successfully');
+  } catch (e) {
+    print('Error removing like: $e');
+  }
+}
+
 Stream<List<Map<String, dynamic>>> fetchPosts() {
+  getx.loader.value = true;
+
   return FirebaseFirestore.instance
       .collection('posts')
-      .orderBy('postTime',
-          descending: true) // Order by postTime for the latest posts
+      .orderBy('postTime', descending: true)
       .snapshots()
       .map((snapshot) {
-    // Filter posts where the userId matches the given userId
     List<Map<String, dynamic>> allPosts =
         snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
-    // Now, we can filter the posts by userId (replace 'userid' with your actual variable)
+    // Filter posts by userId
     getx.userPostId.value = allPosts
-        .where((post) =>
-            post['userId'] == getx.userdetails[0].userId) // Filter by userId
-        .map((post) => post['PostId'] as String) // Extract postId
+        .where((post) => post['userId'] == getx.userdetails[0].userId)
+        .map((post) => post['PostId'] as String)
         .toList();
 
-    // Return all posts (or any other operation you want)
+    getx.loader.value = false;
     return allPosts;
+  }).handleError((error) {
+    print('Stream error: $error');
+    getx.loader.value = false;
   });
 }
 
@@ -208,3 +247,77 @@ Future<bool> uploadFile(File file, String fileType, String postId) async {
 }
 
 // Example usage
+
+Future<String?> createComment(
+    String userId, String text, String username, String postId) async {
+  String formattedTime =
+      DateFormat('hh:mm a, dd MMM yyyy').format(DateTime.now());
+  try {
+    DocumentReference docRef = await _firestore.collection('comments').add({
+      'postID': postId,
+      'userId': userId,
+      'username': username,
+      'LikedId': [],
+      'comment': text,
+      'likeCount': 0,
+      'postTime': formattedTime,
+    });
+
+    String commentId = docRef.id;
+
+    await docRef.update({'commentId': commentId});
+    DocumentReference postRef = _firestore.collection('posts').doc(postId);
+    await postRef.update({
+      'commentId': FieldValue.arrayUnion([commentId]),
+    });
+
+    return commentId; // Return the PostId if successful
+  } catch (e) {
+    print('Error creating Comment: $e');
+    return ""; // Return null if there's an error
+  }
+}
+
+Future<bool> deleteComment(String commentId, String postId) async {
+  try {
+    DocumentReference commentRef =
+        _firestore.collection('comments').doc(commentId);
+
+    await commentRef.delete();
+
+    DocumentReference postRef = _firestore.collection('posts').doc(postId);
+
+    await postRef.update({
+      'commentId': FieldValue.arrayRemove([commentId]),
+    });
+
+    return true; // Success
+  } catch (e) {
+    print('Error deleting comment: $e');
+    return false; // Failure
+  }
+}
+
+Stream<List<Map<String, dynamic>>> fetchComments(String postId) {
+  return FirebaseFirestore.instance
+      .collection('comments')
+      .where('postID', isEqualTo: postId) // Filter by postId
+      .orderBy('postTime', descending: false)
+      .snapshots()
+      .map((snapshot) {
+    List<Map<String, dynamic>> allPosts =
+        snapshot.docs.map((doc) => doc.data()).toList();
+
+    // Filter posts by userId (if needed)
+    getx.userCommentId.value = allPosts
+        .where((post) => post['userId'] == getx.userdetails[0].userId)
+        .map((post) => post['commentId'] as String)
+        .toList();
+
+    print(allPosts);
+
+    return allPosts;
+  }).handleError((error) {
+    print('Stream error: $error');
+  });
+}
