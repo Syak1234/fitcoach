@@ -97,7 +97,6 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
                             trailing: const Icon(Icons.arrow_forward_ios,
                                 color: AppColors.textDark),
                             onTap: () {
-                            
                               Get.to(() => CreateMealScreen(
                                     mealItems: meal.mealItems,
                                     meal: meal,
@@ -121,6 +120,7 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
 
   Widget _buildNoMealsWidget(double screenWidth) {
     return Container(
+      height: 150, // Set fixed height
       padding: EdgeInsets.all(screenWidth * 0.04),
       decoration: BoxDecoration(
         color: AppColors.backgroundDark,
@@ -145,6 +145,8 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // Center content vertically
               children: [
                 Text(
                   "Create a Meal",
