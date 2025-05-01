@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -104,7 +105,6 @@ class _PostsScreenState extends State<PostsScreen> {
                 return ListView(
                   reverse: false,
                   children: posts.map((post) {
-                    
                     return Padding(
                       padding: EdgeInsets.only(
                           left: getx.userdetails[0].userId ==
@@ -120,7 +120,7 @@ class _PostsScreenState extends State<PostsScreen> {
                       child: PostCard(
                           content: post["text"] ?? "",
                           caption: post["caption"] ?? "No caption",
-                          likeIdList: post['LikedId'],
+                          likeIdList: post['LikedId'] ?? [],
                           imageUrl: "",
                           postType: post['postType'],
                           time: post['postTime'].toString(),
@@ -207,7 +207,7 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage(
@@ -220,7 +220,8 @@ class PostCard extends StatelessWidget {
                     Text(username,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: color)),
-                    Text(time, style: TextStyle(color: Colors.grey)),
+                    Text(processTimestampString(time),
+                        style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
@@ -303,4 +304,33 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
+}
+// import 'package:intl/intl.dart';
+
+String processTimestampString(String input) {
+  final lowerInput = input.toLowerCase();
+
+  if (lowerInput.contains('timestamp')) {
+    final regex =
+        RegExp(r'seconds=(\d+),\s*nanoseconds=(\d+)', caseSensitive: false);
+    final match = regex.firstMatch(input);
+
+    if (match != null) {
+      int seconds = int.parse(match.group(1)!);
+      int nanoseconds = int.parse(match.group(2)!);
+
+      int milliseconds = seconds * 1000 + (nanoseconds ~/ 1000000);
+      DateTime dateTime =
+          DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
+
+      // Format to "07:36pm,16 apr,2025"
+      String formatted =
+          DateFormat('hh:mma,dd MMM,yyyy').format(dateTime).toLowerCase();
+
+      return formatted;
+    }
+  }
+
+  // If no timestamp or no match, return original string
+  return input;
 }
