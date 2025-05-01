@@ -203,10 +203,11 @@ class _SignInScreenState extends State<SignInScreen> {
 
                               if (user!.email!.isNotEmpty) {
                                 Userdetails userdetails = Userdetails(
-                                    email: user!.email.toString(),
-                                    userId: user!.uid.toString(),
-                                    name: user!.displayName.toString(),
-                                    userimg: user!.photoURL.toString() ?? '');
+                                  email: user!.email.toString(),
+                                  userId: user!.uid.toString(),
+                                  name: user!.displayName.toString(),
+                                  userimg: user!.photoURL.toString() ?? '',
+                                );
 
                                 SharedPrefHelper.setString(
                                     'email', userdetails.email);
@@ -253,12 +254,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                 print("User Data: $facebookdata");
                                 log(facebookdata!['picture']['data']['url']);
                                 Userdetails userdetails = Userdetails(
-                                    email: facebookdata!['email'] ?? ' ',
-                                    name: facebookdata!['name'] ?? ' ',
-                                    userId: '',
-                                    userimg: facebookdata!['picture']['data']
-                                            ['url'] ??
-                                        ' ');
+                                  email: facebookdata!['email'] ?? ' ',
+                                  name: facebookdata!['name'] ?? ' ',
+                                  userId: '',
+                                  userimg: facebookdata!['picture']['data']
+                                          ['url'] ??
+                                      ' ',
+                                );
                                 Get.toNamed(
                                   AppRoutes.fingerprintSetup,
                                 );

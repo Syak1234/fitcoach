@@ -37,10 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
     userImage.value = await SharedPrefHelper.getString('userimg') ?? '';
 
     Userdetails userdetails = Userdetails(
-        email: await SharedPrefHelper.getString('email') ?? '',
-        userId: await SharedPrefHelper.getString('userId') ?? '',
-        name: await SharedPrefHelper.getString('name') ?? '',
-        userimg: await SharedPrefHelper.getString('userimg') ?? '');
+      email: await SharedPrefHelper.getString('email') ?? '',
+      userId: await SharedPrefHelper.getString('userId') ?? '',
+      name: await SharedPrefHelper.getString('name') ?? '',
+      userimg: await SharedPrefHelper.getString('userimg') ?? '',
+    );
 
     if (getx.userdetails.length > 0) {
       getx.userdetails.clear();
