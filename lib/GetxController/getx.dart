@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:fitcoach/modelClass/mealItemList.dart';
+
+import 'package:fitcoach/modelClass/userDetails.dart';
+
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/utility/no_internet.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +26,8 @@ class Getx extends GetxController {
   late StreamSubscription<ConnectivityResult> _subscription;
   RxList mealItemList = [].obs;
   RxList userPostId = [].obs;
+
+  RxList<Userdetails> userdetails = <Userdetails>[].obs;
 
   var isFeetAndInches = false.obs;
   var feet = 0.obs;

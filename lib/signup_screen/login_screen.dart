@@ -217,6 +217,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                 SharedPrefHelper.setString(
                                     'userimg', userdetails.userimg);
 
+                                if (getx.userdetails.length > 0) {
+                                  getx.userdetails.clear();
+                                }
+
+                                getx.userdetails.add(userdetails);
+
                                 Get.toNamed(
                                   AppRoutes.fingerprintSetup,
                                 );
