@@ -234,7 +234,7 @@ Map<String, dynamic>? extractJwtPayload(String? token) {
 Future createMealApi(
   BuildContext context, {
   required String mealname,
-  required dynamic
+  required Getx
       mealController, // Replace 'dynamic' with your actual controller type
 }) async {
   try {
@@ -287,17 +287,17 @@ Future createMealApi(
         style: ToastificationStyle.fillColored,
       );
     } else {
-      toastification.show(
-        context: context,
-        title: const Text('Failed to Create Meal'),
-        description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
-        type: ToastificationType.error,
-        autoCloseDuration: const Duration(seconds: 3),
-      );
+      // toastification.show(
+      //   context: context,
+      //   title: const Text('Failed to Create Meal'),
+      //   description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
+      //   type: ToastificationType.error,
+      //   autoCloseDuration: const Duration(seconds: 3),
+      // );
     }
   } catch (e) {
     Get.back(); // close loading dialog
-    log("Error: $e");
+    log("Error: x $e");
     toastification.show(
       context: context,
       title: const Text('Error'),
@@ -328,7 +328,7 @@ Future<List<Meal>> allListMealApi(BuildContext context) async {
       Uri.https(ApiUrl.baseUrl, ApiUrl.getMealList + userid),
       headers: headers,
     );
-
+    log(res.body.toString());
     if (res.statusCode == 200) {
       var jsondata = jsonDecode(res.body);
       List<Meal> meals =
@@ -347,7 +347,7 @@ Future updateMealApi(
   BuildContext context, {
   required int id,
   required String mealname,
-  required dynamic
+  required Getx
       mealController, // Replace 'dynamic' with the actual type if known
 }) async {
   try {
@@ -506,12 +506,11 @@ Future updateUserDetails({
   required String specificExperiencePreferance,
   required String calorieyGoal,
   required String sleepQuality,
-  required BuildContext context, // Added context for toast
 }) async {
   try {
     String? token = await SharedPrefHelper.getString('token');
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
 
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.updateUserdeatils + userid);
     final body = jsonEncode({
       "fitnessGoal": fitnessGoal,
@@ -533,39 +532,16 @@ Future updateUserDetails({
     };
 
     final response = await http.post(url, headers: headers, body: body);
-
-    Get.back(); // Close loading dialog
+    Get.back();
     log(response.body.toString());
-
     if (response.statusCode == 200) {
-      toastification.show(
-        context: context,
-        title: const Text('User Details Updated'),
-        autoCloseDuration: const Duration(seconds: 3),
-        type: ToastificationType.success,
-        style: ToastificationStyle.fillColored,
-      );
-    } else {
-      var jsondata = jsonDecode(response.body);
-      toastification.show(
-        context: context,
-        title: const Text('Update Failed'),
-        description:
-            Text(jsondata['message'] ?? 'Failed to update user details'),
-        autoCloseDuration: const Duration(seconds: 3),
-        type: ToastificationType.error,
-      );
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
     }
   } catch (e) {
-    Get.back(); // Close loading dialog
-    log("Error: $e");
-    toastification.show(
-      context: context,
-      title: const Text('Error'),
-      description: Text(e.toString()),
-      autoCloseDuration: const Duration(seconds: 3),
-      type: ToastificationType.error,
-    );
+    Get.back();
+    log(e.toString());
   }
 }
 
