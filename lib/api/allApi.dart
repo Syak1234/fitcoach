@@ -181,7 +181,7 @@ Future createMealApi(
     String? token = await SharedPrefHelper.getString('token');
     List<Map<String, dynamic>> mealItemsJson =
         mealController.mealItems.map((item) => item.toJson()).toList();
-    showDialog( 
+    showDialog(
       context: context,
       builder: (context) {
         return Center(
@@ -330,6 +330,132 @@ Future upadteMealApi(
       // Get.toNamed(
       //   AppRoutes.fingerprintSetup,
       // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}
+
+Future createUserDetails({
+  required String userId,
+  required String fitnessGoal,
+  required String gender,
+  required int weight,
+  required int height,
+  required bool previousFitnessExperience,
+  required String specificDiet,
+  required int daysCommit,
+  required String specificExperiencePreferance,
+  required String calorieyGoal,
+  required String sleepQuality,
+}) async {
+  try {
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
+    String? token = await SharedPrefHelper.getString('token');
+    final body = jsonEncode({
+      "userId": userId,
+      "fitnessGoal": fitnessGoal,
+      "gender": gender,
+      "weight": weight,
+      "height": height,
+      "previousFitnessExperience": previousFitnessExperience,
+      "specificDiet": specificDiet,
+      "daysCommit": daysCommit,
+      "specificExperiencePreferance": specificExperiencePreferance,
+      "calorieyGoal": calorieyGoal,
+      "sleepQuality": sleepQuality,
+    });
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+
+    final response = await http.post(url, headers: headers, body: body);
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}
+
+Future updateUserDetails({
+  required String fitnessGoal,
+  required String gender,
+  required int weight,
+  required int height,
+  required bool previousFitnessExperience,
+  required String specificDiet,
+  required int daysCommit,
+  required String specificExperiencePreferance,
+  required String calorieyGoal,
+  required String sleepQuality,
+}) async {
+  try {
+    String? token = await SharedPrefHelper.getString('token');
+
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.updateUserdeatils + userid);
+    final body = jsonEncode({
+      "fitnessGoal": fitnessGoal,
+      "gender": gender,
+      "weight": weight,
+      "height": height,
+      "previousFitnessExperience": previousFitnessExperience,
+      "specificDiet": specificDiet,
+      "daysCommit": daysCommit,
+      "specificExperiencePreferance": specificExperiencePreferance,
+      "calorieyGoal": calorieyGoal,
+      "sleepQuality": sleepQuality,
+    });
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+
+    final response = await http.post(url, headers: headers, body: body);
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}
+
+Future getUserDetails() async {
+  try {
+    String? token = await SharedPrefHelper.getString('token');
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails + userid);
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+
+    final response = await http.get(
+      url,
+      headers: headers,
+    );
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+     
     }
   } catch (e) {
     Get.back();
