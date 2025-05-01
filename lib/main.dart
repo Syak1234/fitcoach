@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'CommunityAndResource/community_screen1.dart';
+import 'utility/step_trackerUi.dart';
 
 void main() async {
+   final StepsController controller = Get.put(StepsController());
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   OpenFoodAPIConfiguration.userAgent = UserAgent(

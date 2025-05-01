@@ -56,17 +56,17 @@ class _AccountDashboardState extends State<AccountDashboard> {
             // _buildSettingsItem(Icons.language, 'Language',
             //     trailing: 'English (EN)'),
             // _buildSettingsItem(Icons.dark_mode, 'Dark Mode', switchValue: true),
-            _buildSettingsItem(
-              Icons.devices,
-              'Linked Devices',
-              trailing: 'Apple Watch',
-              ontap: () {
-                Get.toNamed(AppRoutes.linkDevice);
-              },
-            ),
+            // _buildSettingsItem(
+            //   Icons.devices,
+            //   'Linked Devices',
+            //   trailing: 'Apple Watch',
+            //   ontap: () {
+            //     Get.toNamed(AppRoutes.linkDevice);
+            //   },
+            // ),
             // _buildSettingsItem(Icons.emoji_events, 'Achievements'),
             _buildSectionTitle('Security & Privacy', beta: true),
-            _buildSettingsItem(Icons.security, 'Main Security'),
+            // _buildSettingsItem(Icons.security, 'Main Security'),
             Obx(
               () => _buildSettingsItem(
                 Icons.fingerprint,
@@ -93,9 +93,9 @@ class _AccountDashboardState extends State<AccountDashboard> {
                 Get.toNamed(AppRoutes.aboutUs);
               },
             ),
-            _buildSettingsItem(Icons.help, 'Help Center'),
-            _buildSettingsItem(Icons.feedback, 'Submit Feedback'),
-            _buildSectionTitle('Danger Zone', warning: true),
+            // _buildSettingsItem(Icons.help, 'Help Center'),
+            // _buildSettingsItem(Icons.feedback, 'Submit Feedback'),
+            // _buildSectionTitle('Danger Zone', warning: true),
             // _buildSettingsItem(Icons.delete, 'Close Account', isDanger: true),
             _buildSectionTitle('Log Out'),
             _buildSettingsItem(Icons.logout, 'Sign Out'),
