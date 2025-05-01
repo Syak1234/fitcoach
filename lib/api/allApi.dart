@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api_url.dart';
+import 'package:fitcoach/modelClass/mealItemList.dart';
 import 'package:fitcoach/routes/app_routes.dart';
+import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import "package:http/http.dart" as http;
@@ -90,7 +94,15 @@ Future signUp(context, userName, pass, confirmPass) async {
 
     var jsondata = jsonDecode(res.body);
     log(jsondata.toString());
-    Get.back();
+    log(res.statusCode.toString());
+    if (res.statusCode == 200) {
+      Get.back();
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SignInScreen(),
+          ));
+    }
   } catch (e) {
     Get.back();
     log(e.toString());
@@ -150,22 +162,26 @@ Future loginApi(context, userName, pass) async {
   }
 }
 
-Future createMealApi(context,
-    {required String mealname,
-    String userid = "5ae35e85-5ab7-4ed1-a994-55054a8bbba9",
-    required String protein,
-    required String fat,
-    required String carbohydrates,
-    required String kcal,
-    required String carbohydratePercentage,
-    required String fatPercentage,
-    required String proteinPercentage,
-    required String name,
-    required String dataSource,
-    required String servingSize}) async {
+Future createMealApi(
+  context, {
+  required String mealname,
+  required Getx mealController,
+  // required String protein,
+  // required String fat,
+  // required String carbohydrates,
+  // required String kcal,
+  // required String carbohydratePercentage,
+  // required String fatPercentage,
+  // required String proteinPercentage,
+  // required String name,
+  // required String dataSource,
+  // required String servingSize
+}) async {
   try {
     String? token = await SharedPrefHelper.getString('token');
-    showDialog(
+    List<Map<String, dynamic>> mealItemsJson =
+        mealController.mealItems.map((item) => item.toJson()).toList();
+    showDialog( 
       context: context,
       builder: (context) {
         return Center(
@@ -173,25 +189,14 @@ Future createMealApi(context,
         );
       },
     );
-
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
     Map obj = {
       "mealName": mealname,
       "userId": userid,
-      "mealItems": [
-        {
-          "protein": protein,
-          "fat": fat,
-          "carbohydrates": carbohydrates,
-          "kcal": kcal,
-          "servingSize": servingSize,
-          "dataSource": dataSource,
-          "name": name,
-          "proteinPercentage": proteinPercentage,
-          "fatPercentage": fatPercentage,
-          "carbohydratePercentage": carbohydratePercentage
-        }
-      ]
+      "mealItems": mealItemsJson
     };
+
+    log(obj.toString());
 
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -207,6 +212,112 @@ Future createMealApi(context,
 
     var res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.createMeal),
+      headers: headers,
+      body: jsonEncode(obj),
+    );
+
+    var jsondata = await jsonDecode(res.body);
+    log(jsondata.toString());
+
+    Get.back();
+    if (res.statusCode == 200) {
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}
+
+Future<List<Meal>> allListMealApi(BuildContext context) async {
+  try {
+    String? token = await SharedPrefHelper.getString('token');
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    var res = await client.get(
+      Uri.https(ApiUrl.baseUrl, ApiUrl.getMealList + userid),
+      headers: headers,
+    );
+
+    if (res.statusCode == 200) {
+      var jsondata = jsonDecode(res.body);
+      List<Meal> meals =
+          (jsondata['result'] as List).map((e) => Meal.fromJson(e)).toList();
+      return meals;
+    } else {
+      throw Exception("Failed to load meals");
+    }
+  } catch (e) {
+    log(e.toString());
+    throw Exception("Error fetching meals");
+  }
+}
+
+Future upadteMealApi(
+  context, {
+  required int id,
+  required String mealname,
+  required Getx mealController,
+  // required String protein,
+  // required String fat,
+  // required String carbohydrates,
+  // required String kcal,
+  // required String carbohydratePercentage,
+  // required String fatPercentage,
+  // required String proteinPercentage,
+  // required String name,
+  // required String dataSource,
+  // required String servingSize
+}) async {
+  try {
+    String? token = await SharedPrefHelper.getString('token');
+    List<Map<String, dynamic>> mealItemsJson =
+        mealController.mealItems.map((item) => item.toJson()).toList();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+    Map obj = {
+      "id": id,
+      "mealName": mealname,
+      // "userId": userid,
+      "mealItems": mealItemsJson
+    };
+
+    log(obj.toString());
+
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+
+    // Ignore SSL certificate verification (for local testing)
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    var res = await client.post(
+      Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
       headers: headers,
       body: jsonEncode(obj),
     );

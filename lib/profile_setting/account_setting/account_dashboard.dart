@@ -96,7 +96,7 @@ class _AccountDashboardState extends State<AccountDashboard> {
             _buildSettingsItem(Icons.help, 'Help Center'),
             _buildSettingsItem(Icons.feedback, 'Submit Feedback'),
             _buildSectionTitle('Danger Zone', warning: true),
-            _buildSettingsItem(Icons.delete, 'Close Account', isDanger: true),
+            // _buildSettingsItem(Icons.delete, 'Close Account', isDanger: true),
             _buildSectionTitle('Log Out'),
             _buildSettingsItem(Icons.logout, 'Sign Out'),
             const SizedBox(height: 20),
@@ -122,8 +122,7 @@ class _AccountDashboardState extends State<AccountDashboard> {
   }
 
   PreferredSizeWidget customAppBar() {
-    return 
-    PreferredSize(
+    return PreferredSize(
       preferredSize: const Size.fromHeight(120),
       child: Stack(
         children: [

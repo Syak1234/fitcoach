@@ -1,3 +1,8 @@
+import 'dart:developer';
+
+import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/meal_create/mealUi/mealList.dart';
+import 'package:fitcoach/modelClass/mealItemList.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -12,31 +17,25 @@ class CustomMealsScreen extends StatefulWidget {
 
 class _CustomMealsScreenState extends State<CustomMealsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> meals = [
-    'Vegetable Salad',
-    'Vegan Bowl',
-    'Chicken Wrap',
-    'Fruit Mix'
-  ];
-  RxList<String> filteredMeals = <String>[].obs;
 
   @override
   void initState() {
     super.initState();
-    filteredMeals.value = List.from(meals);
-    _searchController.addListener(_filterMeals);
+    _searchController.addListener(() {
+      setState(() {}); // Rebuild on search input change
+    });
   }
 
-  void _filterMeals() {
-    filteredMeals.value = meals
-        .where((meal) =>
-            meal.toLowerCase().contains(_searchController.text.toLowerCase()))
-        .toList();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: customAppBar(context),
       body: Padding(
@@ -57,89 +56,116 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            const SizedBox(height: 10),
-            Obx(
-              () => filteredMeals.isNotEmpty
-                  ? Expanded(
-                      child: ListView.builder(
-                        itemCount: filteredMeals.length,
-                        itemBuilder: (context, index) {
-                          return filteredMeals.isNotEmpty
-                              ? Card(
-                                  elevation: 0,
-                                  color: AppColors.gray10,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ListTile(
-                                    title: Text(
-                                      filteredMeals[index],
-                                      style: TextStyle(
-                                        color: AppColors.textDark,
-                                      ),
-                                    ),
-                                    trailing: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: AppColors.textDark),
-                                    onTap: () {},
-                                  ),
-                                )
-                              : Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                        },
-                      ),
-                    )
-                  : Container(
-                      padding: EdgeInsets.all(screenWidth * 0.04),
-                      decoration: BoxDecoration(
-                        color: AppColors.backgroundDark,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: screenWidth * 0.15,
-                            height: screenWidth * 0.15,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryorange,
-                              shape: BoxShape.circle,
+            Expanded(
+              child: FutureBuilder<List<Meal>>(
+                future: allListMealApi(context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return _buildNoMealsWidget(screenWidth);
+                  } else {
+                    List<Meal> meals = snapshot.data!;
+                    String query = _searchController.text.toLowerCase();
+
+                    List<Meal> filteredMeals = meals.where((meal) {
+                      return meal.mealName.toLowerCase().contains(query);
+                    }).toList();
+
+                    if (filteredMeals.isEmpty) {
+                      return Center(
+                        child: Text('No meals found for "$query"'),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: filteredMeals.length,
+                      itemBuilder: (context, index) {
+                        final meal = filteredMeals[index];
+                        return Card(
+                          elevation: 0,
+                          color: AppColors.gray10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ListTile(
+                            title: Text(
+                              meal.mealName,
+                              style: TextStyle(color: AppColors.textDark),
                             ),
-                            child: Icon(
-                              Icons.restaurant_menu,
-                              color: Colors.white,
-                              size: screenWidth * 0.07,
-                            ),
+                            trailing: const Icon(Icons.arrow_forward_ios,
+                                color: AppColors.textDark),
+                            onTap: () {
+                            
+                              Get.to(() => CreateMealScreen(
+                                    mealItems: meal.mealItems,
+                                    meal: meal,
+                                    update: true,
+                                  ));
+                              // Navigate to meal details if needed
+                            },
                           ),
-                          SizedBox(width: screenWidth * 0.05),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Create a Meal",
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.05,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(height: screenWidth * 0.02),
-                                Text(
-                                  "Save time logging your meals! Combine frequently consumed items into Meals for more efficient tracking.",
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoMealsWidget(double screenWidth) {
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundDark,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: screenWidth * 0.15,
+            height: screenWidth * 0.15,
+            decoration: BoxDecoration(
+              color: AppColors.primaryorange,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.restaurant_menu,
+              color: Colors.white,
+              size: screenWidth * 0.07,
+            ),
+          ),
+          SizedBox(width: screenWidth * 0.05),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Create a Meal",
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.05,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: screenWidth * 0.02),
+                Text(
+                  "Save time logging your meals! Combine frequently consumed items into Meals for more efficient tracking.",
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -149,7 +175,6 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
       preferredSize: const Size.fromHeight(90),
       child: Stack(
         children: [
-          // Background Image
           Container(
             height: 130,
             decoration: const BoxDecoration(
@@ -165,34 +190,16 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
               ),
             ),
           ),
-
-          // AppBar Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top Icons Row
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Date Icon + Date
-                      // InkWell(
-                      //   onTap: () {
-                      //     // Get.back();
-                      //   },
-                      //   child: Row(
-                      //     children: [
-                      //       Icon(Icons.arrow_back,
-                      //           color: AppColors.textLight, size: 18),
-                      //       const SizedBox(width: 6),
-                      //     ],
-                      //   ),
-                      // ),
                       const Text(
                         "Create Meal",
                         style: TextStyle(
@@ -203,8 +210,16 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
                       ),
                       InkWell(
                         onTap: () {
-                          Get.toNamed(AppRoutes.createMealScreen);
-                          // _showCustomDialog(context);
+                          Get.to(() => CreateMealScreen(
+                                meal: Meal(
+                                    id: 0,
+                                    mealName: '',
+                                    userId: '',
+                                    mealItems: []),
+                                // meal: Get.arguments[
+                                //     'meal'], // required argument from route
+                                mealItems: Get.arguments ?? [],
+                              ));
                         },
                         child: Row(
                           children: [
@@ -216,30 +231,8 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
                       ),
                     ],
                   ),
-
-                  Spacer(),
-
-                  // Row(
-                  //   children: [
-                  //     Column(
-                  //       crossAxisAlignment: CrossAxisAlignment.end,
-                  //       children: [
-                  //         const Text(
-                  //           "Create Meal",
-                  //           style: TextStyle(
-                  //             color: AppColors.textLight,
-                  //             fontSize: 25,
-                  //             fontWeight: FontWeight.bold,
-                  //           ),
-                  //         ),
-                  //         const SizedBox(height: 4),
-                  //       ],
-                  //     ),
-                  //   ],
-                  // ),
-                  SizedBox(
-                    height: 30,
-                  ),
+                  const Spacer(),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

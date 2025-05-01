@@ -288,6 +288,7 @@ class FoodSearchScreen extends StatelessWidget {
                       }
 
                       var food = controller.filteredFoods[index];
+
                       return Column(
                         children: [
                           ListTile(

@@ -319,11 +319,11 @@ class AppRoutes {
       page: () => CustomMealsScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
-    GetPage(
-      name: createMealScreen,
-      page: () => CreateMealScreen(),
-      transition: Transition.rightToLeft, // Optional: Add transition animations
-    ),
+    // GetPage(
+    //   name: createMealScreen,
+    //   page: () => CreateMealScreen(),
+    //   transition: Transition.rightToLeft, // Optional: Add transition animations
+    // ),
     GetPage(
       name: foodSearchScreen,
       page: () => FoodSearchScreen(),

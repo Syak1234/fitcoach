@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fitcoach/modelClass/mealItemList.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/utility/no_internet.dart';
 import 'package:flutter/material.dart';
@@ -89,5 +90,23 @@ class Getx extends GetxController {
       // ignore: control_flow_in_finally
       return auth;
     }
+  }
+
+  var mealItems = <MealItem>[].obs;
+
+  void addMealItem(MealItem item) {
+    mealItems.add(item);
+  }
+
+  void removeMealItem(MealItem item) {
+    mealItems.remove(item);
+  }
+
+  void clearMealItems() {
+    mealItems.clear();
+  }
+
+  void setMealItems(List<MealItem> items) {
+    mealItems.value = items;
   }
 }

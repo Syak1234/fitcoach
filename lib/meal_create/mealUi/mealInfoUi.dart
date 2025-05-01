@@ -1,7 +1,9 @@
 import 'dart:developer';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/modelClass/mealItemList.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -13,6 +15,7 @@ class NutritionSummaryScreen extends StatefulWidget {
 }
 
 class _NutritionSummaryScreenState extends State<NutritionSummaryScreen> {
+  final Getx mealController = Get.put(Getx());
   late double fat = 0.0;
   double carbohydrates = 0.0;
   double proteins = 0.0;
@@ -166,19 +169,10 @@ class _NutritionSummaryScreenState extends State<NutritionSummaryScreen> {
                 Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                    createMealApi(context,
-                        mealname: "Meal1",
-                        protein: proteins.toString(),
-                        fat: fat.toString(),
-                        carbohydrates: carbohydrates.toString(),
-                        kcal: kcal.toString(),
-                        carbohydratePercentage:
-                            carbohydratePercentage.toString(),
-                        fatPercentage: fatPercentage.toString(),
-                        proteinPercentage: proteinPercentage.toString(),
-                        name: productname,
-                        dataSource: dataSource,
-                        servingSize: servingSize);
+                    final Map<String, dynamic> itemData = Get.arguments;
+                    final newItem = MealItem.fromMap(itemData);
+                    mealController.mealItems.add(newItem);
+                    Get.back(); // Go back afte
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,

@@ -105,6 +105,7 @@ class _PostsScreenState extends State<PostsScreen> {
                 return ListView(
                   reverse: true,
                   children: posts.map((post) {
+                    
                     return Padding(
                       padding: EdgeInsets.only(
                           left: userid == post['userId'].toString() ? 30 : 10,
