@@ -171,7 +171,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                       onPressed: () {
                         if (gk.currentState!.validate()) {
                           widget.update
-                              ? upadteMealApi(context,
+                              ? updateMealApi(context,
                                   id: widget.meal!.id ?? 0,
                                   mealname: mealNameController.text,
                                   mealController: mealController)

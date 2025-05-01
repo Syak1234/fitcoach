@@ -33,14 +33,17 @@ class _HomeScreenState extends State<HomeScreen> {
   RxString name = "".obs;
   RxString userImage = "".obs;
   getUserData() async {
-    name.value = await SharedPrefHelper.getString('name') ?? '';
+    name.value = await SharedPrefHelper.getString('name') ??
+        await SharedPrefHelper.getString('username') ??
+        '';
     userImage.value = await SharedPrefHelper.getString('userimg') ?? '';
 
+    getx.token.value = await SharedPrefHelper.getString('token') ?? '';
+
     Userdetails userdetails = Userdetails(
-      email: await SharedPrefHelper.getString('email') ?? '',
-      userId: await SharedPrefHelper.getString('userId') ?? '',
-      name: await SharedPrefHelper.getString('name') ?? '',
-      userimg: await SharedPrefHelper.getString('userimg') ?? '',
+      userId: await SharedPrefHelper.getString('userid') ?? '',
+      username: await SharedPrefHelper.getString('username') ?? '',
+      token: await SharedPrefHelper.getString('token') ?? '',
     );
 
     if (getx.userdetails.length > 0) {

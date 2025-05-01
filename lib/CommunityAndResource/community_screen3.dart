@@ -335,7 +335,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       onPressed: () {
         if (captionController.text != "") {
           submitPostinfo(captionController.text, getx.userdetails[0].userId,
-              getx.userdetails[0].name);
+              getx.userdetails[0].username);
         }
       },
       child: const Row(

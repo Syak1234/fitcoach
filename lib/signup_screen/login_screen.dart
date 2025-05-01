@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/api/externalFunction.dart';
 import 'package:fitcoach/forget_screen/forget_screen.dart';
 import 'package:fitcoach/functionality/facebook_sign_auth.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
@@ -202,31 +203,19 @@ class _SignInScreenState extends State<SignInScreen> {
                               user = await google_auth.signInWithGoogle();
 
                               if (user!.email!.isNotEmpty) {
-                                Userdetails userdetails = Userdetails(
-                                  email: user!.email.toString(),
-                                  userId: user!.uid.toString(),
-                                  name: user!.displayName.toString(),
-                                  userimg: user!.photoURL.toString() ?? '',
-                                );
+                                // Userdetails userdetails = Userdetails(
+                                //   username: user!.email.toString(),
+                                //   userId: user!.uid.toString(),
+                                //   name: user!.displayName.toString(),
+                                //   userimg: user!.photoURL.toString() ?? '',
+                                // );
 
-                                SharedPrefHelper.setString(
-                                    'email', userdetails.email);
-                                SharedPrefHelper.setString(
-                                    'userId', userdetails.userId);
-                                SharedPrefHelper.setString(
-                                    'name', userdetails.name);
-                                SharedPrefHelper.setString(
-                                    'userimg', userdetails.userimg);
-
-                                if (getx.userdetails.length > 0) {
-                                  getx.userdetails.clear();
-                                }
-
-                                getx.userdetails.add(userdetails);
-
-                                Get.toNamed(
-                                  AppRoutes.fingerprintSetup,
-                                );
+                                loginApi(
+                                    context,
+                                    user!.email.toString(),
+                                    passwordGanaretor(
+                                      user!.email.toString(),
+                                    ));
                               }
                               // user!.email.toString();
                             },
@@ -253,17 +242,20 @@ class _SignInScreenState extends State<SignInScreen> {
                               if (facebookdata != null) {
                                 print("User Data: $facebookdata");
                                 log(facebookdata!['picture']['data']['url']);
-                                Userdetails userdetails = Userdetails(
-                                  email: facebookdata!['email'] ?? ' ',
-                                  name: facebookdata!['name'] ?? ' ',
-                                  userId: '',
-                                  userimg: facebookdata!['picture']['data']
-                                          ['url'] ??
-                                      ' ',
-                                );
-                                Get.toNamed(
-                                  AppRoutes.fingerprintSetup,
-                                );
+                                // Userdetails userdetails = Userdetails(
+                                //   email: facebookdata!['email'] ?? ' ',
+                                //   name: facebookdata!['name'] ?? ' ',
+                                //   userId: '',
+                                //   userimg: facebookdata!['picture']['data']
+                                //           ['url'] ??
+                                //       ' ',
+                                // );
+
+                                loginApi(
+                                    context,
+                                    facebookdata!['email'] ?? "",
+                                    passwordGanaretor(
+                                        facebookdata!['email'] ?? ""));
                               }
                             },
                             child: Container(

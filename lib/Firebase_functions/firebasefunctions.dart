@@ -20,48 +20,48 @@ final FirebaseStorage _storage = FirebaseStorage.instance;
 Getx getx = Get.put(Getx());
 
 // Function to create user table (collection)
-Future<bool> createUser(
-    BuildContext context, String userId, String fullName, String email) async {
-  bool success = false;
-  try {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+// Future<bool> createUser(
+//     BuildContext context, String userId, String token, String email) async {
+//   bool success = false;
+//   try {
+//     showDialog(
+//       context: context,
+//       barrierDismissible: false,
+//       builder: (context) => const Center(child: CircularProgressIndicator()),
+//     );
 
-    await _firestore.collection('users').doc(userId).set({
-      'userId': userId,
-      'fullName': fullName,
-      'email': email,
-    });
-    SharedPrefHelper.setString("userid", userId);
-    SharedPrefHelper.setString("username", fullName);
-    SharedPrefHelper.setString("useremail", email);
-    getx.userdetails.clear();
-    final userdata =
-        Userdetails(userId: userId, userimg: "", name: fullName, email: email);
-    getx.userdetails.add(userdata);
-    success = true;
+//     await _firestore.collection('users').doc(userId).set({
+//       'userId': userId,
+//       'fullName': email,
+//       'email': email,
+//     });
+//     SharedPrefHelper.setString("userid", userId);
+//     SharedPrefHelper.setString("username", email);
+//     SharedPrefHelper.setString("token", email);
+//     getx.userdetails.clear();
+//     final userdata =
+//         Userdetails(userId: userId, userimg: "", name: fullName, email: email);
+//     getx.userdetails.add(userdata);
+//     success = true;
 
-    Navigator.of(context).pop();
-  } catch (e) {
-    success = false;
-    Navigator.of(context).pop();
-    print('Error creating user: $e');
-    resultDialog(
-        context: context,
-        title: "Error",
-        buttonText: "ok",
-        icon: Icons.error,
-        message: "Something went wrong!",
-        iconBackgroundColor: AppColors.backgroundLight,
-        onButtonPressed: () {
-          Navigator.pop(context);
-        });
-  }
-  return success;
-}
+//     Navigator.of(context).pop();
+//   } catch (e) {
+//     success = false;
+//     Navigator.of(context).pop();
+//     print('Error creating user: $e');
+//     resultDialog(
+//         context: context,
+//         title: "Error",
+//         buttonText: "ok",
+//         icon: Icons.error,
+//         message: "Something went wrong!",
+//         iconBackgroundColor: AppColors.backgroundLight,
+//         onButtonPressed: () {
+//           Navigator.pop(context);
+//         });
+//   }
+//   return success;
+// }
 
 // Function to create post table (collection)
 Future<String?> createPost(String userId, String postType, String caption,

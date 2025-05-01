@@ -48,7 +48,7 @@ class _PostsScreenState extends State<PostsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(getx.userdetails[0].name,
+                          Text(getx.userdetails[0].username,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 23,

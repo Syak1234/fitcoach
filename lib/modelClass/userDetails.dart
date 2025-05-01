@@ -1,11 +1,8 @@
 class Userdetails {
-  String name = "";
-  String email = "";
-  String userimg = "";
+  String username = "";
+
+  String token = "";
   String userId = "";
   Userdetails(
-      {required this.email,
-      required this.name,
-      required this.userimg,
-      required this.userId});
+      {required this.username, required this.token, required this.userId});
 }

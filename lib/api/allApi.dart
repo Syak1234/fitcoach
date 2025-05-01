@@ -15,6 +15,7 @@ import 'package:http/io_client.dart';
 import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 
 class SharedPrefHelper {
   static Future<void> setString(String key, String value) async {
@@ -58,21 +59,18 @@ class SharedPrefHelper {
   }
 }
 
-Future signUp(context, userName, pass, confirmPass) async {
+Future signUp(BuildContext context, String userName, String pass,
+    String confirmPass) async {
   try {
     showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     Map obj = {
       "userName": userName,
       "password": pass,
-      "confirmPassword": confirmPass
+      "confirmPassword": confirmPass,
     };
 
     final Map<String, String> headers = {
@@ -80,7 +78,6 @@ Future signUp(context, userName, pass, confirmPass) async {
       'accept': '*/*',
     };
 
-    // Ignore SSL certificate verification (for local testing)
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
@@ -92,32 +89,56 @@ Future signUp(context, userName, pass, confirmPass) async {
       body: jsonEncode(obj),
     );
 
+    Get.back(); // Close the loading dialog
+
     var jsondata = jsonDecode(res.body);
     log(jsondata.toString());
     log(res.statusCode.toString());
+
     if (res.statusCode == 200) {
-      Get.back();
+      toastification.show(
+        context: context,
+        title: const Text('Signup Successful!'),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        alignment: Alignment.topCenter,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SignInScreen(),
-          ));
+        context,
+        MaterialPageRoute(builder: (context) => SignInScreen()),
+      );
+    } else {
+      toastification.show(
+        context: context,
+        title: Text('Signup Failed: ${jsondata['message'] ?? 'Unknown error'}'),
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        alignment: Alignment.topCenter,
+        autoCloseDuration: const Duration(seconds: 4),
+      );
     }
   } catch (e) {
     Get.back();
     log(e.toString());
+
+    toastification.show(
+      context: context,
+      title: const Text('Something went wrong!'),
+      type: ToastificationType.error,
+      style: ToastificationStyle.fillColored,
+      alignment: Alignment.topCenter,
+      autoCloseDuration: const Duration(seconds: 4),
+    );
   }
 }
 
-Future loginApi(context, userName, pass) async {
+Future loginApi(BuildContext context, String userName, String pass) async {
   try {
     showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
     Map obj = {
@@ -125,109 +146,165 @@ Future loginApi(context, userName, pass) async {
       "password": pass,
     };
 
-    final Map<String, String> headers = {
+    final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
     };
 
-    // Ignore SSL certificate verification (for local testing)
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
 
-    var res = await client.post(
+    final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.login),
       headers: headers,
       body: jsonEncode(obj),
     );
 
-    Map data = await jsonDecode(res.body.toString());
-    log(data.toString());
-    final jsondata = data["result"];
+    Get.back();
 
     if (res.statusCode == 200) {
+      Map data = jsonDecode(res.body.toString());
+      final jsondata = data["result"];
+
       log(jsondata['id'] + "hjhjhjhj");
-      SharedPrefHelper.setString("userid", jsondata['id']);
-      SharedPrefHelper.setString("username", jsondata['userName']);
-      SharedPrefHelper.setString("token", jsondata['token']);
-      Get.back();
-      Get.toNamed(
-        AppRoutes.fingerprintSetup,
+
+      await SharedPrefHelper.setString("userid", jsondata['id']);
+      await SharedPrefHelper.setString("username", jsondata['userName']);
+      await SharedPrefHelper.setString("token", jsondata['token']);
+
+      toastification.show(
+        context: context,
+        title: const Text('Login Successful'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+
+      Get.toNamed(AppRoutes.fingerprintSetup);
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('Login Failed'),
+        description:
+            Text(jsonDecode(res.body)['message'] ?? 'Something went wrong'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
       );
     }
   } catch (e) {
     Get.back();
     log(e.toString());
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
 }
 
+// import 'dart:convert';
+
+Map<String, dynamic>? extractJwtPayload(String? token) {
+  if (token == null || token.isEmpty) {
+    return null;
+  }
+
+  List<String> parts = token.split('.');
+
+  if (parts.length != 3) {
+    return null; // invalid JWT format
+  }
+
+  String payload = parts[1];
+
+  // Normalize and decode Base64Url
+  String normalized = base64Url.normalize(payload);
+  String decoded = utf8.decode(base64Url.decode(normalized));
+
+  Map<String, dynamic> jsonPayload = json.decode(decoded);
+
+  print(jsonPayload.toString());
+  return jsonPayload;
+}
+
 Future createMealApi(
-  context, {
+  BuildContext context, {
   required String mealname,
-  required Getx mealController,
-  // required String protein,
-  // required String fat,
-  // required String carbohydrates,
-  // required String kcal,
-  // required String carbohydratePercentage,
-  // required String fatPercentage,
-  // required String proteinPercentage,
-  // required String name,
-  // required String dataSource,
-  // required String servingSize
+  required dynamic
+      mealController, // Replace 'dynamic' with your actual controller type
 }) async {
   try {
     String? token = await SharedPrefHelper.getString('token');
     List<Map<String, dynamic>> mealItemsJson =
         mealController.mealItems.map((item) => item.toJson()).toList();
+
     showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
     String userid = await SharedPrefHelper.getString('userid') ?? '';
     Map obj = {
       "mealName": mealname,
       "userId": userid,
-      "mealItems": mealItemsJson
+      "mealItems": mealItemsJson,
     };
 
-    log(obj.toString());
+    log("Request: $obj");
 
-    final Map<String, String> headers = {
+    final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
       'Authorization': 'Bearer $token'
     };
 
-    // Ignore SSL certificate verification (for local testing)
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
 
-    var res = await client.post(
+    final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.createMeal),
       headers: headers,
       body: jsonEncode(obj),
     );
 
-    var jsondata = await jsonDecode(res.body);
-    log(jsondata.toString());
+    Get.back(); // close loading dialog
 
-    Get.back();
+    var jsondata = jsonDecode(res.body);
+    log("Response: $jsondata");
+
     if (res.statusCode == 200) {
-      // Get.toNamed(
-      //   AppRoutes.fingerprintSetup,
-      // );
+      toastification.show(
+        context: context,
+        title: const Text('Meal Created'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('Failed to Create Meal'),
+        description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
+        type: ToastificationType.error,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
     }
   } catch (e) {
-    Get.back();
-    log(e.toString());
+    Get.back(); // close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      type: ToastificationType.error,
+      autoCloseDuration: const Duration(seconds: 3),
+    );
   }
 }
 
@@ -266,74 +343,76 @@ Future<List<Meal>> allListMealApi(BuildContext context) async {
   }
 }
 
-Future upadteMealApi(
-  context, {
+Future updateMealApi(
+  BuildContext context, {
   required int id,
   required String mealname,
-  required Getx mealController,
-  // required String protein,
-  // required String fat,
-  // required String carbohydrates,
-  // required String kcal,
-  // required String carbohydratePercentage,
-  // required String fatPercentage,
-  // required String proteinPercentage,
-  // required String name,
-  // required String dataSource,
-  // required String servingSize
+  required dynamic
+      mealController, // Replace 'dynamic' with the actual type if known
 }) async {
   try {
     String? token = await SharedPrefHelper.getString('token');
     List<Map<String, dynamic>> mealItemsJson =
         mealController.mealItems.map((item) => item.toJson()).toList();
+
     showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
-    Map obj = {
-      "id": id,
-      "mealName": mealname,
-      // "userId": userid,
-      "mealItems": mealItemsJson
-    };
 
-    log(obj.toString());
+    Map obj = {"id": id, "mealName": mealname, "mealItems": mealItemsJson};
 
-    final Map<String, String> headers = {
+    log("Update Request: $obj");
+
+    final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
       'Authorization': 'Bearer $token'
     };
 
-    // Ignore SSL certificate verification (for local testing)
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
 
-    var res = await client.post(
+    final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
       headers: headers,
       body: jsonEncode(obj),
     );
 
-    var jsondata = await jsonDecode(res.body);
-    log(jsondata.toString());
+    Get.back(); // Close loading dialog
 
-    Get.back();
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
     if (res.statusCode == 200) {
-      // Get.toNamed(
-      //   AppRoutes.fingerprintSetup,
-      // );
+      toastification.show(
+        context: context,
+        title: const Text('Meal Updated'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('Update Failed'),
+        description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
     }
   } catch (e) {
-    Get.back();
-    log(e.toString());
+    Get.back(); // Close loading dialog
+    log("Update Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
 }
 
@@ -349,6 +428,7 @@ Future createUserDetails({
   required String specificExperiencePreferance,
   required String calorieyGoal,
   required String sleepQuality,
+  required BuildContext context, // Added BuildContext parameter for toast
 }) async {
   try {
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
@@ -374,16 +454,44 @@ Future createUserDetails({
     };
 
     final response = await http.post(url, headers: headers, body: body);
-    Get.back();
+
+    Get.back(); // Close loading dialog
+
     log(response.body.toString());
+
     if (response.statusCode == 200) {
-      // Get.toNamed(
-      //   AppRoutes.fingerprintSetup,
-      // );
+      // Success toast
+      toastification.show(
+        context: context,
+        title: const Text('User Details Created'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+      // Optional: Navigate to next screen (e.g., fingerprint setup)
+      // Get.toNamed(AppRoutes.fingerprintSetup);
+    } else {
+      // Failure toast with error message from response
+      var jsondata = jsonDecode(response.body);
+      toastification.show(
+        context: context,
+        title: const Text('Error'),
+        description:
+            Text(jsondata['message'] ?? 'Failed to create user details'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
     }
   } catch (e) {
-    Get.back();
-    log(e.toString());
+    Get.back(); // Close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
 }
 
@@ -398,11 +506,12 @@ Future updateUserDetails({
   required String specificExperiencePreferance,
   required String calorieyGoal,
   required String sleepQuality,
+  required BuildContext context, // Added context for toast
 }) async {
   try {
     String? token = await SharedPrefHelper.getString('token');
-
     String userid = await SharedPrefHelper.getString('userid') ?? '';
+
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.updateUserdeatils + userid);
     final body = jsonEncode({
       "fitnessGoal": fitnessGoal,
@@ -424,16 +533,39 @@ Future updateUserDetails({
     };
 
     final response = await http.post(url, headers: headers, body: body);
-    Get.back();
+
+    Get.back(); // Close loading dialog
     log(response.body.toString());
+
     if (response.statusCode == 200) {
-      // Get.toNamed(
-      //   AppRoutes.fingerprintSetup,
-      // );
+      toastification.show(
+        context: context,
+        title: const Text('User Details Updated'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+    } else {
+      var jsondata = jsonDecode(response.body);
+      toastification.show(
+        context: context,
+        title: const Text('Update Failed'),
+        description:
+            Text(jsondata['message'] ?? 'Failed to update user details'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
     }
   } catch (e) {
-    Get.back();
-    log(e.toString());
+    Get.back(); // Close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
 }
 
@@ -454,9 +586,7 @@ Future getUserDetails() async {
     );
     Get.back();
     log(response.body.toString());
-    if (response.statusCode == 200) {
-     
-    }
+    if (response.statusCode == 200) {}
   } catch (e) {
     Get.back();
     log(e.toString());

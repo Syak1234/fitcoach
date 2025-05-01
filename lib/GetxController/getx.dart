@@ -27,6 +27,8 @@ class Getx extends GetxController {
   RxList mealItemList = [].obs;
   RxList userPostId = [].obs;
 
+  RxString token = "".obs;
+
   RxList<Userdetails> userdetails = <Userdetails>[].obs;
 
   var isFeetAndInches = false.obs;
