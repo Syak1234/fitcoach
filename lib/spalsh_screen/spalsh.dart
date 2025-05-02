@@ -38,27 +38,41 @@ class _SpalshState extends State<Spalsh> {
 
   getData() async {
     Future.delayed(const Duration(seconds: 3), () async {
+      SharedPreferences sp = await SharedPreferences.getInstance();
+
+      bool islogin = await sp.getBool("IsLogin") ?? false;
       final isAuthentication = await Getx().isBioMatricEnable();
       log(isAuthentication.toString());
       if (isAuthentication) {
         _authenticateWithFingerprint();
       } else {
-        // Get.off(() => WelcomeScreen1());
-        Get.offNamed(
-          AppRoutes.welcomeScreen1,
-        );
+        islogin
+            ? Get.offNamed(
+                AppRoutes.bottomDashboard,
+              )
+            :
+            // Get.off(() => WelcomeScreen1());
+            Get.offNamed(
+                AppRoutes.welcomeScreen1,
+              );
       }
     });
   }
 
   Future<void> _authenticateWithFingerprint() async {
     try {
-      // SharedPreferences sp = await SharedPreferences.getInstance();
+      SharedPreferences sp = await SharedPreferences.getInstance();
+
+      bool islogin = await sp.getBool("IsLogin") ?? false;
       bool authenticated = await Getx().authBioMatric();
 
       authenticated
-          ? Get.toNamed(AppRoutes.login)
-          : Get.toNamed(AppRoutes.welcomeScreen1);
+          ? islogin
+              ? Get.toNamed(AppRoutes.bottomDashboard)
+              : Get.toNamed(AppRoutes.login)
+          : islogin
+              ? Get.toNamed(AppRoutes.bottomDashboard)
+              : Get.toNamed(AppRoutes.welcomeScreen1);
     } catch (e) {
       Get.toNamed(AppRoutes.welcomeScreen1);
     }

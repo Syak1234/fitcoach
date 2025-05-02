@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen5.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -142,8 +143,9 @@ class _ComScreen4State extends State<ComScreen4> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         _savePreferences();
+
         Get.toNamed(
           AppRoutes.comScreen5,
         );

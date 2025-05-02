@@ -173,6 +173,7 @@ Future loginApi(BuildContext context, String userName, String pass) async {
       await SharedPrefHelper.setString("userid", jsondata['id']);
       await SharedPrefHelper.setString("username", jsondata['userName']);
       await SharedPrefHelper.setString("token", jsondata['token']);
+      await SharedPrefHelper.setBool("IsLogin", true);
 
       toastification.show(
         context: context,
@@ -418,26 +419,47 @@ Future updateMealApi(
 
 Future createUserDetails({
   required String userId,
-  required String fitnessGoal,
-  required String gender,
-  required int weight,
-  required int height,
-  required bool previousFitnessExperience,
-  required String specificDiet,
-  required int daysCommit,
-  required String specificExperiencePreferance,
-  required String calorieyGoal,
-  required String sleepQuality,
+  // required String fitnessGoal,
+  // required String gender,
+  // required int weight,
+  // required int height,
+  // required bool previousFitnessExperience,
+  // required String specificDiet,
+  // required int daysCommit,
+  // required String specificExperiencePreferance,
+  // required String calorieyGoal,
+  // required String sleepQuality,
+  // required String age,
   required BuildContext context, // Added BuildContext parameter for toast
 }) async {
   try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
     String? token = await SharedPrefHelper.getString('token');
+    String fitnessGoal = await SharedPrefHelper.getString('fitness_goal') ?? "";
+    String gender = await SharedPrefHelper.getString('selected_gender') ?? "";
+    int height = await SharedPrefHelper.getInt('user_height_cm') ?? 0;
+    double weight =
+        await prefs.getDouble('kg') ?? await prefs.getDouble('lbs') ?? 0;
+    bool previousFitnessExperience =
+        await SharedPrefHelper.getString('isFitnessExp') == "YES"
+            ? true
+            : false;
+    String specificDiet = await SharedPrefHelper.getString('diet') ?? "";
+    int daysCommit =
+        int.parse(await SharedPrefHelper.getString('work_day_commit') ?? "0");
+    List specificExperiencePreferance =
+        await prefs.getStringList('excercise_pref') ?? [];
+    String calorieyGoal =
+        await SharedPrefHelper.getString('kcal_goal_perday') ?? "";
+    String sleepQuality = await SharedPrefHelper.getString('sleep') ?? "";
+    int age = int.parse(await SharedPrefHelper.getString('age') ?? "0");
+
     final body = jsonEncode({
       "userId": userId,
       "fitnessGoal": fitnessGoal,
       "gender": gender,
-      "weight": weight,
+      "weight": weight.toInt(),
       "height": height,
       "previousFitnessExperience": previousFitnessExperience,
       "specificDiet": specificDiet,
@@ -445,6 +467,7 @@ Future createUserDetails({
       "specificExperiencePreferance": specificExperiencePreferance,
       "calorieyGoal": calorieyGoal,
       "sleepQuality": sleepQuality,
+      "age": age,
     });
 
     final headers = {
@@ -455,7 +478,7 @@ Future createUserDetails({
 
     final response = await http.post(url, headers: headers, body: body);
 
-    Get.back(); // Close loading dialog
+    // Get.back(); // Close loading dialog
 
     log(response.body.toString());
 
@@ -483,7 +506,7 @@ Future createUserDetails({
       );
     }
   } catch (e) {
-    Get.back(); // Close loading dialog
+    // Get.back(); // Close loading dialog
     log("Error: $e");
     toastification.show(
       context: context,
@@ -566,5 +589,19 @@ Future getUserDetails() async {
   } catch (e) {
     Get.back();
     log(e.toString());
+  }
+}
+
+Future<bool> logoutFunction() async {
+  try {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    sp.remove("userid");
+    sp.remove("username");
+    sp.remove("token");
+    sp.setBool("IsLogin", false);
+
+    return true;
+  } catch (e) {
+    return false;
   }
 }

@@ -33,6 +33,8 @@ class Getx extends GetxController {
   RxBool loader = false.obs;
 
   RxList<Userdetails> userdetails = <Userdetails>[].obs;
+  RxList<UserAssessmentDetaiils> userAssessmentDetaiils =
+      <UserAssessmentDetaiils>[].obs;
 
   var isFeetAndInches = false.obs;
   var feet = 0.obs;

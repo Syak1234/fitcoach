@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -122,7 +123,11 @@ class _ComScreen1State extends State<ComScreen1> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await SharedPrefHelper.setString("fitnessGoal",
+                        options[getx.isCom_select_Option.value].toString());
+                    print(options[getx.isCom_select_Option.value]);
+
                     Get.toNamed(AppRoutes.comScreen2);
                   },
                   style: ElevatedButton.styleFrom(

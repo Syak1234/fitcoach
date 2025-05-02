@@ -1,7 +1,9 @@
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,7 +100,22 @@ class _AccountDashboardState extends State<AccountDashboard> {
             // _buildSectionTitle('Danger Zone', warning: true),
             // _buildSettingsItem(Icons.delete, 'Close Account', isDanger: true),
             _buildSectionTitle('Log Out'),
-            _buildSettingsItem(Icons.logout, 'Sign Out'),
+            InkWell(
+                onTap: () {
+                  showSignoutConfirmDialog(
+                      context: context,
+                      ontap: () async {
+                        if (await logoutFunction()) {
+                          Fluttertoast.showToast(msg: "Successfully sign out!");
+                          Get.offNamed(
+                            AppRoutes.login,
+                          );
+                        } else {
+                          Fluttertoast.showToast(msg: "Faild to sign out!");
+                        }
+                      });
+                },
+                child: _buildSettingsItem(Icons.logout, 'Sign Out')),
             const SizedBox(height: 20),
             Center(
               child: Column(
@@ -326,4 +343,27 @@ class _AccountDashboardState extends State<AccountDashboard> {
       ),
     );
   }
+}
+
+Future<void> showSignoutConfirmDialog({
+  required BuildContext context,
+  required VoidCallback ontap,
+}) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Sign out'),
+      content: Text('Are you sure you want to Sign out?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: ontap,
+          child: Text('OK', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
 }

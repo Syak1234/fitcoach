@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fitcoach/Comprehensive_screen/com_screen4.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -35,7 +36,6 @@ class _ComScreen3State extends State<ComScreen3> {
 
     final a = prefs.getDouble(type) ?? '';
     log(a.toString());
-    
   }
 
   void toggleUnit(bool toKg) {
@@ -223,8 +223,11 @@ class _ComScreen3State extends State<ComScreen3> {
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
-      onPressed: () {
+      onPressed: () async {
         _savePreferences(isKg ? 'kg' : 'lbs');
+        await SharedPrefHelper.setString(
+            "weight", "${currentWeight.toInt()}${isKg ? 'kg' : 'lbs'}");
+
         Get.toNamed(
           AppRoutes.height,
         );

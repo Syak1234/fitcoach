@@ -321,3 +321,20 @@ Stream<List<Map<String, dynamic>>> fetchComments(String postId) {
     print('Stream error: $error');
   });
 }
+
+Future<void> deleteCollection(String collectionName,
+    {int batchSize = 100}) async {
+  final collectionRef = FirebaseFirestore.instance.collection(collectionName);
+  final querySnapshot = await collectionRef.limit(batchSize).get();
+
+  final batch = FirebaseFirestore.instance.batch();
+  for (var doc in querySnapshot.docs) {
+    batch.delete(doc.reference);
+  }
+  await batch.commit();
+
+  // If there are still documents, recursively call the function
+  if (querySnapshot.docs.length >= batchSize) {
+    await deleteCollection(collectionName, batchSize: batchSize);
+  }
+}

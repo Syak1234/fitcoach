@@ -160,7 +160,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
                             if (gk.currentState!.validate()) {
                               loginApi(context, _emailController.text,
-                                  _passwordController.text);
+                                      _passwordController.text)
+                                  .then((val) async {
+                                createUserDetails(
+                                    context: context,
+                                    userId: await SharedPrefHelper.getString(
+                                            "userid") ??
+                                        "");
+                              });
                             }
                           },
                           child: Row(
@@ -215,7 +222,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                     user!.email.toString(),
                                     passwordGanaretor(
                                       user!.email.toString(),
-                                    ));
+                                    )).then((_) async {
+                                  createUserDetails(
+                                      context: context,
+                                      userId: await SharedPrefHelper.getString(
+                                              "userid") ??
+                                          "");
+                                });
                               }
                               // user!.email.toString();
                             },
@@ -252,10 +265,17 @@ class _SignInScreenState extends State<SignInScreen> {
                                 // );
 
                                 loginApi(
-                                    context,
-                                    facebookdata!['email'] ?? "",
-                                    passwordGanaretor(
-                                        facebookdata!['email'] ?? ""));
+                                        context,
+                                        facebookdata!['email'] ?? "",
+                                        passwordGanaretor(
+                                            facebookdata!['email'] ?? ""))
+                                    .then((_) async {
+                                  createUserDetails(
+                                      context: context,
+                                      userId: await SharedPrefHelper.getString(
+                                              "userid") ??
+                                          "");
+                                });
                               }
                             },
                             child: Container(

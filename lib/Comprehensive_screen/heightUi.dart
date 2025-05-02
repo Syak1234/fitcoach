@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -144,6 +145,18 @@ class HeightSelectionScreen extends StatelessWidget {
                 onPressed: controller.isValidHeight
                     ? () async {
                         await _saveHeightToPreferences();
+
+                        String heightString;
+                        if (controller.isFeetAndInches.value) {
+                          heightString =
+                              "${controller.feet.value}ft${controller.inches.value}in";
+                        } else {
+                          heightString = "${controller.cm.value}cm";
+                        }
+
+                        await SharedPrefHelper.setString(
+                            "height", heightString);
+
                         Get.toNamed(AppRoutes.comScreen4);
                       }
                     : null,

@@ -1,5 +1,6 @@
 import 'package:fitcoach/Comprehensive_screen/com_screen3.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -165,7 +166,10 @@ class _ComScreen2State extends State<ComScreen2> {
       ),
       onPressed: selectedGender == null
           ? null
-          : () {
+          : () async {
+              await SharedPrefHelper.setString(
+                  "gender", selectedGender.toString());
+
               Get.toNamed(AppRoutes.comScreen3);
             },
       child: const Row(
