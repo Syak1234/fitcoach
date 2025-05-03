@@ -102,18 +102,16 @@ class _AccountDashboardState extends State<AccountDashboard> {
             _buildSectionTitle('Log Out'),
             InkWell(
                 onTap: () {
-                  showSignoutConfirmDialog(
-                      context: context,
-                      ontap: () async {
-                        if (await logoutFunction()) {
-                          Fluttertoast.showToast(msg: "Successfully sign out!");
-                          Get.offNamed(
-                            AppRoutes.login,
-                          );
-                        } else {
-                          Fluttertoast.showToast(msg: "Faild to sign out!");
-                        }
-                      });
+                  showSignoutConfirmDialog(context, () async {
+                    if (await logoutFunction()) {
+                      Fluttertoast.showToast(msg: "Successfully sign out!");
+                      Get.offNamed(
+                        AppRoutes.login,
+                      );
+                    } else {
+                      Fluttertoast.showToast(msg: "Faild to sign out!");
+                    }
+                  });
                 },
                 child: _buildSettingsItem(Icons.logout, 'Sign Out')),
             const SizedBox(height: 20),
@@ -345,25 +343,35 @@ class _AccountDashboardState extends State<AccountDashboard> {
   }
 }
 
-Future<void> showSignoutConfirmDialog({
-  required BuildContext context,
-  required VoidCallback ontap,
-}) async {
+void showSignoutConfirmDialog(BuildContext context, VoidCallback ontap) {
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Sign out'),
-      content: Text('Are you sure you want to Sign out?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppColors.backgroundLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
         ),
-        TextButton(
-          onPressed: ontap,
-          child: Text('OK', style: TextStyle(color: Colors.red)),
-        ),
-      ],
-    ),
+        title: const Text("Sign out",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to sign out?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: AppColors.red,
+              foregroundColor: AppColors.textLight,
+            ),
+            onPressed: ontap,
+            child: const Text("Yes"),
+          ),
+        ],
+      );
+    },
   );
 }

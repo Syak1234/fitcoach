@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   RxString name = "".obs;
   RxString userImage = "".obs;
   getUserData() async {
+    await getUserDetails();
+
     name.value = await SharedPrefHelper.getString('name') ??
         await SharedPrefHelper.getString('username') ??
         '';
@@ -176,7 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 radius: 28,
                                 backgroundImage: NetworkImage(userImage.value),
                               )
-                            : CircularProgressIndicator(),
+                            : CircleAvatar(
+                                radius: 28,
+                                backgroundImage: NetworkImage(
+                                    'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png')),
                         const SizedBox(width: 12),
 
                         // Greeting Text

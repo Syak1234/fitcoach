@@ -5,6 +5,7 @@ import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api_url.dart';
 import 'package:fitcoach/modelClass/mealItemList.dart';
+import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,8 @@ import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
+
+Getx getx = Get.put(Getx());
 
 class SharedPrefHelper {
   static Future<void> setString(String key, String value) async {
@@ -182,6 +185,8 @@ Future loginApi(BuildContext context, String userName, String pass) async {
         type: ToastificationType.success,
         style: ToastificationStyle.fillColored,
       );
+
+      getx.pagesIndex.value = 0;
 
       Get.toNamed(AppRoutes.fingerprintSetup);
     } else {
@@ -419,41 +424,22 @@ Future updateMealApi(
 
 Future createUserDetails({
   required String userId,
-  // required String fitnessGoal,
-  // required String gender,
-  // required int weight,
-  // required int height,
-  // required bool previousFitnessExperience,
-  // required String specificDiet,
-  // required int daysCommit,
-  // required String specificExperiencePreferance,
-  // required String calorieyGoal,
-  // required String sleepQuality,
-  // required String age,
+  required String fitnessGoal,
+  required String gender,
+  required int weight,
+  required int height,
+  required bool previousFitnessExperience,
+  required String specificDiet,
+  required int daysCommit,
+  required String specificExperiencePreferance,
+  required String calorieyGoal,
+  required String sleepQuality,
+  required String age,
   required BuildContext context, // Added BuildContext parameter for toast
 }) async {
   try {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
     String? token = await SharedPrefHelper.getString('token');
-    String fitnessGoal = await SharedPrefHelper.getString('fitness_goal') ?? "";
-    String gender = await SharedPrefHelper.getString('selected_gender') ?? "";
-    int height = await SharedPrefHelper.getInt('user_height_cm') ?? 0;
-    double weight =
-        await prefs.getDouble('kg') ?? await prefs.getDouble('lbs') ?? 0;
-    bool previousFitnessExperience =
-        await SharedPrefHelper.getString('isFitnessExp') == "YES"
-            ? true
-            : false;
-    String specificDiet = await SharedPrefHelper.getString('diet') ?? "";
-    int daysCommit =
-        int.parse(await SharedPrefHelper.getString('work_day_commit') ?? "0");
-    List specificExperiencePreferance =
-        await prefs.getStringList('excercise_pref') ?? [];
-    String calorieyGoal =
-        await SharedPrefHelper.getString('kcal_goal_perday') ?? "";
-    String sleepQuality = await SharedPrefHelper.getString('sleep') ?? "";
-    int age = int.parse(await SharedPrefHelper.getString('age') ?? "0");
 
     final body = jsonEncode({
       "userId": userId,
@@ -476,13 +462,17 @@ Future createUserDetails({
       'Authorization': 'Bearer $token'
     };
 
-    final response = await http.post(url, headers: headers, body: body);
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+    final response = await client.post(url, headers: headers, body: body);
 
     // Get.back(); // Close loading dialog
 
     log(response.body.toString());
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       // Success toast
       toastification.show(
         context: context,
@@ -569,27 +559,82 @@ Future updateUserDetails({
 }
 
 Future getUserDetails() async {
-  try {
-    String? token = await SharedPrefHelper.getString('token');
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
-    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails + userid);
-    final headers = {
-      'Content-Type': 'application/json',
-      'accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
+  // try {
+  String? token = await SharedPrefHelper.getString('token');
+  String userid = await SharedPrefHelper.getString('userid') ?? '';
+  final url = Uri.https(ApiUrl.baseUrl, ApiUrl.getUserdeatils + userid);
+  final headers = {
+    'Content-Type': 'application/json',
+    'accept': '*/*',
+    'Authorization': 'Bearer $token'
+  };
+  final ioClient = HttpClient()
+    ..badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+  final client = IOClient(ioClient);
+  final response = await client.get(
+    url,
+    headers: headers,
+  );
+  // Get.back();
+  log(response.body.toString());
+  if (response.statusCode == 200) {
+    final decoded = json.decode(response.body);
+    final result = decoded['result'];
+    List<String> specificExperienceList = result['specificExperiencePreferance']
+        .toString()
+        .replaceAll('[', '')
+        .replaceAll(']', '')
+        .split(',')
+        .map((e) => e.trim())
+        .where((String e) => e.isNotEmpty)
+        .toList();
 
-    final response = await http.get(
-      url,
-      headers: headers,
-    );
-    Get.back();
+    UserAssessmentDetaiils details = UserAssessmentDetaiils(
+        fitnessGoal: result['fitnessGoal'].toString(),
+        gender: result['gender'].toString(),
+        weight: result['weight'].toString(),
+        height: result['height'].toString(),
+        previousFitnessExperience:
+            result['previousFitnessExperience'].toString(),
+        specificDiet: result['specificDiet'].toString(),
+        daysCommit: result['daysCommit'].toString(),
+        specificExperiencePreferance: specificExperienceList ?? [],
+        calorieyGoal: result['calorieyGoal'].toString(),
+        sleepQuality: result['sleepQuality'].toString(),
+        age: await SharedPrefHelper.getString("age").toString());
+
+    getx.userAssessmentDetaiils.add(details);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fitness_goal', result['fitnessGoal'].toString());
+
+    // await prefs.setString('fitness_goal', result['fitnessGoal'].toString());
+    await prefs.setString('selected_gender', result['gender'].toString());
+    await prefs.setDouble('lbs', double.parse(result['weight'].toString()));
+    await prefs.setDouble('kg', double.parse(result['weight'].toString()));
+
+    await prefs.setInt('user_height_cm', result['height'] ?? 0);
+    await prefs.setString('isFitnessExp',
+        result['previousFitnessExperience'] ?? false == true ? "YES" : "NO");
+    await prefs.setString('diet', result['specificDiet'].toString());
+    await prefs.setString('work_day_commit', result['daysCommit'].toString());
+    await prefs.setStringList('excercise_pref', specificExperienceList);
+    await prefs.setString(
+        'kcal_goal_perday', result['calorieyGoal'].toString());
+    await prefs.setString('sleep', result['sleepQuality'].toString());
+    await prefs.setString(
+        'age', await SharedPrefHelper.getString("age").toString());
+
     log(response.body.toString());
-    if (response.statusCode == 200) {}
-  } catch (e) {
-    Get.back();
-    log(e.toString());
+  } else {
+    log(response.body.toString());
+    log(response.statusCode.toString());
   }
+  // } catch (e) {
+  //   // Get.back();
+  //   log(e.toString());
+  // }
 }
 
 Future<bool> logoutFunction() async {

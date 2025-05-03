@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/profile_setting/profile_screen/finger_print_setup.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -18,23 +19,57 @@ class ProfileScreen2 extends StatefulWidget {
 
 class _ProfileScreen2State extends State<ProfileScreen2> {
   // String accountType = "Coach";
-  double weight = 50;
-  String gender = "Trans Female";
+  RxString weightUnit = "kg".obs;
+  RxBool isExperienced = false.obs;
+  // double weight = 50;
+  // RxString usergender = "Trans Female".obs;
+
   Getx getx = Get.put(Getx());
   final List<String> genders = ['Male', 'Female', 'Trans Female', 'Non-Binary'];
+  final List<String> fitnessGoalList = [
+    "I wanna lose weight",
+    "I wanna get bulks",
+    "I wanna gain endurance",
+    "Just trying out the app! 👍"
+  ];
+
+  final List<String> dietList = [
+    'Plant Based',
+    'Carbo Diet',
+    'Specialized',
+    'Traditional'
+  ];
+
   final List<String> locations = [
     'Location permission permanently denied.',
     'New York, USA',
     'London, UK',
     'Paris, France'
   ];
-  String selectedGender = 'Trans Female';
+
+  final List<String> sleepQuality = [
+    ">8 hours",
+    "7-8 hours",
+    "6-7 hours",
+    "3-4 hours",
+    "<2 hours"
+  ];
+  final List<String> daysCommit = ["1", "2", "3", "4", "5", "6", "7"];
+
+  String selectedGender = 'Female';
+  RxString selectedFitnessGoal = "I wanna lose weight".obs;
+  RxString selectedDiet = "Plant Based".obs;
+  RxString selectedDay = "1".obs;
+  RxString selectedSleep = "7-8 hours".obs;
+
   String selectedLocation = 'Location permission permanently denied.';
 
   Future<void> _getCurrentLocation() async {
     try {
       bool serviceEnabled;
       LocationPermission permission;
+
+      weightUnit.value = await SharedPrefHelper.getString("weightUnit") ?? "kg";
 
       // Check if location services are enabled
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -91,7 +126,17 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
   String location = "No location found";
   @override
   void initState() {
+    selectedGender = getx.userAssessmentDetaiils[0].gender;
+    selectedFitnessGoal.value = getx.userAssessmentDetaiils[0].fitnessGoal;
+    selectedDiet.value = getx.userAssessmentDetaiils[0].specificDiet;
+    selectedDay.value = getx.userAssessmentDetaiils[0].daysCommit;
+    isExperienced.value =
+        getx.userAssessmentDetaiils[0].previousFitnessExperience == "true"
+            ? true
+            : false;
+    selectedSleep.value = getx.userAssessmentDetaiils[0].sleepQuality;
     _getCurrentLocation();
+
     super.initState();
   }
 
@@ -171,13 +216,15 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 SizedBox(height: 5),
                 // Full Name Field
                 TextField(
+                  enabled: false,
                   style: TextStyle(color: AppColors.textDark),
                   decoration: InputDecoration(
                     fillColor: AppColors.gray10,
                     filled: true,
                     // labelText: "Full Name",
                     labelStyle: TextStyle(color: Colors.grey.shade400),
-                    hintText: "Makise Kurisu",
+                    hintText:
+                        "${getx.userdetails[0].username.replaceAll("@gmail.com", "")}",
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     prefixIcon: Icon(Icons.person, color: AppColors.textDark),
                     enabledBorder: OutlineInputBorder(
@@ -206,13 +253,14 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
 
                 // Email Address Field
                 TextField(
+                  enabled: false,
                   style: TextStyle(color: AppColors.textDark),
                   decoration: InputDecoration(
                     fillColor: AppColors.gray10,
                     filled: true,
                     // labelText: "Email Address",
                     labelStyle: TextStyle(color: Colors.grey.shade400),
-                    hintText: "elementary221b@gmail.com",
+                    hintText: "${getx.userdetails[0].username}",
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     prefixIcon: Icon(
                       Icons.email,
@@ -244,6 +292,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 TextField(
                   style: TextStyle(color: AppColors.textDark),
                   obscureText: true,
+                  enabled: false,
                   decoration: InputDecoration(
                     fillColor: AppColors.gray10,
                     filled: true,
@@ -277,22 +326,51 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "Weight",
-                      style: TextStyle(
-                          color: AppColors.textDark,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Weight",
+                          style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${getx.userAssessmentDetaiils[0].weight} ${weightUnit.value}",
+                          style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                          textScaler: TextScaler.linear(2),
+                        ),
+                      ],
                     ),
+                    Icon(Icons.edit),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Height",
+                          style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${getx.userAssessmentDetaiils[0].height} cm",
+                          style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                          textScaler: TextScaler.linear(2),
+                        ),
+                      ],
+                    ),
+                    Icon(Icons.edit)
                   ],
-                ),
-                Text(
-                  "${weight.toStringAsFixed(1)} kg",
-                  style: TextStyle(
-                      color: AppColors.textDark,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                  textScaler: TextScaler.linear(2),
                 ),
 
                 // Continue Button
@@ -344,6 +422,230 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // SizedBox(height: 16),
+
+                const Text(
+                  'Fitness Goal',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.gray10,
+                    borderRadius: BorderRadius.circular(19),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButton<String>(
+                    dropdownColor: AppColors.gray10,
+                    value: selectedFitnessGoal.value,
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: AppColors.textDark),
+                    underline: const SizedBox(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedFitnessGoal.value = value!;
+                      });
+                    },
+                    items: fitnessGoalList
+                        .map((goals) => DropdownMenuItem(
+                              value: goals,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.fitness_center,
+                                      color: AppColors.textDark),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    goals,
+                                    style: const TextStyle(
+                                        color: AppColors.textDark),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Specific Diet',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.gray10,
+                    borderRadius: BorderRadius.circular(19),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButton<String>(
+                    dropdownColor: AppColors.gray10,
+                    value: selectedDiet.value,
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: AppColors.textDark),
+                    underline: const SizedBox(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDiet.value = value!;
+                      });
+                    },
+                    items: dietList
+                        .map((diet) => DropdownMenuItem(
+                              value: diet,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.free_breakfast,
+                                      color: AppColors.textDark),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    diet,
+                                    style: const TextStyle(
+                                        color: AppColors.textDark),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Commit Days ',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.gray10,
+                    borderRadius: BorderRadius.circular(19),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButton<String>(
+                    dropdownColor: AppColors.gray10,
+                    value: selectedDay.value,
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: AppColors.textDark),
+                    underline: const SizedBox(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDay.value = value!;
+                      });
+                    },
+                    items: daysCommit
+                        .map((day) => DropdownMenuItem(
+                              value: day,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.trip_origin,
+                                      color: AppColors.textDark),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    day + "x",
+                                    style: const TextStyle(
+                                        color: AppColors.textDark),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Obx(
+                  () => _buildSettingsItem(
+                      Icons.run_circle_outlined,
+                      isExperienced.value
+                          ? "Yes, I am experienced"
+                          : "No, I am not experienced ", onChanged: (val) {
+                    isExperienced.value = val!;
+                  }, switchValue: isExperienced.value),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "Caloriey Goal",
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${getx.userAssessmentDetaiils[0].calorieyGoal} kcal",
+                      style: TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                      textScaler: TextScaler.linear(2),
+                    ),
+                    Icon(Icons.edit)
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Sleep Quality',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.gray10,
+                    borderRadius: BorderRadius.circular(19),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButton<String>(
+                    dropdownColor: AppColors.gray10,
+                    value: selectedSleep.value,
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down,
+                        color: AppColors.textDark),
+                    underline: const SizedBox(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSleep.value = value!;
+                      });
+                    },
+                    items: sleepQuality
+                        .map((sleep) => DropdownMenuItem(
+                              value: sleep,
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                      Icons.airline_seat_individual_suite,
+                                      color: AppColors.textDark),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    sleep,
+                                    style: const TextStyle(
+                                        color: AppColors.textDark),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
                 // Location Dropdown
                 const Text(
                   'Location',
@@ -454,4 +756,103 @@ class AccountTypeButton extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildSettingsItem(
+  IconData icon,
+  String title, {
+  bool isDanger = false,
+  bool isButtonOnRight = true,
+  bool switchValue = false,
+  void Function()? ontap,
+  void Function(bool)? onChanged,
+}) {
+  final trailingWidget = Switch(
+    value: switchValue,
+    onChanged: onChanged,
+    activeTrackColor: AppColors.textLight,
+    inactiveTrackColor: AppColors.textLight,
+    activeColor: AppColors.primaryorange,
+  );
+
+  return InkWell(
+    onTap: ontap,
+    child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDanger ? AppColors.red : AppColors.gray10,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: isButtonOnRight
+            ? [
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDanger
+                            ? AppColors.red10.withOpacity(0.5)
+                            : AppColors.backgroundLight,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        icon,
+                        color:
+                            isDanger ? AppColors.textLight : AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            isDanger ? AppColors.textLight : AppColors.textDark,
+                      ),
+                    ),
+                  ],
+                ),
+                trailingWidget,
+              ]
+            : [
+                trailingWidget,
+                const SizedBox(width: 12),
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDanger
+                            ? AppColors.red10.withOpacity(0.5)
+                            : AppColors.backgroundLight,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        icon,
+                        color:
+                            isDanger ? AppColors.textLight : AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            isDanger ? AppColors.textLight : AppColors.textDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+      ),
+    ),
+  );
 }

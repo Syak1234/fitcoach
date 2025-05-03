@@ -33,6 +33,7 @@ class _ComScreen3State extends State<ComScreen3> {
   Future<void> _savePreferences(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(type, currentWeight.toDouble());
+    await prefs.setString("weightUnit", type);
 
     final a = prefs.getDouble(type) ?? '';
     log(a.toString());

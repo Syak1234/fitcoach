@@ -13,6 +13,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../GetxController/getx.dart';
 import '../functionality/google_signin_auth.dart';
@@ -162,11 +163,70 @@ class _SignInScreenState extends State<SignInScreen> {
                               loginApi(context, _emailController.text,
                                       _passwordController.text)
                                   .then((val) async {
-                                createUserDetails(
-                                    context: context,
-                                    userId: await SharedPrefHelper.getString(
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+
+                                String fitnessGoal =
+                                    await SharedPrefHelper.getString(
+                                            'fitness_goal') ??
+                                        "";
+                                String gender =
+                                    await SharedPrefHelper.getString(
+                                            'selected_gender') ??
+                                        "";
+                                int height = await SharedPrefHelper.getInt(
+                                        'user_height_cm') ??
+                                    0;
+                                double weight = await prefs.getDouble('kg') ??
+                                    await prefs.getDouble('lbs') ??
+                                    0;
+                                bool previousFitnessExperience =
+                                    await SharedPrefHelper.getString(
+                                                'isFitnessExp') ==
+                                            "YES"
+                                        ? true
+                                        : false;
+                                String specificDiet =
+                                    await SharedPrefHelper.getString('diet') ??
+                                        "";
+                                int daysCommit = int.parse(
+                                    await SharedPrefHelper.getString(
+                                            'work_day_commit') ??
+                                        "0");
+                                List specificExperiencePreferance = await prefs
+                                        .getStringList('excercise_pref') ??
+                                    [];
+                                String calorieyGoal =
+                                    await SharedPrefHelper.getString(
+                                            'kcal_goal_perday') ??
+                                        "";
+                                String sleepQuality =
+                                    await SharedPrefHelper.getString('sleep') ??
+                                        "";
+                                int age = int.parse(
+                                    await SharedPrefHelper.getString('age') ??
+                                        "0");
+                                String userid =
+                                    await SharedPrefHelper.getString(
                                             "userid") ??
-                                        "");
+                                        "";
+                                createUserDetails(
+                                  context: context,
+                                  userId: userid,
+                                  age: age.toString(),
+                                  calorieyGoal: calorieyGoal,
+                                  daysCommit: daysCommit,
+                                  fitnessGoal: fitnessGoal,
+                                  gender: gender,
+                                  height: height,
+                                  weight: weight.toInt(),
+                                  previousFitnessExperience:
+                                      previousFitnessExperience,
+                                  sleepQuality: sleepQuality,
+                                  specificDiet: specificDiet,
+                                  specificExperiencePreferance:
+                                      specificExperiencePreferance.toString(),
+                                );
                               });
                             }
                           },
@@ -223,11 +283,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                     passwordGanaretor(
                                       user!.email.toString(),
                                     )).then((_) async {
-                                  createUserDetails(
-                                      context: context,
-                                      userId: await SharedPrefHelper.getString(
-                                              "userid") ??
-                                          "");
+                                  // createUserDetails(
+                                  //     context: context,
+                                  //     userId: await SharedPrefHelper.getString(
+                                  //             "userid") ??
+                                  //         "");
                                 });
                               }
                               // user!.email.toString();
@@ -270,11 +330,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                         passwordGanaretor(
                                             facebookdata!['email'] ?? ""))
                                     .then((_) async {
-                                  createUserDetails(
-                                      context: context,
-                                      userId: await SharedPrefHelper.getString(
-                                              "userid") ??
-                                          "");
+                                  // createUserDetails(
+                                  //     context: context,
+                                  //     userId: await SharedPrefHelper.getString(
+                                  //             "userid") ??
+                                  //         "");
                                 });
                               }
                             },
