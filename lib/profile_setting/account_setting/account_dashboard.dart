@@ -106,7 +106,7 @@ class _AccountDashboardState extends State<AccountDashboard> {
                     if (await logoutFunction()) {
                       Fluttertoast.showToast(msg: "Successfully sign out!");
                       Get.offNamed(
-                        AppRoutes.login,
+                        AppRoutes.splash,
                       );
                     } else {
                       Fluttertoast.showToast(msg: "Faild to sign out!");

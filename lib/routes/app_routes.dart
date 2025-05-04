@@ -341,11 +341,11 @@ class AppRoutes {
       page: () => WorkoutScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
-    GetPage(
-      name: workoutLogSet,
-      page: () => WorkoutLogSetScreen(),
-      transition: Transition.rightToLeft, // Optional: Add transition animations
-    ),
+    // GetPage(
+    //   name: workoutLogSet,
+    //   page: () => WorkoutLogSetScreen(),
+    //   transition: Transition.rightToLeft, // Optional: Add transition animations
+    // ),
     GetPage(
       name: commmunityScreen1,
       page: () => CommunityScreen1(),
