@@ -16,9 +16,9 @@ class ComScreen7 extends StatefulWidget {
 }
 
 class _ComScreen7State extends State<ComScreen7> {
-  Future<void> _savePreferences(String days) async {
+  Future<void> _savePreferences(int days) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('work_day_commit', days);
+    await prefs.setInt('work_day_commit', days);
   }
 
   @override
@@ -153,7 +153,7 @@ class _ComScreen7State extends State<ComScreen7> {
             // Continue Button
             ElevatedButton(
               onPressed: () {
-                _savePreferences(controller.selectedDays.value.toString());
+                _savePreferences(controller.selectedDays.value);
                 Get.toNamed(
                   AppRoutes.comScreen8,
                 );
@@ -177,7 +177,7 @@ class _ComScreen7State extends State<ComScreen7> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
           ],
         ),

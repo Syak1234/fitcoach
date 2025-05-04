@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../Comprehensive_screen/com_screen2.dart';
 
@@ -56,11 +57,13 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
   ];
   final List<String> daysCommit = ["1", "2", "3", "4", "5", "6", "7"];
 
-  String selectedGender = 'Female';
+  RxString selectedGender = 'Female'.obs;
   RxString selectedFitnessGoal = "I wanna lose weight".obs;
   RxString selectedDiet = "Plant Based".obs;
   RxString selectedDay = "1".obs;
   RxString selectedSleep = "7-8 hours".obs;
+  RxString username = "".obs;
+  RxString email = "".obs;
 
   String selectedLocation = 'Location permission permanently denied.';
 
@@ -70,6 +73,8 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
       LocationPermission permission;
 
       weightUnit.value = await SharedPrefHelper.getString("weightUnit") ?? "kg";
+      getx.selectedweightUnit.value =
+          await SharedPrefHelper.getString("weightUnit") ?? "kg";
 
       // Check if location services are enabled
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -126,18 +131,47 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
   String location = "No location found";
   @override
   void initState() {
-    selectedGender = getx.userAssessmentDetaiils[0].gender;
-    selectedFitnessGoal.value = getx.userAssessmentDetaiils[0].fitnessGoal;
-    selectedDiet.value = getx.userAssessmentDetaiils[0].specificDiet;
-    selectedDay.value = getx.userAssessmentDetaiils[0].daysCommit;
-    isExperienced.value =
-        getx.userAssessmentDetaiils[0].previousFitnessExperience == "true"
-            ? true
-            : false;
-    selectedSleep.value = getx.userAssessmentDetaiils[0].sleepQuality;
+    getProfileDetails();
+    // selectedGender = getx.userAssessmentDetaiils[0].gender;
+    // selectedFitnessGoal.value = getx.userAssessmentDetaiils[0].fitnessGoal;
+    // selectedDiet.value = getx.userAssessmentDetaiils[0].specificDiet;
+    // selectedDay.value = getx.userAssessmentDetaiils[0].daysCommit;
+    // isExperienced.value =
+    //     getx.userAssessmentDetaiils[0].previousFitnessExperience == "true"
+    //         ? true
+    //         : false;
+    // selectedSleep.value = getx.userAssessmentDetaiils[0].sleepQuality;
     _getCurrentLocation();
 
     super.initState();
+  }
+
+  getProfileDetails() {
+    try {
+      selectedGender.value = getx.userAssessmentDetaiils[0].gender;
+      selectedFitnessGoal.value = getx.userAssessmentDetaiils[0].fitnessGoal;
+      selectedDiet.value = getx.userAssessmentDetaiils[0].specificDiet;
+      selectedDay.value = getx.userAssessmentDetaiils[0].daysCommit;
+      isExperienced.value =
+          getx.userAssessmentDetaiils[0].previousFitnessExperience == "true"
+              ? true
+              : false;
+      selectedSleep.value = getx.userAssessmentDetaiils[0].sleepQuality;
+
+      getx.selectedWeight.value = getx.userAssessmentDetaiils[0].weight;
+      getx.selectedHeight.value = getx.userAssessmentDetaiils[0].height;
+      getx.selectedCalory.value = getx.userAssessmentDetaiils[0].calorieyGoal;
+      getx.selectedExcersiceList.value = getx
+          .userAssessmentDetaiils[0].specificExperiencePreferance
+          .toString();
+
+      username.value =
+          getx.userdetails[0].username.replaceAll("@gmail.com", "");
+      email.value = getx.userdetails[0].username;
+      getx.selectedAge.value = getx.userAssessmentDetaiils[0].age;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   @override
@@ -184,22 +218,43 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage("assets/profile/img1.png"),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        child: CircleAvatar(
-                          backgroundColor: AppColors.primaryorange,
-                          radius: 16,
-                          child: Icon(
-                            Icons.camera_alt,
-                            color: AppColors.textLight,
-                            size: 16,
-                          ),
-                        ),
-                      ),
+                      Obx(() {
+                        if (getx.profileImage.value != null) {
+                          return ClipOval(
+                            child: Image.file(
+                              getx.profileImage.value!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage:
+                                      AssetImage('assets/profile/img1.png'),
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return CircleAvatar(
+                            radius: 50,
+                            backgroundImage:
+                                AssetImage('assets/profile/img1.png'),
+                          );
+                        }
+                      }),
+                      // Positioned(
+                      //   bottom: 0,
+                      //   child: CircleAvatar(
+                      //     backgroundColor: AppColors.primaryorange,
+                      //     radius: 16,
+                      //     child: Icon(
+                      //       Icons.camera_alt,
+                      //       color: AppColors.textLight,
+                      //       size: 16,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -223,8 +278,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     filled: true,
                     // labelText: "Full Name",
                     labelStyle: TextStyle(color: Colors.grey.shade400),
-                    hintText:
-                        "${getx.userdetails[0].username.replaceAll("@gmail.com", "")}",
+                    hintText: "${username.value}",
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     prefixIcon: Icon(Icons.person, color: AppColors.textDark),
                     enabledBorder: OutlineInputBorder(
@@ -260,7 +314,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     filled: true,
                     // labelText: "Email Address",
                     labelStyle: TextStyle(color: Colors.grey.shade400),
-                    hintText: "${getx.userdetails[0].username}",
+                    hintText: "${email.value}",
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     prefixIcon: Icon(
                       Icons.email,
@@ -337,17 +391,26 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                               fontSize: 18,
                               fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          "${getx.userAssessmentDetaiils[0].weight} ${weightUnit.value}",
-                          style: TextStyle(
-                              color: AppColors.textDark,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                          textScaler: TextScaler.linear(2),
+                        Obx(
+                          () => Text(
+                            "${getx.selectedWeight} ${getx.selectedweightUnit}",
+                            style: TextStyle(
+                                color: AppColors.textDark,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            textScaler: TextScaler.linear(2),
+                          ),
                         ),
                       ],
                     ),
-                    Icon(Icons.edit),
+                    InkWell(
+                        onTap: () {
+                          getx.forUpdate.value = true;
+                          Get.toNamed(
+                            AppRoutes.comScreen3,
+                          );
+                        },
+                        child: Icon(Icons.edit)),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,7 +423,9 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "${getx.userAssessmentDetaiils[0].height} cm",
+                          getx.selectedHeight.value.contains("cm")
+                              ? "${getx.selectedHeight.value}"
+                              : "${getx.selectedHeight.value} cm",
                           style: TextStyle(
                               color: AppColors.textDark,
                               fontSize: 16,
@@ -369,12 +434,73 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                         ),
                       ],
                     ),
-                    Icon(Icons.edit)
+                    InkWell(
+                        onTap: () {
+                          getx.forUpdate.value = true;
+                          Get.toNamed(
+                            AppRoutes.height,
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Icon(Icons.edit),
+                        ))
                   ],
                 ),
 
                 // Continue Button
                 SizedBox(height: 16),
+
+                const Text(
+                  'Age',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                    width: MediaQuery.of(context).size.width - 20,
+                    decoration: BoxDecoration(
+                      color: AppColors.gray10,
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Icon(Icons.directions_run_rounded,
+                              color: AppColors.textDark),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 200,
+                            child: Obx(
+                              () => Text(
+                                overflow: TextOverflow.ellipsis,
+                                getx.selectedAge.value.contains("Instance")
+                                    ? "Not Specified"
+                                    : getx.selectedAge.value + "    years",
+                                style: const TextStyle(
+                                    color: AppColors.textDark,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                              onTap: () {
+                                getx.forUpdate.value = true;
+
+                                Get.toNamed(AppRoutes.comScreen4);
+                              },
+                              child:
+                                  Icon(Icons.edit, color: AppColors.textDark)),
+                        ],
+                      ),
+                    )),
+                const SizedBox(height: 20),
 
                 const Text(
                   'Gender',
@@ -392,14 +518,14 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: DropdownButton<String>(
                     dropdownColor: AppColors.gray10,
-                    value: selectedGender,
+                    value: selectedGender.value,
                     isExpanded: true,
                     icon: const Icon(Icons.keyboard_arrow_down,
                         color: AppColors.textDark),
                     underline: const SizedBox(),
                     onChanged: (value) {
                       setState(() {
-                        selectedGender = value!;
+                        selectedGender.value = value!;
                       });
                     },
                     items: genders
@@ -502,7 +628,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                               value: diet,
                               child: Row(
                                 children: [
-                                  const Icon(Icons.free_breakfast,
+                                  const Icon(Icons.restaurant,
                                       color: AppColors.textDark),
                                   const SizedBox(width: 10),
                                   Text(
@@ -585,15 +711,26 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "${getx.userAssessmentDetaiils[0].calorieyGoal} kcal",
-                      style: TextStyle(
-                          color: AppColors.textDark,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                      textScaler: TextScaler.linear(2),
+                    Obx(
+                      () => Text(
+                        "${getx.selectedCalory.value} kcal",
+                        style: TextStyle(
+                            color: AppColors.textDark,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                        textScaler: TextScaler.linear(2),
+                      ),
                     ),
-                    Icon(Icons.edit)
+                    InkWell(
+                        onTap: () {
+                          getx.forUpdate.value = true;
+
+                          Get.toNamed(AppRoutes.comScreen9);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 15),
+                          child: Icon(Icons.edit),
+                        ))
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -645,6 +782,57 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                //  const SizedBox(height: 20),
+
+                const Text(
+                  'Specific Experience Preferance ',
+                  style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                    width: MediaQuery.of(context).size.width - 20,
+                    decoration: BoxDecoration(
+                      color: AppColors.gray10,
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Icon(Icons.directions_run_rounded,
+                              color: AppColors.textDark),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: 200,
+                            child: Obx(
+                              () => Text(
+                                overflow: TextOverflow.ellipsis,
+                                getx.selectedExcersiceList
+                                    .toString()
+                                    .replaceAll("[", "")
+                                    .replaceAll("]", ""),
+                                style:
+                                    const TextStyle(color: AppColors.textDark),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                              onTap: () {
+                                getx.forUpdate.value = true;
+
+                                Get.toNamed(AppRoutes.comScreen8);
+                              },
+                              child:
+                                  Icon(Icons.edit, color: AppColors.textDark)),
+                        ],
+                      ),
+                    )),
+                const SizedBox(height: 20),
 
                 // Location Dropdown
                 const Text(
@@ -688,7 +876,27 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      updateUserDetails(
+                              userId: getx.userdetails[0].userId,
+                              fitnessGoal: selectedFitnessGoal.value,
+                              gender: selectedGender.value,
+                              weight: getx.selectedWeight.value,
+                              height: getx.selectedHeight.value,
+                              previousFitnessExperience: isExperienced.value,
+                              specificDiet: selectedDiet.value,
+                              daysCommit: int.parse(selectedDay.value),
+                              specificExperiencePreferance:
+                                  getx.selectedExcersiceList.value,
+                              calorieyGoal: getx.selectedCalory.value,
+                              sleepQuality: selectedSleep.value,
+                              age: getx.selectedAge.value,
+                              context: context,
+                              profileImage: getx.profileImage.value)
+                          .then((val) async {
+                        await getUserDetails();
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(

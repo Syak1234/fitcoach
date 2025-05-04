@@ -15,7 +15,7 @@ class ComScreen5 extends StatefulWidget {
 class _ComScreen5State extends State<ComScreen5> {
   Future<void> _savePreferences(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('isFitnessExp', type);
+    await prefs.setBool('isFitnessExp', type == "YES");
   }
 
   @override

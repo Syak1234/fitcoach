@@ -20,10 +20,26 @@ class _ComScreen4State extends State<ComScreen4> {
 
   Future<void> _savePreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('age', selectedIndex.toString());
+    await prefs.setString('age', (selectedIndex + 1).toString());
+
+    getx.selectedAge.value = (selectedIndex + 1).toString();
 
     // final a = prefs.getDouble(type) ?? '';
     // log(a.toString());
+  }
+
+  void initState() {
+    super.initState();
+    setvalue();
+  }
+
+  setvalue() {
+    try {
+      if (getx.forUpdate.value) {
+        selectedIndex = int.parse(getx.selectedAge.value);
+      }
+    } catch (e) {}
+    setState(() {});
   }
 
   @override
@@ -146,9 +162,15 @@ class _ComScreen4State extends State<ComScreen4> {
       onPressed: () async {
         _savePreferences();
 
-        Get.toNamed(
-          AppRoutes.comScreen5,
-        );
+        if (getx.forUpdate.value) {
+          getx.forUpdate.value = false;
+          Get.back();
+        } else {
+          Get.toNamed(
+            AppRoutes.comScreen5,
+          );
+        }
+
         // Get.to(() => ProfileScreen1(),
         //     transition: Transition.rightToLeft);
       },
