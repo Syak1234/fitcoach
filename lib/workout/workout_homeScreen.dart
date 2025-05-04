@@ -1,5 +1,7 @@
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/workout/workoutListUi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -123,22 +125,28 @@ class WorkoutMobileView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.add_circle_outline,
-                    color: AppColors.primaryBlue,
-                  ),
-                  onPressed: () {},
-                ),
-                const Text(
-                  "Add Exercise",
-                  style: TextStyle(
+            InkWell(
+              onTap: () {
+                Get.to(() => AddExerciseScreen(),
+                    transition: Transition.leftToRight);
+              },
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.add_circle_outline,
                       color: AppColors.primaryBlue,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
+                    ),
+                    onPressed: () async {},
+                  ),
+                  const Text(
+                    "Add Exercise",
+                    style: TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -174,6 +182,7 @@ class WorkoutMobileView extends StatelessWidget {
                 ],
               ),
             ),
+
             const SizedBox(height: 20),
           ],
         ),

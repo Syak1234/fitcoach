@@ -75,30 +75,30 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      height: 80,
+      height: 100,
       color: AppColors.gray10,
       shape: const CircularNotchedRectangle(),
-      notchMargin: 10,
+      notchMargin: 5,
       child: SizedBox(
-        height: 70,
+        height: 80,
         child: Row(
           mainAxisAlignment:
               MainAxisAlignment.spaceBetween, // Distribute evenly
           children: [
-            _buildNavItem(Icons.home, 0),
-            _buildNavItem(Icons.fitness_center, 1),
-            _buildNavItem(Icons.forum, 2),
+            _buildNavItem(Icons.home, 0, 'Home'),
+            _buildNavItem(Icons.fitness_center, 1, 'Workout'),
+            _buildNavItem(Icons.forum, 2, 'Forum'),
             // const SizedBox(
             //     width: 50), // Space for FAB (adjustable based on your FAB size)
-            _buildNavItem(Icons.restaurant, 3),
-            _buildNavItem(Icons.person, 4),
+            _buildNavItem(Icons.restaurant, 3, 'Meal'),
+            _buildNavItem(Icons.person, 4, 'Profile'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index) {
+  Widget _buildNavItem(IconData icon, int index, name) {
     return InkWell(
       onTap: () => _onItemTapped(index),
       child: Container(
@@ -117,15 +117,23 @@ class BottomNavBar extends StatelessWidget {
                     : AppColors.gray,
               ),
               if (getx.pagesIndex.value == index)
-                Container(
-                  width: 30,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 4),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryorange,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
+                Column(
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(color: AppColors.gray),
+                    ),
+                    Container(
+                      width: 30,
+                      height: 4,
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryorange,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),
