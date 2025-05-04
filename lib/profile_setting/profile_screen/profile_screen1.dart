@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/profile_setting/profile_screen/profile_screen2.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -38,6 +39,8 @@ class _ProfileScreen1State extends State<ProfileScreen1> {
         print("File size exceeds 5 MB. Please choose a smaller file.");
         return;
       }
+
+      getx.profileImage.value = file;
 
       // If file size is valid, proceed
       final fileBytes = await file.readAsBytes();

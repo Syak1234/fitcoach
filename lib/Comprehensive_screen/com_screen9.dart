@@ -16,10 +16,18 @@ class _ComScreen9State extends State<ComScreen9> {
   var calorieGoal = 200.obs; // Observable calorie goal
   late TextEditingController textController;
 
+  Getx getx = Get.put(Getx());
+
   @override
   void initState() {
     super.initState();
-    textController = TextEditingController(text: calorieGoal.value.toString());
+    setvalue();
+    if (getx.forUpdate.value == false) {
+      textController =
+          TextEditingController(text: calorieGoal.value.toString());
+    } else {
+      textController = TextEditingController(text: getx.selectedCalory.value);
+    }
 
     // Update the text field when calorieGoal changes
     ever(calorieGoal, (value) {
@@ -48,6 +56,17 @@ class _ComScreen9State extends State<ComScreen9> {
   Future<void> _savePreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('kcal_goal_perday', calorieGoal.value.toString());
+    getx.selectedCalory.value = calorieGoal.value.toString();
+  }
+
+  setvalue() {
+    try {
+      if (getx.forUpdate.value) {
+        textController.text = getx.userAssessmentDetaiils[0].calorieyGoal;
+        // calorieGoal.value=int.parse(getx.userAssessmentDetaiils[0].calorieyGoal);
+      }
+    } catch (e) {}
+    setState(() {});
   }
 
   @override
@@ -165,9 +184,15 @@ class _ComScreen9State extends State<ComScreen9> {
                 ElevatedButton(
                   onPressed: () {
                     _savePreferences();
-                    Get.toNamed(
-                      AppRoutes.comScreen10,
-                    );
+                    if (getx.forUpdate.value) {
+                      getx.forUpdate.value = false;
+                      getx.selectedCalory.value = calorieGoal.value.toString();
+                      Get.back();
+                    } else {
+                      Get.toNamed(
+                        AppRoutes.comScreen10,
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundDark,

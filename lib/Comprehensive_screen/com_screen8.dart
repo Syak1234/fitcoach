@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fitcoach/Comprehensive_screen/com_screen9.dart';
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
@@ -18,12 +19,60 @@ class ComScreen8 extends StatefulWidget {
 
 class _ComScreen8State extends State<ComScreen8> {
   final Getx controller = Get.put(Getx());
+
+  final List<Map<String, dynamic>> exercises = [
+    {'name': 'Jogging', 'icon': Icons.directions_run},
+    {'name': 'Walking', 'icon': Icons.directions_walk},
+    {'name': 'Hiking', 'icon': Icons.hiking},
+    {'name': 'Skating', 'icon': Icons.skateboarding},
+    {'name': 'Biking', 'icon': Icons.pedal_bike},
+    {'name': 'Weightlift', 'icon': Icons.fitness_center},
+    {'name': 'Cardio', 'icon': Icons.monitor_heart},
+    {'name': 'Yoga', 'icon': Icons.self_improvement},
+    {'name': 'Other', 'icon': Icons.settings},
+  ];
+
+  void selectExercisesFromString(String exercisesString) {
+    // Get all exercise names in lowercase for comparison
+    final availableExerciseNames =
+        exercises.map((e) => e['name'].toString().toLowerCase()).toList();
+
+    // Clear previous selections
+    controller.selectedPreferences.clear();
+
+    // Split input string and trim items
+    final inputExercises =
+        exercisesString.split(',').map((e) => e.trim().toLowerCase()).toList();
+
+    // Go through each input exercise and add to selectedPreferences if valid
+    for (var exercise in inputExercises) {
+      int index = availableExerciseNames.indexOf(exercise);
+      if (index != -1) {
+        // Add the original (capitalized) name
+        controller.selectedPreferences.add(exercises[index]['name']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (getx.forUpdate.value) {
+      selectExercisesFromString(getx.selectedExcersiceList.value
+          .toString()
+          .replaceAll("[", "")
+          .replaceAll("]", ""));
+    }
+  }
+
   Future<void> _savePreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('excercise_pref', controller.selectedPreferences);
     final a = prefs.getStringList(
       'excercise_pref',
     );
+    getx.selectedExcersiceList.value =
+        controller.selectedPreferences.toString();
 
     log(a.toString());
   }
@@ -167,9 +216,15 @@ class _ComScreen8State extends State<ComScreen8> {
               onPressed: () {
                 if (controller.selectedPreferences.isNotEmpty) {
                   _savePreferences();
-                  Get.toNamed(
-                    AppRoutes.comScreen9,
-                  );
+
+                  if (getx.forUpdate.value) {
+                    getx.forUpdate.value = false;
+                    Get.back();
+                  } else {
+                    Get.toNamed(
+                      AppRoutes.comScreen9,
+                    );
+                  }
                 } else {
                   Get.snackbar(
                       "Error", "Please select at least one exercise preference",
@@ -196,8 +251,7 @@ class _ComScreen8State extends State<ComScreen8> {
                 ],
               ),
             ),
-            
-            
+
             const SizedBox(height: 20),
           ],
         ),

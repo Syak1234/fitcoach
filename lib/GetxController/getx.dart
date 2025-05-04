@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -32,6 +33,10 @@ class Getx extends GetxController {
   RxString selectedweightUnit = "".obs;
   RxString selectedHeight = "".obs;
   RxString selectedCalory = "".obs;
+  RxString selectedExcersiceList = "".obs;
+  RxString selectedAge = "".obs;
+
+  Rx<File?> profileImage = Rx<File?>(null);
 
   RxString token = "".obs;
 
