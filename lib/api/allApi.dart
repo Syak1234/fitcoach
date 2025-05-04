@@ -650,3 +650,63 @@ Future<bool> logoutFunction() async {
     return false;
   }
 }
+Future<List<Map<String, dynamic>>> getAllWorkout() async {
+  try {
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.allworkOutList);
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+    };
+
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+
+    final client = IOClient(ioClient);
+    final response = await client.get(url, headers: headers);
+    log('Response: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data['result']);
+    } else {
+      throw Exception('Failed to load workouts');
+    }
+  } catch (e) {
+    log('Error: $e');
+    return [];
+  }
+}
+
+Future deleteworkout({required int id}) async {
+  try {
+    // String? token = await SharedPrefHelper.getString('token');
+
+    // String userid = await SharedPrefHelper.getString('userid') ?? '';
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.deleteworkOut + id.toString());
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+    final response = await client.get(
+      url,
+      headers: headers,
+    );
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}

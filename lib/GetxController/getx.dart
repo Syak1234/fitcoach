@@ -122,4 +122,35 @@ class Getx extends GetxController {
   void setMealItems(List<MealItem> items) {
     mealItems.value = items;
   }
+
+  var selectedCategory = 'Back'.obs;
+  var selectedExercises = <Map<String, dynamic>>[].obs;
+
+  final List<String> categories = [
+    'All',
+    'Back',
+    'Biceps',
+    'Chest',
+    'Triceps',
+    'Legs',
+    'Shoulders',
+    'Abs',
+    'Excluded',
+  ];
+
+  void toggleExercise(Map<String, dynamic> exercise) {
+    if (selectedExercises.contains(exercise)) {
+      selectedExercises.remove(exercise);
+    } else {
+      selectedExercises.add(exercise);
+    }
+  }
+
+  bool isSelected(Map<String, dynamic> exercise) {
+    return selectedExercises.contains(exercise);
+  }
+
+  void selectCategory(String category) {
+    selectedCategory.value = category;
+  }
 }

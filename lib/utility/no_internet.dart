@@ -79,59 +79,38 @@ class NoInternetScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryorange,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(19),
-                    ),
-                  ),
-                  onPressed: () {
-                    // void main() {
-                    HealthCalculator userHealth = HealthCalculator(
-                      height: 164.592,
-                      weight: 55,
-                      age: 24,
-                      gender: "Male",
-                      exerciseDays: 0,
-                      calorieGoal: 2200,
-                      dietPreference: "Plant Based", // Choose from the list
-                      sleepQuality: 0.8,
-                      exercisePreference: "Other", // Choose from the list
-                    );
-                    print("BMI: ${userHealth.calculateBMI()}");
-                    print("BMR: ${userHealth.calculateBMR()} kcal/day");
-                    print(
-                        "Daily Calories Needed: ${userHealth.calculateDailyCalories()} kcal");
-                    print(
-                        "Exercise Score: ${userHealth.calculateExerciseScore()}");
-                    print("Diet Score: ${userHealth.calculateDietScore()}");
-                    print(
-                        "Overall Health Score: ${userHealth.calculateHealthScore()}%");
-                    Get.to(() => StepCounterApp());
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 32),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         backgroundColor: AppColors.primaryorange,
+            //         padding: EdgeInsets.symmetric(vertical: 16),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(19),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         // void main() {
 
-                    // Navigate to Home
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Take Me Home",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18)),
-                      SizedBox(width: 8),
-                      Icon(Icons.home, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            //         // Navigate to Home
+            //       },
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Text("Take Me Home",
+            //               style: TextStyle(
+            //                   color: Colors.white,
+            //                   fontWeight: FontWeight.bold,
+            //                   fontSize: 18)),
+            //           SizedBox(width: 8),
+            //           Icon(Icons.home, color: Colors.white),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

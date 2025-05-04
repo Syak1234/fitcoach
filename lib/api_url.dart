@@ -8,4 +8,8 @@ class ApiUrl {
   static const createuserdetails = '/api/UserDetails/create-user-details';
   static const getUserdeatils = "/api/UserDetails/get-user-details/";
   static const updateUserdeatils = "/api/UserDetails/update-user-details/";
+  static const allworkOutList="/api/WorkoutImage/all";
+  static const createworkOut="/api/WorkoutImage/create";
+  static const updateworkOut="/api/WorkoutImage/update";
+  static const deleteworkOut="/api/WorkoutImage/delete/";
 }

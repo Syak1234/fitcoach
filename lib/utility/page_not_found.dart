@@ -17,16 +17,16 @@ class NotFoundScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Back Button
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.topLeft,
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(16.0),
+            //     child: IconButton(
+            //       icon: Icon(Icons.arrow_back, color: Colors.white),
+            //       onPressed: () => Navigator.pop(context),
+            //     ),
+            //   ),
+            // ),
 
             // Image
             Expanded(
@@ -81,38 +81,38 @@ class NotFoundScreen extends StatelessWidget {
             SizedBox(height: 32),
 
             // Home Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryorange,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(19),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Navigate to Home
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Take Me Home",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.home, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 32),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         backgroundColor: AppColors.primaryorange,
+            //         padding: EdgeInsets.symmetric(vertical: 16),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(19),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         // Navigate to Home
+            //       },
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Text(
+            //             "Take Me Home",
+            //             style: TextStyle(
+            //                 color: Colors.white,
+            //                 fontWeight: FontWeight.bold,
+            //                 fontSize: 18),
+            //           ),
+            //           SizedBox(width: 8),
+            //           Icon(Icons.home, color: Colors.white),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
             SizedBox(height: 40),
           ],
