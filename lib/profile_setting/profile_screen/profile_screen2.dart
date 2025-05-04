@@ -393,7 +393,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                         ),
                         Obx(
                           () => Text(
-                            "${getx.selectedWeight} ${getx.selectedweightUnit}",
+                            "${getx.selectedWeight} kg",
                             style: TextStyle(
                                 color: AppColors.textDark,
                                 fontSize: 16,
@@ -785,7 +785,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                 //  const SizedBox(height: 20),
 
                 const Text(
-                  'Specific Experience Preferance ',
+                  'Experience Preferance ',
                   style: TextStyle(
                       color: AppColors.textDark,
                       fontSize: 18,
@@ -1017,7 +1017,7 @@ Widget _buildSettingsItem(
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color:
                             isDanger ? AppColors.textLight : AppColors.textDark,

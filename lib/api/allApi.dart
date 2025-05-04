@@ -664,8 +664,7 @@ Future getUserDetails() async {
       await prefs.setString(
           'kcal_goal_perday', result['calorieyGoal'].toString());
       await prefs.setString('sleep', result['sleepQuality'].toString());
-      // await prefs.setString(
-      //     'age', await SharedPrefHelper.getString("age")??"");
+      await prefs.setString('age', result['age'].toString());
 
       log(response.body.toString());
     } else {
