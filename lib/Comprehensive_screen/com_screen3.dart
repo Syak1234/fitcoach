@@ -27,16 +27,32 @@ class _ComScreen3State extends State<ComScreen3> {
   @override
   void initState() {
     super.initState();
+    setvalue();
     _rulerPickerController = RulerPickerController(value: currentWeight);
   }
 
   Future<void> _savePreferences(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(type, currentWeight.toDouble());
+    // await prefs.setDouble(type, currentWeight.toDouble());
+    await prefs.setString("weight", currentWeight.toString() + type);
+
     await prefs.setString("weightUnit", type);
 
     final a = prefs.getDouble(type) ?? '';
     log(a.toString());
+  }
+
+  Future setvalue() async {
+    if (getx.forUpdate.value) {
+      try {
+        isKg = await SharedPrefHelper.getString("weightUnit") == "kg";
+
+        currentWeight = int.parse(getx.userAssessmentDetaiils[0].weight);
+      } catch (e) {
+        currentWeight = 70;
+      }
+    }
+    setState(() {});
   }
 
   void toggleUnit(bool toKg) {
@@ -225,13 +241,19 @@ class _ComScreen3State extends State<ComScreen3> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () async {
-        _savePreferences(isKg ? 'kg' : 'lbs');
-        await SharedPrefHelper.setString(
-            "weight", "${currentWeight.toInt()}${isKg ? 'kg' : 'lbs'}");
+        if (getx.forUpdate.value) {
+          getx.selectedWeight.value = currentWeight.toString();
+          getx.selectedweightUnit.value = isKg ? 'kg' : 'lbs';
+          _savePreferences(isKg ? 'kg' : 'lbs');
+          getx.forUpdate.value = false;
+          Get.back();
+        } else {
+          _savePreferences(isKg ? 'kg' : 'lbs');
 
-        Get.toNamed(
-          AppRoutes.height,
-        );
+          Get.toNamed(
+            AppRoutes.height,
+          );
+        }
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,

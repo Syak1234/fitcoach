@@ -177,22 +177,19 @@ class _SignInScreenState extends State<SignInScreen> {
                                 int height = await SharedPrefHelper.getInt(
                                         'user_height_cm') ??
                                     0;
-                                double weight = await prefs.getDouble('kg') ??
-                                    await prefs.getDouble('lbs') ??
-                                    0;
+                                String weight =
+                                    await prefs.getString('weight') ?? "";
+
                                 bool previousFitnessExperience =
-                                    await SharedPrefHelper.getString(
-                                                'isFitnessExp') ==
-                                            "YES"
-                                        ? true
-                                        : false;
+                                    await SharedPrefHelper.getBool(
+                                            'isFitnessExp') ??
+                                        false;
                                 String specificDiet =
                                     await SharedPrefHelper.getString('diet') ??
                                         "";
-                                int daysCommit = int.parse(
-                                    await SharedPrefHelper.getString(
-                                            'work_day_commit') ??
-                                        "0");
+                                int daysCommit = await SharedPrefHelper.getInt(
+                                        'work_day_commit') ??
+                                    0;
                                 List specificExperiencePreferance = await prefs
                                         .getStringList('excercise_pref') ??
                                     [];
@@ -203,9 +200,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                 String sleepQuality =
                                     await SharedPrefHelper.getString('sleep') ??
                                         "";
-                                int age = int.parse(
+                                String age =
                                     await SharedPrefHelper.getString('age') ??
-                                        "0");
+                                        "";
                                 String userid =
                                     await SharedPrefHelper.getString(
                                             "userid") ??
@@ -213,13 +210,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                 createUserDetails(
                                   context: context,
                                   userId: userid,
-                                  age: age.toString(),
+                                  age: age,
                                   calorieyGoal: calorieyGoal,
                                   daysCommit: daysCommit,
                                   fitnessGoal: fitnessGoal,
                                   gender: gender,
                                   height: height,
-                                  weight: weight.toInt(),
+                                  weight: weight,
                                   previousFitnessExperience:
                                       previousFitnessExperience,
                                   sleepQuality: sleepQuality,

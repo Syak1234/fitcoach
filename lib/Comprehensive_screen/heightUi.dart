@@ -9,15 +9,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../GetxController/getx.dart';
 import '../routes/app_routes.dart';
 
-class HeightSelectionScreen extends StatelessWidget {
+class HeightSelectionScreen extends StatefulWidget {
+  @override
+  State<HeightSelectionScreen> createState() => _HeightSelectionScreenState();
+}
+
+class _HeightSelectionScreenState extends State<HeightSelectionScreen> {
   final Getx controller = Get.put(Getx());
 
   final FocusNode feetFocusNode = FocusNode();
+
   final FocusNode inchesFocusNode = FocusNode();
+
   final FocusNode cmFocusNode = FocusNode();
 
   final TextEditingController feetController = TextEditingController();
+
   final TextEditingController inchesController = TextEditingController();
+
   final TextEditingController cmController = TextEditingController();
 
   // Save height in cm to SharedPreferences
@@ -33,9 +42,26 @@ class HeightSelectionScreen extends StatelessWidget {
     } else {
       heightInCm = controller.cm.value;
     }
-
+    getx.selectedHeight.value = heightInCm.toString();
     await prefs.setInt("user_height_cm", heightInCm);
     log("Saved height: $heightInCm cm");
+  }
+
+  setvalue() {
+    try {
+      if (getx.forUpdate.value) {
+        controller.cm.value = int.parse(getx.userAssessmentDetaiils[0].height);
+        cmController.text = getx.userAssessmentDetaiils[0].height;
+        controller.isFeetAndInches.value = false;
+      }
+    } catch (e) {}
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setvalue();
   }
 
   @override
@@ -151,13 +177,16 @@ class HeightSelectionScreen extends StatelessWidget {
                           heightString =
                               "${controller.feet.value}ft${controller.inches.value}in";
                         } else {
-                          heightString = "${controller.cm.value}cm";
+                          heightString = "${controller.cm.value} cm";
                         }
 
-                        await SharedPrefHelper.setString(
-                            "height", heightString);
-
-                        Get.toNamed(AppRoutes.comScreen4);
+                        if (getx.forUpdate.value) {
+                          // getx.selectedHeight.value = heightString;
+                          getx.forUpdate.value = false;
+                          Get.back();
+                        } else {
+                          Get.toNamed(AppRoutes.comScreen4);
+                        }
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

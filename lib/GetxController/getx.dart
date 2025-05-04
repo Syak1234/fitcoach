@@ -27,6 +27,11 @@ class Getx extends GetxController {
   RxList mealItemList = [].obs;
   RxList userPostId = [].obs;
   RxList userCommentId = [].obs;
+  RxBool forUpdate = false.obs;
+  RxString selectedWeight = "".obs;
+  RxString selectedweightUnit = "".obs;
+  RxString selectedHeight = "".obs;
+  RxString selectedCalory = "".obs;
 
   RxString token = "".obs;
 
