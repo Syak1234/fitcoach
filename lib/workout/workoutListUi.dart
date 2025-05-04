@@ -1,15 +1,13 @@
+import 'dart:developer';
+
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
-import 'package:fitcoach/utility/page_not_found.dart';
+import 'package:fitcoach/dbfunction.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fitcoach/api_url.dart';
 import 'package:fitcoach/constant.dart';
 import 'package:fitcoach/theme/app_colors.dart';
-// import 'package:fitcoach/controllers/exercise_controller.dart';
-// controllers/exercise_controller.dart
-import 'package:get/get.dart';
-import 'package:get/get.dart';
 
 class AddExerciseController extends GetxController {
   final categories = [
@@ -106,7 +104,10 @@ class AddExerciseScreen extends StatelessWidget {
                     final category = controller.categories[index];
                     final isSelected = category == selectedCategory;
                     return GestureDetector(
-                      onTap: () => controller.selectedCategory.value = category,
+                      onTap: () {
+                        log("Selected Category: $category");
+                        controller.selectedCategory.value = category;
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         alignment: Alignment.center,
@@ -131,21 +132,29 @@ class AddExerciseScreen extends StatelessWidget {
           const SizedBox(height: 20),
           Expanded(
             child: Obx(() {
+              // Filtering exercises based on selected category
+              final filteredExercises =
+                  controller.selectedCategory.value == 'All'
+                      ? controller.exercises
+                      : controller.exercises
+                          .where((exercise) =>
+                              exercise['type'].toString().toUpperCase() ==
+                              controller.selectedCategory.value.toUpperCase())
+                          .toList();
+
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (!controller.exercises.isEmpty) {
-                return NotFoundScreen();
+              if (filteredExercises.isEmpty) {
+                return const Center(child: Text('No exercises found.'));
               }
 
               return ListView.builder(
-                itemCount: controller.exercises.length,
+                itemCount: filteredExercises.length,
                 itemBuilder: (_, index) {
-                  final exercise = controller.exercises[index];
+                  final exercise = filteredExercises[index];
                   final imageUrl =
                       "https://${ApiUrl.baseUrl}${exercise['imageUrl']}";
-                  // final isSelected = controller.selectedExercises
-                  //     .any((item) => item['id'] == exercise['id']);
 
                   return GestureDetector(
                     onTap: () => controller.toggleExercise(exercise),
@@ -200,15 +209,32 @@ class AddExerciseScreen extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: () {
-                  print("Selected Exercises:");
+                onPressed: () async {
                   for (var e in controller.selectedExercises) {
-                    print("${e["imageName"]} - ${e["imageUrl"]}");
+                    final workout = {
+                      'workoutname': e['imageName'] ?? '',
+                      'kg': double.tryParse(e['kg'].toString()) ?? 1,
+                      'reps': int.tryParse(e['reps'].toString()) ?? 1,
+                      'sets': int.tryParse(e['sets'].toString()) ?? 1,
+                      'workoutimg': e['imageUrl'] ?? '',
+                    };
+
+                    final result =
+                        await WorkoutDatabase.instance.insertWorkout(workout);
+
+                    if (result == -1) {
+                      print(
+                          "Duplicate entry not inserted: ${workout['workoutname']}");
+                    } else {
+                      print("Workout inserted: ${workout['workoutname']}");
+                    }
+                    final a = await WorkoutDatabase.instance.fetchAllWorkouts();
+                    log(a.toString());
                   }
-                  // Get.toNamed(AppRoutes.workoutLogSet);
-                }
-                // Add functionality here
-                ,
+
+                  Get.back();
+                  // Add additional functionality as needed
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryorange,
                   shape: RoundedRectangleBorder(
@@ -219,11 +245,6 @@ class AddExerciseScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Icon(
-                    //   Icons.play_circle,
-                    //   color: AppColors.textLight,
-                    //   size: 30,
-                    // ),
                     Text(
                       'Add ${controller.selectedExercises.length} exercises',
                       style: TextStyle(
@@ -236,27 +257,6 @@ class AddExerciseScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              //  SizedBox(
-              //   width: double.infinity,
-              //   child: ElevatedButton(
-              //     onPressed: () {
-              // print("Selected Exercises:");
-              // for (var e in controller.selectedExercises) {
-              //   print("${e["imageName"]} - ${e["imageUrl"]}");
-              // }
-              //     },
-              //     style: ElevatedButton.styleFrom(
-              //       padding: const EdgeInsets.symmetric(vertical: 14),
-              //       backgroundColor: Colors.blue,
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(16),
-              //       ),
-              //     ),
-              //     child: Text(
-              //         'Add ${controller.selectedExercises.length} exercises'),
-              //   ),
-              // ),
             );
           }),
         ],
