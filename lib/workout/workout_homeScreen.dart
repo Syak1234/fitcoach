@@ -10,9 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-class WorkoutScreen extends StatelessWidget {
+class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({Key? key}) : super(key: key);
 
+  @override
+  State<WorkoutScreen> createState() => _WorkoutScreenState();
+}
+
+class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     return ScreenTypeLayout(
@@ -33,6 +38,7 @@ class WorkoutController extends GetxController {
   void fetchWorkouts() async {
     final data = await WorkoutDatabase.instance.fetchAllWorkouts();
     workoutList.value = data;
+    // log(workoutList.);
   }
 
   Future<void> refreshWorkouts() async {
@@ -155,125 +161,136 @@ class WorkoutMobileView extends StatelessWidget {
   Widget build(BuildContext context) {
     final WorkoutController controller = Get.put(WorkoutController());
 
-    return Scaffold(
-      appBar: customAppBar(context),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: AppColors.primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: const Text(
-                  "TRY PREMIUM",
-                  style: TextStyle(
-                      color: AppColors.textLight, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _customButton("Equipment", Icons.fitness_center),
-                _customButton("Muscle Groups", Icons.add),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Obx(() => Text(
-                  "${controller.workoutList.length} Exercises",
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                )),
-            const SizedBox(height: 10),
-
-            // 🔽 List from DB
-            Expanded(
-              child: Obx(() {
-                if (controller.workoutList.isEmpty) {
-                  return const Center(child: Text("No exercises added."));
-                }
-
-                return ListView.builder(
-                  itemCount: controller.workoutList.length,
-                  itemBuilder: (context, index) {
-                    final workout = controller.workoutList[index];
-                    return ExerciseTile(
-                      title: workout['workoutname'],
-                      weight: "${workout['kg']}",
-                      reps: "${workout['reps']}",
-                      sets: "${workout['sets']}",
-                      icon: Icons.fitness_center,
-                    );
-                  },
-                );
-              }),
-            ),
-
-            const SizedBox(height: 10),
-            InkWell(
-              onTap: () async {
-                await Get.to(() => AddExerciseScreen());
-                controller.refreshWorkouts(); // ⬅ Refresh after adding
-              },
-              child: Row(
+    return GetBuilder<WorkoutController>(
+        init: WorkoutController(),
+        builder: (controller) {
+          controller.fetchWorkouts();
+          return Scaffold(
+            appBar: customAppBar(context),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline,
-                        color: AppColors.primaryBlue),
-                    onPressed: null,
+                  // Center(
+                  //   child: ElevatedButton(
+                  //     onPressed: () {},
+                  //     style: ElevatedButton.styleFrom(
+                  //       elevation: 0,
+                  //       backgroundColor: AppColors.primaryBlue,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(20),
+                  //       ),
+                  //     ),
+                  //     child: const Text(
+                  //       "TRY PREMIUM",
+                  //       style: TextStyle(
+                  //           color: AppColors.textLight,
+                  //           fontWeight: FontWeight.bold),
+                  //     ),
+                  //   ),
+                  // ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _customButton("Equipment", Icons.fitness_center),
+                      _customButton("Muscle Groups", Icons.add),
+                    ],
                   ),
-                  const Text(
-                    "Add Exercise",
-                    style: TextStyle(
-                        color: AppColors.primaryBlue,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
+                  const SizedBox(height: 20),
+                  Obx(() => Text(
+                        "${controller.workoutList.length} Exercises",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      )),
+                  const SizedBox(height: 10),
 
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Get.to(() => WorkoutLogSetScreen(controller.workoutList));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.backgroundDark,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.play_circle, color: AppColors.textLight, size: 30),
-                  Text(
-                    ' Start Workout',
-                    style: TextStyle(
-                      color: AppColors.textLight,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  // 🔽 List from DB
+                  Expanded(
+                    child: Obx(() {
+                      if (controller.workoutList.isEmpty) {
+                        return const Center(child: Text("No exercises added."));
+                      }
+
+                      return ListView.builder(
+                        itemCount: controller.workoutList.length,
+                        itemBuilder: (context, index) {
+                          final workout = controller.workoutList[index];
+                          log(workout.toString());
+                          return ExerciseTile(
+                            id: workout['id'],
+                            title: workout['workoutname'],
+                            weight: "${workout['kg']}",
+                            reps: "${workout['reps']}",
+                            sets: "${workout['sets']}",
+                            icon: Icons.fitness_center,
+                            index: index,
+                          );
+                        },
+                      );
+                    }),
+                  ),
+
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () async {
+                      await Get.to(() => AddExerciseScreen());
+                      controller.refreshWorkouts(); // ⬅ Refresh after adding
+                    },
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline,
+                              color: AppColors.primaryBlue),
+                          onPressed: null,
+                        ),
+                        const Text(
+                          "Add Exercise",
+                          style: TextStyle(
+                              color: AppColors.primaryBlue,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(width: 8),
+
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                          () => WorkoutLogSetScreen(controller.workoutList, 0));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.backgroundDark,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.play_circle,
+                            color: AppColors.textLight, size: 30),
+                        Text(
+                          ' Start Workout',
+                          style: TextStyle(
+                            color: AppColors.textLight,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -283,22 +300,26 @@ class ExerciseTile extends StatelessWidget {
   final String reps;
   final String sets;
   final IconData icon;
+  final int id;
+  final int index;
 
-  const ExerciseTile({
-    Key? key,
-    required this.title,
-    required this.weight,
-    required this.reps,
-    required this.sets,
-    required this.icon,
-  }) : super(key: key);
+  const ExerciseTile(
+      {Key? key,
+      required this.id,
+      required this.title,
+      required this.weight,
+      required this.reps,
+      required this.sets,
+      required this.icon,
+      required this.index})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final WorkoutController controller = Get.put(WorkoutController());
     return InkWell(
       onTap: () {
-        Get.to(() => WorkoutLogSetScreen(controller.workoutList));
+        Get.to(() => WorkoutLogSetScreen(controller.workoutList, index));
       },
       child: Card(
         elevation: 0,
@@ -330,19 +351,19 @@ class ExerciseTile extends StatelessWidget {
               int setsInt = int.tryParse(sets) ?? 1;
               int repsInt = int.tryParse(reps) ?? 1;
               int weightInt = int.tryParse(weight) ?? 1;
-
+              log(weight);
               setsInt = setsInt == 0 ? 1 : setsInt;
               repsInt = repsInt == 0 ? 1 : repsInt;
               weightInt = weightInt == 0 ? 1 : weightInt;
 
-              showWorkoutPicker(
-                context,
-                title,
-                setsInt,
-                repsInt,
-                weightInt,
-                (kg, reps, sets) {},
-              );
+              showWorkoutPicker(context,
+                  workoutname: title,
+                  sets: setsInt,
+                  reps: repsInt,
+                  kg: weightInt,
+                  onSave: (kg, reps, sets) {},
+                  id: id,
+                  workoutimg: '');
             },
             icon: Icon(Icons.more_horiz),
           ),

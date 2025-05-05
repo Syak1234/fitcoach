@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:fitcoach/constant.dart';
+import 'package:fitcoach/dbfunction.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/workout/workoutListUi.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,9 @@ import 'package:get/get.dart';
 
 class WorkoutLogSetScreen extends StatefulWidget {
   RxList<dynamic> workoutList;
+  int index;
 
-  WorkoutLogSetScreen(this.workoutList, {super.key});
+  WorkoutLogSetScreen(this.workoutList, this.index, {super.key});
 
   @override
   State<WorkoutLogSetScreen> createState() => _WorkoutLogSetScreenState();
@@ -22,15 +24,21 @@ class _WorkoutLogSetScreenState extends State<WorkoutLogSetScreen> {
   RxString selcetedkg = "".obs;
   RxString selcetedreps = "".obs;
   RxString selcetedsets = "".obs;
+  RxInt id = 0.obs;
 
   @override
   Widget build(BuildContext context) {
-    selcetedimg.value = widget.workoutList[0]['workoutimg'];
+    selcetedimg.value = widget.workoutList[widget.index]['workoutimg'];
     selcetedkg.value =
-        (int.tryParse(widget.workoutList[0]['kg'].toString()) ?? 0).toString();
-    selcetedreps.value = (widget.workoutList[0]['reps'] ?? 0).toString();
-    selcetedsets.value = (widget.workoutList[0]['sets'] ?? 0).toString();
-    selcetedworkoutname.value = widget.workoutList[0]['workoutname'];
+        (int.tryParse(widget.workoutList[widget.index]['kg'].toString()) ?? 0)
+            .toString();
+    selcetedreps.value =
+        (widget.workoutList[widget.index]['reps'] ?? 0).toString();
+    selcetedsets.value =
+        (widget.workoutList[widget.index]['sets'] ?? 0).toString();
+    selcetedworkoutname.value = widget.workoutList[widget.index]['workoutname'];
+    id.value = widget.workoutList[widget.index]['id'];
+    selectedIndex.value = widget.index;
 
     return Scaffold(
       body: Column(
@@ -80,6 +88,7 @@ class _WorkoutLogSetScreenState extends State<WorkoutLogSetScreen> {
                           selcetedsets.value = workout['sets'].toString();
                           selcetedworkoutname.value =
                               workout['workoutname'].toString();
+                          id.value = workout['id'];
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -168,18 +177,16 @@ class _WorkoutLogSetScreenState extends State<WorkoutLogSetScreen> {
                             padding: const EdgeInsets.only(left: 10),
                             child: ElevatedButton(
                               onPressed: () {
-                                showWorkoutPicker(
-                                  context,
-                                  selcetedworkoutname.value,
-                                  int.tryParse(selcetedkg.value) ?? 1,
-                                  int.tryParse(selcetedreps.value) ?? 1,
-                                  int.tryParse(selcetedsets.value) ?? 1,
-                                  (kg, reps, sets) {
-                                    selcetedkg.value = kg.toString();
-                                    selcetedreps.value = reps.toString();
-                                    selcetedsets.value = sets.toString();
-                                  },
-                                );
+                                showWorkoutPicker(context,
+                                    workoutname: selcetedworkoutname.value,
+                                    kg: int.tryParse(selcetedkg.value) ?? 1,
+                                    reps: int.tryParse(selcetedreps.value) ?? 1,
+                                    sets: int.tryParse(selcetedsets.value) ?? 1,
+                                    onSave: (kg, reps, sets) {
+                                  selcetedkg.value = kg.toString();
+                                  selcetedreps.value = reps.toString();
+                                  selcetedsets.value = sets.toString();
+                                }, id: id.value, workoutimg: selcetedimg.value);
                               },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
@@ -226,14 +233,14 @@ class _WorkoutLogSetScreenState extends State<WorkoutLogSetScreen> {
   }
 }
 
-void showWorkoutPicker(
-  BuildContext context,
-  String workoutname,
-  int kg,
-  int reps,
-  int sets,
-  Function(int kg, int reps, int sets) onSave,
-) {
+void showWorkoutPicker(BuildContext context,
+    {required String workoutname,
+    required int kg,
+    required int reps,
+    required int sets,
+    required Function(int kg, int reps, int sets) onSave,
+    required int id,
+    required String workoutimg}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -275,7 +282,13 @@ void showWorkoutPicker(
                 ),
                 Divider(thickness: 0.8, color: AppColors.gray80),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    showCrunchExcludeSheet(
+                        context, workoutimg, workoutname, id);
+
+                    //
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     minimumSize: const Size(double.infinity, 55),
@@ -292,6 +305,14 @@ void showWorkoutPicker(
                 ElevatedButton(
                   onPressed: () {
                     onSave(kg, reps, sets);
+                    WorkoutDatabase.instance.updateWorkout({
+                      'id': id,
+                      'workoutname': workoutname,
+                      'kg': kg,
+                      'reps': reps,
+                      "sets": sets,
+                      "workoutimg": workoutimg
+                    });
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -367,4 +388,123 @@ Widget buildPicker(
       ],
     ),
   );
+}
+
+void showCrunchExcludeSheet(BuildContext context, workoutimg, workoutname, id) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) {
+      return CrunchExcludeSheet(
+          workoutimg: workoutimg, workoutname: workoutname, id: id);
+    },
+  );
+}
+
+class CrunchExcludeSheet extends StatelessWidget {
+  String workoutimg;
+  String workoutname;
+  int id;
+  CrunchExcludeSheet(
+      {required this.workoutimg,
+      required this.workoutname,
+      required this.id,
+      super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        // Bottom Sheet Body
+        Container(
+          margin: const EdgeInsets.only(top: 100),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.horizontal_rule, color: Colors.grey, size: 32),
+              const SizedBox(height: 12),
+              Image.network(
+                Constant.imagebaseUrl + workoutimg,
+                width: 100,
+                height: 100,
+              ),
+              // Image.asset(
+              //   'assets/crunch_icon.png', // Replace with your asset
+              //   height: 60,
+              // ),
+              const SizedBox(height: 12),
+              Text(
+                "Exclude this in the future?",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                workoutname,
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              _optionButton("Exclude Forever", context, () {
+                WorkoutDatabase.instance.deleteWorkout(
+                  id,
+                );
+                Navigator.pop(context);
+              }),
+              _optionButton("Just for today", context, () {
+                WorkoutDatabase.instance.deleteWorkout(
+                  id,
+                );
+                Navigator.pop(context);
+              }),
+              _optionButton("Cancel", context, () {
+                Navigator.pop(context);
+              }, isCancel: true),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+        // Top Muscle Image
+        // Positioned(
+        //   top: 0,
+        //   child: Image.asset(
+        //     'assets/crunch_top.png', // Replace with your asset
+        //     height: 160,
+        //   ),
+        // ),
+      ],
+    );
+  }
+
+  Widget _optionButton(String text, BuildContext context, Function() param2,
+      {bool isCancel = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: TextButton(
+        onPressed: param2,
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: isCancel ? Colors.transparent : Colors.grey.shade800,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          minimumSize: const Size(double.infinity, 0),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isCancel ? Colors.blue : Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
 }

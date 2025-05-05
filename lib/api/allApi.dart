@@ -335,7 +335,7 @@ Future<List<Meal>> allListMealApi(BuildContext context) async {
       Uri.https(ApiUrl.baseUrl, ApiUrl.getMealList + userid),
       headers: headers,
     );
-    log(res.body.toString());
+    log("meal list " + res.body.toString());
     if (res.statusCode == 200) {
       var jsondata = jsonDecode(res.body);
       List<Meal> meals =
@@ -374,13 +374,15 @@ Future updateMealApi(
     final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
-      'Authorization': 'Bearer $token'
+      // 'Authorization': 'Bearer $token'
     };
 
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
+
+    log(obj.toString());
 
     final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
@@ -760,6 +762,7 @@ Future deleteworkout({required int id}) async {
   }
 }
 
+<<<<<<< HEAD
 Future<bool> genarateFPcode(
   BuildContext context, {
   required String email,
@@ -774,17 +777,29 @@ Future<bool> genarateFPcode(
     Map obj = {"email": email};
 
     log("Update Request: $obj");
+=======
+Future deleteMeal(context, {required int id}) async {
+  try {
+    // String? token = await SharedPrefHelper.getString('token');
+
+    // String userid = await SharedPrefHelper.getString('userid') ?? '';
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.deletemeal + id.toString());
+>>>>>>> 289c7ef1cb623d618d43c66fc1482d9ba2bed528
 
     final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
       // 'Authorization': 'Bearer $token'
     };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 289c7ef1cb623d618d43c66fc1482d9ba2bed528
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
+<<<<<<< HEAD
 
     final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.genarateFPotp),
@@ -814,11 +829,36 @@ Future<bool> genarateFPcode(
             .toString()
             .replaceAll('[', "")
             .replaceAll("]", "")),
+=======
+    final response = await client.delete(
+      url,
+      headers: headers,
+    );
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('Successfully'),
+        description: Text('Delete Meal'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+      );
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('Error'),
+        description: Text('Delete failed'),
+>>>>>>> 289c7ef1cb623d618d43c66fc1482d9ba2bed528
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.error,
       );
     }
   } catch (e) {
+<<<<<<< HEAD
     Get.back(); // Close loading dialog
     log("Update Error: $e");
     toastification.show(
@@ -830,4 +870,9 @@ Future<bool> genarateFPcode(
     );
   }
   return false;
+=======
+    Get.back();
+    log(e.toString());
+  }
+>>>>>>> 289c7ef1cb623d618d43c66fc1482d9ba2bed528
 }

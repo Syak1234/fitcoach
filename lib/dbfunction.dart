@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -71,13 +73,19 @@ class WorkoutDatabase {
   // Update a workout
   Future<int> updateWorkout(Map<String, dynamic> workout) async {
     final db = await instance.database;
+    log(workout.toString());
+
     int id = workout['id'];
-    return await db.update(
+
+    final rowsAffected = await db.update(
       'workouts',
       workout,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    log('Rows affected: $rowsAffected');
+    return rowsAffected;
   }
 
   // Delete a workout

@@ -22,7 +22,7 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() async {
   HttpOverrides.global = MyHttpOverrides();
-  final StepsController controller = Get.put(StepsController());
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   OpenFoodAPIConfiguration.userAgent = UserAgent(

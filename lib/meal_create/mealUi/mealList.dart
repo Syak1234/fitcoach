@@ -44,7 +44,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: customAppBar(context),
+      appBar: customAppBar(context, widget.meal!.id),
       body: Form(
         key: gk,
         child: SingleChildScrollView(
@@ -126,6 +126,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                               itemCount: mealController.mealItems.length,
                               itemBuilder: (context, index) {
                                 final item = mealController.mealItems[index];
+
                                 return ListTile(
                                   title: Text(
                                     item.name ??
@@ -204,7 +205,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
   }
 
   // Custom Dialog for Deleting Meal Item
-  void _showCustomDialog(BuildContext context) {
+  void _showCustomDialog(BuildContext context, id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -229,7 +230,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                 foregroundColor: AppColors.textLight,
               ),
               onPressed: () {
-                Navigator.of(context).pop();
+                // deleteMeal(context,id: id);
               },
               child: const Text("Delete"),
             ),
@@ -240,7 +241,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
   }
 
   // Custom AppBar Widget
-  PreferredSizeWidget customAppBar(context) {
+  PreferredSizeWidget customAppBar(context, id) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(110),
       child: Stack(
@@ -285,7 +286,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                       ),
                       InkWell(
                         onTap: () {
-                          _showCustomDialog(context);
+                          _showCustomDialog(context, id);
                         },
                         child: Row(
                           children: [
