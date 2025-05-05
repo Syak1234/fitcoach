@@ -207,6 +207,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     await SharedPrefHelper.getString(
                                             "userid") ??
                                         "";
+
                                 createUserDetails(
                                   context: context,
                                   userId: userid,
@@ -224,6 +225,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   specificExperiencePreferance:
                                       specificExperiencePreferance.toString(),
                                 );
+                                // getUserDetails();
                               });
                             }
                           },
@@ -267,6 +269,50 @@ class _SignInScreenState extends State<SignInScreen> {
                               user = await google_auth.signInWithGoogle();
 
                               if (user!.email!.isNotEmpty) {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+
+                                String fitnessGoal =
+                                    await SharedPrefHelper.getString(
+                                            'fitness_goal') ??
+                                        "";
+                                String gender =
+                                    await SharedPrefHelper.getString(
+                                            'selected_gender') ??
+                                        "";
+                                int height = await SharedPrefHelper.getInt(
+                                        'user_height_cm') ??
+                                    0;
+                                String weight =
+                                    await prefs.getString('weight') ?? "";
+
+                                bool previousFitnessExperience =
+                                    await SharedPrefHelper.getBool(
+                                            'isFitnessExp') ??
+                                        false;
+                                String specificDiet =
+                                    await SharedPrefHelper.getString('diet') ??
+                                        "";
+                                int daysCommit = await SharedPrefHelper.getInt(
+                                        'work_day_commit') ??
+                                    0;
+                                List specificExperiencePreferance = await prefs
+                                        .getStringList('excercise_pref') ??
+                                    [];
+                                String calorieyGoal =
+                                    await SharedPrefHelper.getString(
+                                            'kcal_goal_perday') ??
+                                        "";
+                                String sleepQuality =
+                                    await SharedPrefHelper.getString('sleep') ??
+                                        "";
+                                String age =
+                                    await SharedPrefHelper.getString('age') ??
+                                        "";
+                                String userid =
+                                    await SharedPrefHelper.getString(
+                                            "userid") ??
+                                        "";
                                 // Userdetails userdetails = Userdetails(
                                 //   username: user!.email.toString(),
                                 //   userId: user!.uid.toString(),
@@ -274,17 +320,39 @@ class _SignInScreenState extends State<SignInScreen> {
                                 //   userimg: user!.photoURL.toString() ?? '',
                                 // );
 
-                                loginApi(
+                                signUp(
                                     context,
                                     user!.email.toString(),
                                     passwordGanaretor(
                                       user!.email.toString(),
+                                    ),
+                                    passwordGanaretor(
+                                      user!.email.toString(),
                                     )).then((_) async {
-                                  // createUserDetails(
-                                  //     context: context,
-                                  //     userId: await SharedPrefHelper.getString(
-                                  //             "userid") ??
-                                  //         "");
+                                  loginApi(
+                                    context,
+                                    user!.email.toString(),
+                                    passwordGanaretor(
+                                      user!.email.toString(),
+                                    ),
+                                  );
+                                  createUserDetails(
+                                    context: context,
+                                    userId: userid,
+                                    age: age,
+                                    calorieyGoal: calorieyGoal,
+                                    daysCommit: daysCommit,
+                                    fitnessGoal: fitnessGoal,
+                                    gender: gender,
+                                    height: height,
+                                    weight: weight,
+                                    previousFitnessExperience:
+                                        previousFitnessExperience,
+                                    sleepQuality: sleepQuality,
+                                    specificDiet: specificDiet,
+                                    specificExperiencePreferance:
+                                        specificExperiencePreferance.toString(),
+                                  );
                                 });
                               }
                               // user!.email.toString();
@@ -312,6 +380,51 @@ class _SignInScreenState extends State<SignInScreen> {
                               if (facebookdata != null) {
                                 print("User Data: $facebookdata");
                                 log(facebookdata!['picture']['data']['url']);
+
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+
+                                String fitnessGoal =
+                                    await SharedPrefHelper.getString(
+                                            'fitness_goal') ??
+                                        "";
+                                String gender =
+                                    await SharedPrefHelper.getString(
+                                            'selected_gender') ??
+                                        "";
+                                int height = await SharedPrefHelper.getInt(
+                                        'user_height_cm') ??
+                                    0;
+                                String weight =
+                                    await prefs.getString('weight') ?? "";
+
+                                bool previousFitnessExperience =
+                                    await SharedPrefHelper.getBool(
+                                            'isFitnessExp') ??
+                                        false;
+                                String specificDiet =
+                                    await SharedPrefHelper.getString('diet') ??
+                                        "";
+                                int daysCommit = await SharedPrefHelper.getInt(
+                                        'work_day_commit') ??
+                                    0;
+                                List specificExperiencePreferance = await prefs
+                                        .getStringList('excercise_pref') ??
+                                    [];
+                                String calorieyGoal =
+                                    await SharedPrefHelper.getString(
+                                            'kcal_goal_perday') ??
+                                        "";
+                                String sleepQuality =
+                                    await SharedPrefHelper.getString('sleep') ??
+                                        "";
+                                String age =
+                                    await SharedPrefHelper.getString('age') ??
+                                        "";
+                                String userid =
+                                    await SharedPrefHelper.getString(
+                                            "userid") ??
+                                        "";
                                 // Userdetails userdetails = Userdetails(
                                 //   email: facebookdata!['email'] ?? ' ',
                                 //   name: facebookdata!['name'] ?? ' ',
@@ -321,17 +434,38 @@ class _SignInScreenState extends State<SignInScreen> {
                                 //       ' ',
                                 // );
 
-                                loginApi(
+                                signUp(
                                         context,
                                         facebookdata!['email'] ?? "",
                                         passwordGanaretor(
+                                            facebookdata!['email'] ?? ""),
+                                        passwordGanaretor(
                                             facebookdata!['email'] ?? ""))
                                     .then((_) async {
-                                  // createUserDetails(
-                                  //     context: context,
-                                  //     userId: await SharedPrefHelper.getString(
-                                  //             "userid") ??
-                                  //         "");
+                                  loginApi(
+                                    context,
+                                    user!.email.toString(),
+                                    passwordGanaretor(
+                                      user!.email.toString(),
+                                    ),
+                                  );
+                                  createUserDetails(
+                                    context: context,
+                                    userId: userid,
+                                    age: age,
+                                    calorieyGoal: calorieyGoal,
+                                    daysCommit: daysCommit,
+                                    fitnessGoal: fitnessGoal,
+                                    gender: gender,
+                                    height: height,
+                                    weight: weight,
+                                    previousFitnessExperience:
+                                        previousFitnessExperience,
+                                    sleepQuality: sleepQuality,
+                                    specificDiet: specificDiet,
+                                    specificExperiencePreferance:
+                                        specificExperiencePreferance.toString(),
+                                  );
                                 });
                               }
                             },

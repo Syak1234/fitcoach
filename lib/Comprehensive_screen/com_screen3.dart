@@ -31,10 +31,19 @@ class _ComScreen3State extends State<ComScreen3> {
     _rulerPickerController = RulerPickerController(value: currentWeight);
   }
 
+  String lbsToKg(int lbs) {
+    double kg = lbs * 0.45359237;
+    return '$lbs lbs is equal to ${kg.toStringAsFixed(2)} kg';
+  }
+
   Future<void> _savePreferences(String type) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String finalWeight = currentWeight.toString();
     // await prefs.setDouble(type, currentWeight.toDouble());
-    await prefs.setString("weight", currentWeight.toString() + type);
+    if (type != "kg") {
+      finalWeight = lbsToKg(currentWeight.toInt());
+    }
+    await prefs.setString("weight", finalWeight.toString());
 
     await prefs.setString("weightUnit", type);
 
@@ -45,7 +54,7 @@ class _ComScreen3State extends State<ComScreen3> {
   Future setvalue() async {
     if (getx.forUpdate.value) {
       try {
-        isKg = await SharedPrefHelper.getString("weightUnit") == "kg";
+        // isKg = await SharedPrefHelper.getString("weightUnit") == "kg";
 
         currentWeight = int.parse(getx.userAssessmentDetaiils[0].weight);
       } catch (e) {
