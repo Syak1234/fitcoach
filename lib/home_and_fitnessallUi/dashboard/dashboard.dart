@@ -278,14 +278,14 @@ class FitnessMetricsWidget extends StatelessWidget {
               },
               context: context),
           const SizedBox(width: 8),
-          _buildMetricCard(
-              title: 'Calories',
-              value: '1578',
-              subvalue: 'kcal',
-              color: AppColors.gray80,
-              icon: Icons.local_fire_department,
-              child: _buildCaloriesChart(),
-              context: context),
+          // _buildMetricCard(
+          //     title: 'Calories',
+          //     value: '1578',
+          //     subvalue: 'kcal',
+          //     color: AppColors.gray80,
+          //     icon: Icons.local_fire_department,
+          //     child: _buildCaloriesChart(),
+          //     context: context),
         ],
       ),
     );

@@ -335,7 +335,7 @@ Future<List<Meal>> allListMealApi(BuildContext context) async {
       Uri.https(ApiUrl.baseUrl, ApiUrl.getMealList + userid),
       headers: headers,
     );
-    log(res.body.toString());
+    log("meal list " + res.body.toString());
     if (res.statusCode == 200) {
       var jsondata = jsonDecode(res.body);
       List<Meal> meals =
@@ -374,13 +374,15 @@ Future updateMealApi(
     final headers = {
       'Content-Type': 'application/json',
       'accept': '*/*',
-      'Authorization': 'Bearer $token'
+      // 'Authorization': 'Bearer $token'
     };
 
     final ioClient = HttpClient()
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
+
+    log(obj.toString());
 
     final res = await client.post(
       Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
@@ -746,6 +748,54 @@ Future deleteworkout({required int id}) async {
       // Get.toNamed(
       //   AppRoutes.fingerprintSetup,
       // );
+    }
+  } catch (e) {
+    Get.back();
+    log(e.toString());
+  }
+}
+
+Future deleteMeal(context, {required int id}) async {
+  try {
+    // String? token = await SharedPrefHelper.getString('token');
+
+    // String userid = await SharedPrefHelper.getString('userid') ?? '';
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.deletemeal + id.toString());
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+    final response = await client.delete(
+      url,
+      headers: headers,
+    );
+    Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('Successfully'),
+        description: Text('Delete Meal'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+      );
+      // Get.toNamed(
+      //   AppRoutes.fingerprintSetup,
+      // );
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('Error'),
+        description: Text('Delete failed'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
     }
   } catch (e) {
     Get.back();
