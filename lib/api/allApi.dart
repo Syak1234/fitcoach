@@ -437,6 +437,7 @@ Future createUserDetails({
   required String sleepQuality,
   required String age,
   required BuildContext context,
+  File? profileImage, // <-- Add this if you want to upload an image
 }) async {
   try {
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
@@ -449,6 +450,7 @@ Future createUserDetails({
 
     final request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
+
     request.fields.addAll({
       "UserId": userId,
       "FitnessGoal": fitnessGoal,
@@ -462,8 +464,14 @@ Future createUserDetails({
       "CalorieyGoal": calorieyGoal,
       "SleepQuality": sleepQuality,
       "Age": age,
-      "ProfileImage": "", // empty string for now
     });
+
+    // Attach image if provided
+    if (profileImage != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('ProfileImage', profileImage.path),
+      );
+    }
 
     final streamedResponse = await client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
@@ -750,4 +758,76 @@ Future deleteworkout({required int id}) async {
     Get.back();
     log(e.toString());
   }
+}
+
+Future<bool> genarateFPcode(
+  BuildContext context, {
+  required String email,
+  // Replace 'dynamic' with the actual type if known
+}) async {
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    Map obj = {"email": email};
+
+    log("Update Request: $obj");
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final res = await client.post(
+      Uri.https(ApiUrl.baseUrl, ApiUrl.genarateFPotp),
+      headers: headers,
+      body: jsonEncode(obj),
+    );
+
+    Get.back(); // Close loading dialog
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('OTP send successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+      return true;
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text('send Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+    }
+  } catch (e) {
+    Get.back(); // Close loading dialog
+    log("Update Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
+  }
+  return false;
 }

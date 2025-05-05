@@ -42,6 +42,10 @@ class Getx extends GetxController {
 
   RxBool loader = false.obs;
 
+  RxBool sendViaEmail = false.obs;
+  RxBool sendVia2fa = false.obs;
+  RxBool sendViagoogle = false.obs;
+
   RxList<Userdetails> userdetails = <Userdetails>[].obs;
   RxList<UserAssessmentDetaiils> userAssessmentDetaiils =
       <UserAssessmentDetaiils>[].obs;
