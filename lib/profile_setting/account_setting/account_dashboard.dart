@@ -40,13 +40,13 @@ class _AccountDashboardState extends State<AccountDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionTitle('General'),
-            _buildSettingsItem(
-              Icons.notifications,
-              'Notifications',
-              ontap: () {
-                Get.toNamed(AppRoutes.notification);
-              },
-            ),
+            // _buildSettingsItem(
+            //   Icons.notifications,
+            //   'Notifications',
+            //   ontap: () {
+            //     Get.toNamed(AppRoutes.notification);
+            //   },
+            // ),
             _buildSettingsItem(
               Icons.person,
               'Personal Information',

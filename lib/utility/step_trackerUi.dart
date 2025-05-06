@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class StepsTakenScreen extends StatelessWidget {
   final StepsController controller = Get.put(StepsController());
@@ -141,10 +142,6 @@ class StepsController extends GetxController {
 
   Map<String, int> stepHistory = {};
   String selectedDate = DateTime.now().toIso8601String().substring(0, 10);
-  // String selectedDate = DateTime.now()
-  //     .subtract(Duration(days: ))
-  //     .toIso8601String()
-  //     .substring(0, 10);
 
   final double stepLength = 0.75;
   final double caloriesPerStep = 0.04;
@@ -186,14 +183,15 @@ class StepsController extends GetxController {
       savedInitialSteps = currentSteps;
     }
 
-    // Prevent negative step count
     todaySteps.value = (currentSteps - savedInitialSteps) < 0
         ? 0
         : currentSteps - savedInitialSteps;
+
     minutesWalked.value = (todaySteps.value / stepsPerMinute).toInt();
     stepHistory[selectedDate] = todaySteps.value;
-    _saveStepHistory();
+    await _saveStepHistory();
     updateMetrics();
+    await sendStepDataToApi(); // <-- 🔁 Send data to API
   }
 
   void onPedestrianStatusChanged(PedestrianStatus event) {
@@ -227,6 +225,39 @@ class StepsController extends GetxController {
   void updateMetrics() {
     distanceInKm.value = (todaySteps.value * stepLength) / 1000;
     caloriesBurned.value = todaySteps.value * caloriesPerStep;
+  }
+
+  /// ✅ API sending logic
+  Future<void> sendStepDataToApi() async {
+    final url = Uri.parse("https://your.api.endpoint/steps"); // Replace this
+
+    final data = {
+      "date": selectedDate,
+      "steps": todaySteps.value,
+      "kcal": caloriesBurned.value.toStringAsFixed(1),
+      "km": distanceInKm.value.toStringAsFixed(2),
+      "minutes": minutesWalked.value,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer YOUR_TOKEN', // Uncomment if needed
+        },
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200) {
+        log("✅ Step data successfully sent to API.");
+      } else {
+        log("❌ Failed to send data: ${response.statusCode}");
+        log("Response: ${response.body}");
+      }
+    } catch (e) {
+      log("❗ Error sending step data: $e");
+    }
   }
 }
 
