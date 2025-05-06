@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +14,21 @@ class OTPConfirmationPage extends StatefulWidget {
 }
 
 class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
-  final _controllers = List.generate(4, (_) => TextEditingController());
-  final _focusNodes = List.generate(4, (_) => FocusNode());
+  final _controllers = List.generate(6, (_) => TextEditingController());
+  final _focusNodes = List.generate(6, (_) => FocusNode());
   RxBool invalidOTP = false.obs;
   int focusedIndex = 0;
 
+  RxInt secondsRemaining = 60.obs;
+  late Timer _timer;
+
+  Getx getx = Get.put(Getx());
   @override
   void initState() {
     super.initState();
+    startTimer();
     // Set listeners to track focus changes
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 6; i++) {
       _focusNodes[i].addListener(() {
         if (_focusNodes[i].hasFocus) {
           setState(() {
@@ -34,10 +43,23 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
     });
   }
 
+  void startTimer() {
+    secondsRemaining.value = 60;
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (secondsRemaining.value > 0) {
+        secondsRemaining.value--;
+      } else {
+        _timer.cancel();
+      }
+    });
+  }
+
   @override
   void dispose() {
     _controllers.forEach((c) => c.dispose());
     _focusNodes.forEach((f) => f.dispose());
+    _timer.cancel();
+
     super.dispose();
   }
 
@@ -141,12 +163,15 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
               Text(
                 'Please enter the four digit OTP code we\nsent to your phone! 🙏',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                    overflow: TextOverflow.ellipsis),
               ),
               SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (index) => buildOTPField(index)),
+                children: List.generate(6, (index) => buildOTPField(index)),
               ),
               SizedBox(height: 20),
 
@@ -181,9 +206,10 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     String enteredOTP = _controllers.map((c) => c.text).join();
-                    if (enteredOTP.length < 4) {
+                    if (enteredOTP.length < 6) {
                       invalidOTP.value = true;
                     } else {
+                      getx.otpFP.value = enteredOTP;
                       invalidOTP.value = false;
                       Get.toNamed(AppRoutes.resetPassword);
                     }
@@ -194,7 +220,7 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                     backgroundColor: AppColors.backgroundDark,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                   ),
                   child: Row(
@@ -217,24 +243,37 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                 height: 20,
               ),
               // Spacer(),
-              TextButton(
-                onPressed: () {},
-                child: Text.rich(
-                  TextSpan(
-                    text: "Didn’t receive your OTP? ",
+              Obx(() {
+                if (secondsRemaining.value > 0) {
+                  return Text(
+                    "Resend code in 0:${secondsRemaining.value.toString().padLeft(2, '0')}",
                     style: TextStyle(color: Colors.grey[600]),
-                    children: [
+                  );
+                } else {
+                  return TextButton(
+                    onPressed: () {
+                      genarateFPcode(context, email: getx.emailFP.value);
+                      // Trigger resend logic here
+                      startTimer();
+                    },
+                    child: Text.rich(
                       TextSpan(
-                        text: 'Send again',
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        text: "Didn’t receive your OTP? ",
+                        style: TextStyle(color: Colors.grey[600]),
+                        children: [
+                          TextSpan(
+                            text: 'Send again',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  );
+                }
+              }),
             ],
           ),
         ),

@@ -1,3 +1,5 @@
+import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,7 +59,7 @@ class PasswordScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios, size: 32),
+                  icon: Icon(Icons.arrow_back_ios, size: 25),
                   onPressed: () {
                     Get.back();
                   },
@@ -65,9 +67,10 @@ class PasswordScreen extends StatelessWidget {
               ),
               SizedBox(height: 40),
               Text(
-                "Let’s Set Up Your Password.",
+                "Let’s Set Up Your \nPassword.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  overflow: TextOverflow.ellipsis,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -76,6 +79,7 @@ class PasswordScreen extends StatelessWidget {
               Obx(() => TextField(
                     obscureText: controller.obscureText.value,
                     onChanged: controller.checkPassword,
+                    controller: SearchController(),
                     decoration: InputDecoration(
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -87,7 +91,7 @@ class PasswordScreen extends StatelessWidget {
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide(
                           color: AppColors.primaryorange,
                           width: 2,
@@ -101,7 +105,8 @@ class PasswordScreen extends StatelessWidget {
                         ),
                       ),
                       suffixIcon: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
                         child: InkWell(
                           onTap: () {
                             controller.obscureText.value =
@@ -164,7 +169,17 @@ class PasswordScreen extends StatelessWidget {
                             controller.hasSymbol.value &&
                             controller.hasAlphabet.value &&
                             controller.password.value.length >= 6)
-                        ? () {}
+                        ? () async {
+                            await resetPassword(context,
+                                    email: getx.emailFP.value,
+                                    otp: getx.otpFP.value,
+                                    newPassword: controller.password.value)
+                                .then((val) {
+                              if (val) {
+                                Get.toNamed(AppRoutes.login);
+                              }
+                            });
+                          }
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.backgroundDark,

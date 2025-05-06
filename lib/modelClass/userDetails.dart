@@ -3,8 +3,12 @@ class Userdetails {
 
   String token = "";
   String userId = "";
-  Userdetails(
-      {required this.username, required this.token, required this.userId});
+
+  Userdetails({
+    required this.username,
+    required this.token,
+    required this.userId,
+  });
 }
 
 class UserAssessmentDetaiils {
@@ -19,6 +23,7 @@ class UserAssessmentDetaiils {
   List specificExperiencePreferance = [];
   String calorieyGoal = "";
   String sleepQuality = "";
+  String profileimage = "";
 
   UserAssessmentDetaiils({
     required this.fitnessGoal,
@@ -32,5 +37,6 @@ class UserAssessmentDetaiils {
     required this.calorieyGoal,
     required this.sleepQuality,
     required this.age,
+    required this.profileimage,
   });
 }
