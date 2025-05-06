@@ -260,28 +260,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 String age =
                                     await SharedPrefHelper.getString('age') ??
                                         "";
-                                String userid =
-                                    await SharedPrefHelper.getString(
-                                            "userid") ??
-                                        "";
 
-                                createUserDetails(
-                                  context: context,
-                                  userId: userid,
-                                  age: age,
-                                  calorieyGoal: calorieyGoal,
-                                  daysCommit: daysCommit,
-                                  fitnessGoal: fitnessGoal,
-                                  gender: gender,
-                                  height: height,
-                                  weight: weight,
-                                  previousFitnessExperience:
-                                      previousFitnessExperience,
-                                  sleepQuality: sleepQuality,
-                                  specificDiet: specificDiet,
-                                  specificExperiencePreferance:
-                                      specificExperiencePreferance.toString(),
-                                );
+                                await loginApi(
+                                  context,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                ).then((val) async {
+                                  String userid =
+                                      await SharedPrefHelper.getString(
+                                              "userid") ??
+                                          "";
+                                  await createUserDetails(
+                                    context: context,
+                                    userId: userid,
+                                    age: age,
+                                    calorieyGoal: calorieyGoal,
+                                    daysCommit: daysCommit,
+                                    fitnessGoal: fitnessGoal,
+                                    gender: gender,
+                                    height: height,
+                                    weight: weight,
+                                    previousFitnessExperience:
+                                        previousFitnessExperience,
+                                    sleepQuality: sleepQuality,
+                                    specificDiet: specificDiet,
+                                    specificExperiencePreferance:
+                                        specificExperiencePreferance.toString(),
+                                  );
+                                });
                               });
                             }
                           },

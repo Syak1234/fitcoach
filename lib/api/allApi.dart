@@ -439,6 +439,7 @@ Future createUserDetails({
   required String sleepQuality,
   required String age,
   required BuildContext context,
+  File? profileImage, // <-- Add this if you want to upload an image
 }) async {
   try {
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
@@ -451,6 +452,7 @@ Future createUserDetails({
 
     final request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
+
     request.fields.addAll({
       "UserId": userId,
       "FitnessGoal": fitnessGoal,
@@ -464,8 +466,14 @@ Future createUserDetails({
       "CalorieyGoal": calorieyGoal,
       "SleepQuality": sleepQuality,
       "Age": age,
-      "ProfileImage": "", // empty string for now
     });
+
+    // Attach image if provided
+    if (profileImage != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('ProfileImage', profileImage.path),
+      );
+    }
 
     final streamedResponse = await client.send(request);
     final response = await http.Response.fromStream(streamedResponse);
@@ -754,12 +762,20 @@ Future deleteworkout({required int id}) async {
   }
 }
 
-Future deleteMeal(context, {required int id}) async {
+Future<bool> genarateFPcode(
+  BuildContext context, {
+  required String email,
+  // Replace 'dynamic' with the actual type if known
+}) async {
   try {
-    // String? token = await SharedPrefHelper.getString('token');
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
 
-    // String userid = await SharedPrefHelper.getString('userid') ?? '';
-    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.deletemeal + id.toString());
+    Map obj = {"email": email};
+
+    log("Update Request: $obj");
 
     final headers = {
       'Content-Type': 'application/json',
@@ -770,36 +786,51 @@ Future deleteMeal(context, {required int id}) async {
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
-    final response = await client.delete(
-      url,
+
+    final res = await client.post(
+      Uri.https(ApiUrl.baseUrl, ApiUrl.genarateFPotp),
       headers: headers,
+      body: jsonEncode(obj),
     );
-    Get.back();
-    log(response.body.toString());
-    if (response.statusCode == 200) {
+
+    Get.back(); // Close loading dialog
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
       toastification.show(
         context: context,
-        title: const Text('Successfully'),
-        description: Text('Delete Meal'),
+        title: const Text('OTP send successfully!'),
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
       );
-      // Get.toNamed(
-      //   AppRoutes.fingerprintSetup,
-      // );
+      return true;
     } else {
       toastification.show(
         context: context,
-        title: const Text('Error'),
-        description: Text('Delete failed'),
+        title: const Text('send Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.error,
       );
     }
   } catch (e) {
-    Get.back();
-    log(e.toString());
+    Get.back(); // Close loading dialog
+    log("Update Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
+  return false;
 }
 
 Future<void> sendUserData({required String userId,required String date,required int water,required int step }) async {

@@ -12,6 +12,9 @@ import 'package:fitcoach/Comprehensive_screen/com_screen7.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen8.dart';
 import 'package:fitcoach/Comprehensive_screen/com_screen9.dart';
 import 'package:fitcoach/Comprehensive_screen/heightUi.dart';
+import 'package:fitcoach/ForgetPassword/otpConfirm_Screen.dart';
+import 'package:fitcoach/ForgetPassword/otpRequest.dart';
+import 'package:fitcoach/ForgetPassword/resetPassword.dart';
 import 'package:fitcoach/forget_screen/forget_screen.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard_bottom.dart';
@@ -93,6 +96,10 @@ class AppRoutes {
   static const commmunityScreen3 = '/CommunityScreen3';
   static const workoutLogSet = "/WorkoutLogSetScreen";
   static const workOutScreen = "/WorkoutScreen";
+  static const requestEmailOtpForForgetPassword =
+      "/requestEmailOtpForForgetPassword";
+  static const otpConfirmPage = "/OtpConfirmPage";
+  static const resetPassword = "/ResetPassword";
 
   // Define routes here
   static final pages = [
@@ -359,6 +366,23 @@ class AppRoutes {
     GetPage(
       name: commmunityScreen3,
       page: () => CommunityPostScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+
+    GetPage(
+      name: requestEmailOtpForForgetPassword,
+      page: () => OTPRequestScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+
+    GetPage(
+      name: otpConfirmPage,
+      page: () => OTPConfirmationPage(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: resetPassword,
+      page: () => PasswordScreen(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

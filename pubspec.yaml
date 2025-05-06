@@ -110,6 +110,8 @@ flutter:
     - assets/homeScreen/
     - assets/community_and_resource/
     - assets/workoutimg/
+    - assets/ForgetPassword/
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

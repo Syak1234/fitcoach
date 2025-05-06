@@ -13,4 +13,5 @@ class ApiUrl {
   static const createworkOut = "/api/WorkoutImage/create";
   static const updateworkOut = "/api/WorkoutImage/update";
   static const deleteworkOut = "/api/WorkoutImage/delete/";
+  static const genarateFPotp = "/api/User/forgot-password";
 }
