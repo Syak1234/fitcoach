@@ -988,3 +988,111 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
   }
   return false;
 }
+
+Future<void> sendUserData({required String userId,required String date,required int water,required int step }) async {
+  final url = Uri.parse(
+      '${ApiUrl.baseUrl}/api/DailyActivity/create'); // Replace with your API URL
+
+  final Map<String, dynamic> payload = {
+    "userId":userId,
+    "date":date,
+    //  DateTime.now()
+    //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
+    "water": water,
+    "step": step,
+  };
+
+  final headers = {
+    "Content-Type": "application/json",
+    // Add auth token here if needed, e.g. "Authorization": "Bearer YOUR_TOKEN"
+  };
+
+  try {
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Data sent successfully: ${response.body}');
+    } else {
+      print('Failed to send data: ${response.statusCode} - ${response.body}');
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+  }
+}
+
+Future<void> updateData({required String userId,required String date,required int water,required int step }) async {
+  final url = Uri.parse(
+      '${ApiUrl.baseUrl}/api/DailyActivity/update'); // Replace with your API endpoint
+
+ final Map<String, dynamic> requestBody = {
+    "userId":userId,
+    "date":date,
+    //  DateTime.now()
+    //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
+    "water": water,
+    "step": step,
+  };
+
+  try {
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Success: ${response.body}');
+    } else {
+      print('Failed with status: ${response.statusCode}');
+      print('Response: ${response.body}');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> fetchServiceData() async {
+  // final String userId = 'hjhjjh';
+  final Uri url = Uri.parse(
+      '${ApiUrl.baseUrl}/api/InternalService/get-all'); // Replace with actual URL
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Success: $data');
+    } else {
+      print('Failed with status: ${response.statusCode}');
+      print('Response: ${response.body}');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+
+
+Future<void> fetchstepandwaterlist({required String userId}) async {
+  // final String userId = 'hjhjjh';
+  final Uri url = Uri.parse(
+      '${ApiUrl.baseUrl}/api/DailyActivity/$userId'); // Replace with actual URL
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Success: $data');
+    } else {
+      print('Failed with status: ${response.statusCode}');
+      print('Response: ${response.body}');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}

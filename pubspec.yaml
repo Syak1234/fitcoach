@@ -73,6 +73,7 @@ dependencies:
   toastification: ^3.0.2
   share_plus: ^11.0.0
   fluttertoast: ^8.2.12
+  table_calendar:
   # flutter_foreground_service: ^0.4.1
   # android_alarm_manager_plus:
  

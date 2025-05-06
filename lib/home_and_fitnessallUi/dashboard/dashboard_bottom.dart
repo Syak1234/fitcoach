@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
@@ -11,6 +12,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'dashboard.dart';
+
+class NewScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Auto Redirected Screen')),
+      body: Center(
+        child: Text('You were inactive for 30 seconds!'),
+      ),
+    );
+  }
+}
 
 class DashboardBottom extends StatefulWidget {
   const DashboardBottom({super.key});
@@ -29,6 +42,29 @@ class _DashboardBottomState extends State<DashboardBottom> {
   ];
 
   Getx getx = Get.put(Getx());
+  Timer? _inactivityTimer;
+
+  void _startInactivityTimer() {
+    _inactivityTimer?.cancel();
+    _inactivityTimer = Timer(Duration(seconds: 30), _goToNextPage);
+  }
+
+  void _goToNextPage() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => NewScreen()),
+    );
+  }
+
+  void _handleUserInteraction([_]) {
+    _startInactivityTimer(); // Reset timer on interaction
+  }
+
+  @override
+  void initState() {
+    // _startInactivityTimer();
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

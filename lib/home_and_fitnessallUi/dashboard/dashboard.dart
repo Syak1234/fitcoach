@@ -8,10 +8,12 @@ import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:fitcoach/utility/step_trackerUi.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -59,25 +61,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  'Fitness Metrics',
-                  style: TextStyle(
-                      fontSize: AppFontSize.mediumfontSize - 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.gray80),
-                ),
-              ],
+            Text(
+              'Fitness Metrics',
+              style: TextStyle(
+                fontSize: AppFontSize.mediumfontSize - 10,
+                fontWeight: FontWeight.bold,
+                color: AppColors.gray80,
+              ),
             ),
+            SizedBox(height: 8),
+            FitnessMetricsWidget(),
+            SizedBox(height: 16),
             SizedBox(
-              height: 8,
+              height: 400, // Set height for the chart
+              child: HistoryCalendar(),
             ),
-            FitnessMetricsWidget()
           ],
         ),
       ),
@@ -138,32 +141,32 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         // Notification Bell with Badge
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed(AppRoutes.notification);
-                          },
-                          child: badges.Badge(
-                            position:
-                                badges.BadgePosition.topEnd(top: -4, end: -4),
-                            badgeContent: const Text("8",
-                                style: TextStyle(
-                                    color: AppColors.textLight, fontSize: 12)),
-                            badgeStyle: const badges.BadgeStyle(
-                              badgeColor: AppColors.primaryorange,
-                              padding: EdgeInsets.all(6),
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color:
-                                    AppColors.backgroundDark.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(Icons.notifications,
-                                  color: AppColors.textLight, size: 22),
-                            ),
-                          ),
-                        ),
+                        //     InkWell(
+                        //       onTap: () {
+                        //         Get.toNamed(AppRoutes.notification);
+                        //       },
+                        //       child: badges.Badge(
+                        //         position:
+                        //             badges.BadgePosition.topEnd(top: -4, end: -4),
+                        //         badgeContent: const Text("8",
+                        //             style: TextStyle(
+                        //                 color: AppColors.textLight, fontSize: 12)),
+                        //         badgeStyle: const badges.BadgeStyle(
+                        //           badgeColor: AppColors.primaryorange,
+                        //           padding: EdgeInsets.all(6),
+                        //         ),
+                        //         child: Container(
+                        //           padding: const EdgeInsets.all(8),
+                        //           decoration: BoxDecoration(
+                        //             color:
+                        //                 AppColors.backgroundDark.withOpacity(0.4),
+                        //             borderRadius: BorderRadius.circular(12),
+                        //           ),
+                        //           child: const Icon(Icons.notifications,
+                        //               color: AppColors.textLight, size: 22),
+                        //         ),
+                        //       ),
+                        //     ),
                       ],
                     ),
 
@@ -244,49 +247,119 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class LineChartSample extends StatelessWidget {
+  final List<String> months;
+  final List<double> values;
+
+  const LineChartSample({
+    super.key,
+    required this.months,
+    required this.values,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Generate spots from values
+    final spots = List.generate(
+      values.length,
+      (index) => FlSpot(index.toDouble(), values[index]),
+    );
+
+    return LineChart(
+      LineChartData(
+        minX: 0,
+        maxX: (months.length - 1).toDouble(),
+        minY: 0,
+        maxY: values.reduce((a, b) => a > b ? a : b) + 1,
+        titlesData: FlTitlesData(
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: true),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 1,
+              reservedSize: 40,
+              getTitlesWidget: (double value, TitleMeta meta) {
+                final index = value.toInt();
+                if (index < 0 || index >= months.length) {
+                  return const SizedBox.shrink();
+                }
+                return SideTitleWidget(
+                  // axisSide: meta.axisSide,
+                  space: 8,
+                  meta: meta, // Required meta parameter
+                  child: Text(
+                    months[index],
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        gridData: FlGridData(show: true),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: Colors.deepPurple, width: 2),
+        ),
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            color: Colors.deepPurple,
+            barWidth: 4,
+            dotData: FlDotData(show: true),
+            belowBarData: BarAreaData(
+              show: true,
+              color: Colors.deepPurple.withOpacity(0.3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class FitnessMetricsWidget extends StatelessWidget {
   final StepsController controller = Get.put(StepsController());
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          Obx(
-            () => _buildMetricCard(
-              title: 'Steps',
-              value: controller.todaySteps.value.toString(),
-              subvalue: ' steps today',
-              color: AppColors.primaryorange,
-              icon: Icons.add,
-              child: _buildStepChart(),
-              onTap: () {
-                Get.toNamed(AppRoutes.stepUi);
-              },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // ✅ Center the cards
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Obx(
+              () => _buildMetricCard(
+                title: 'Steps',
+                value: controller.todaySteps.value.toString(),
+                subvalue: ' steps today',
+                color: AppColors.primaryorange,
+                icon: Icons.add,
+                child: _buildStepChart(),
+                onTap: () {
+                  Get.toNamed(AppRoutes.stepUi);
+                },
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          _buildMetricCard(
-              title: 'Hydration',
-              value: '781',
-              subvalue: 'ml',
-              color: AppColors.primaryBlue,
-              icon: Icons.water_drop,
-              child: _buildHydrationChart(),
-              onTap: () {
-                Get.toNamed(AppRoutes.hydrationScreen);
-              },
-              context: context),
-          const SizedBox(width: 8),
-          // _buildMetricCard(
-          //     title: 'Calories',
-          //     value: '1578',
-          //     subvalue: 'kcal',
-          //     color: AppColors.gray80,
-          //     icon: Icons.local_fire_department,
-          //     child: _buildCaloriesChart(),
-          //     context: context),
-        ],
+            const SizedBox(width: 8),
+            _buildMetricCard(
+                title: 'Hydration',
+                value: '781',
+                subvalue: 'ml',
+                color: AppColors.primaryBlue,
+                icon: Icons.water_drop,
+                child: _buildHydrationChart(),
+                onTap: () {
+                  Get.toNamed(AppRoutes.hydrationScreen);
+                },
+                context: context),
+          ],
+        ),
       ),
     );
   }
@@ -415,3 +488,60 @@ Widget _buildCaloriesChart() {
 //     );
 //   }
 // }
+class HistoryCalendar extends StatefulWidget {
+  @override
+  _HistoryCalendarState createState() => _HistoryCalendarState();
+}
+
+class _HistoryCalendarState extends State<HistoryCalendar> {
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      padding: const EdgeInsets.all(16.0),
+      child: TableCalendar(
+        firstDay: DateTime.utc(2020, 1, 1),
+        lastDay: DateTime.utc(2030, 12, 31),
+        focusedDay: _focusedDay,
+        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+        onDaySelected: (selectedDay, focusedDay) {
+          setState(() {
+            _selectedDay = selectedDay;
+            _focusedDay = focusedDay;
+          });
+        },
+        calendarStyle: CalendarStyle(
+          todayDecoration: BoxDecoration(
+            color: Colors.blueAccent,
+            shape: BoxShape.circle,
+          ),
+          selectedDecoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+          weekendTextStyle: TextStyle(color: Colors.white),
+          defaultTextStyle: TextStyle(color: Colors.white),
+          outsideTextStyle: TextStyle(color: Colors.grey),
+        ),
+        headerStyle: HeaderStyle(
+          formatButtonVisible: false,
+          titleCentered: true,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
+          rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),
+        ),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: TextStyle(color: Colors.white),
+          weekendStyle: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
