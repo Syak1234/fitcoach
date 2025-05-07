@@ -177,6 +177,8 @@ Future loginApi(
 
     Get.back();
 
+    log(res.body);
+
     if (res.statusCode == 200) {
       Map data = jsonDecode(res.body.toString());
       final jsondata = data["result"];
@@ -989,45 +991,6 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
   return false;
 }
 
-Future<void> sendUserData(
-    {required String userId,
-    required String date,
-    required int water,
-    required int step}) async {
-  final url = Uri.parse(
-      '${ApiUrl.baseUrl}/api/DailyActivity/create'); // Replace with your API URL
-
-  final Map<String, dynamic> payload = {
-    "userId": userId,
-    "date": date,
-    //  DateTime.now()
-    //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
-    "water": water,
-    "step": step,
-  };
-
-  final headers = {
-    "Content-Type": "application/json",
-    // Add auth token here if needed, e.g. "Authorization": "Bearer YOUR_TOKEN"
-  };
-
-  try {
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode(payload),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Data sent successfully: ${response.body}');
-    } else {
-      print('Failed to send data: ${response.statusCode} - ${response.body}');
-    }
-  } catch (e) {
-    print('Error occurred: $e');
-  }
-}
-
 Future<void> updateData(
     {required String userId,
     required String date,
@@ -1043,6 +1006,7 @@ Future<void> updateData(
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
     "water": water,
     "step": step,
+    // "id":
   };
 
   try {

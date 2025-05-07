@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/api_url.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
@@ -14,6 +15,11 @@ import 'package:badges/badges.dart' as badges;
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -78,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
             FitnessMetricsWidget(),
             SizedBox(height: 16),
             SizedBox(
-              height: 400, // Set height for the chart
+              height: 450, // Set height for the chart
               child: HistoryCalendar(),
             ),
           ],
@@ -488,7 +494,10 @@ Widget _buildCaloriesChart() {
 //     );
 //   }
 // }
+
 class HistoryCalendar extends StatefulWidget {
+  HistoryCalendar();
+
   @override
   _HistoryCalendarState createState() => _HistoryCalendarState();
 }
@@ -496,50 +505,193 @@ class HistoryCalendar extends StatefulWidget {
 class _HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  List<dynamic> _allActivities = [];
+  Map<String, dynamic>? _selectedDayData;
+  Getx getx = Get.put(Getx());
+  @override
+  void initState() {
+    call();
+    super.initState();
+  }
+
+  Future call() async {
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+
+    fetchStepAndWaterList(userId: userid);
+  }
+
+  Future<void> fetchStepAndWaterList({required String userId}) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    final Uri url = Uri.https(ApiUrl.baseUrl, '/api/DailyActivity/$userId');
+
+    try {
+      final response = await http.get(url);
+      log(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final result = data['result'] as List<dynamic>;
+
+        setState(() {
+          _allActivities = result;
+        });
+
+        if (_selectedDay != null) {
+          _filterDataForSelectedDate();
+        }
+      } else {
+        log(response.request.toString());
+        print('Failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      // Dismiss the loading dialog
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _filterDataForSelectedDate() {
+    if (_selectedDay == null) return;
+
+    final formattedSelectedDate =
+        DateFormat('yyyy-MM-dd').format(_selectedDay!);
+
+    final match = _allActivities.firstWhere(
+      (activity) =>
+          activity['date'].toString().startsWith(formattedSelectedDate),
+      orElse: () => null,
+    );
+
+    setState(() {
+      _selectedDayData = match;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.black,
+      ),
       padding: const EdgeInsets.all(16.0),
-      child: TableCalendar(
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
-        focusedDay: _focusedDay,
-        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-        onDaySelected: (selectedDay, focusedDay) {
-          setState(() {
-            _selectedDay = selectedDay;
-            _focusedDay = focusedDay;
-          });
-        },
-        calendarStyle: CalendarStyle(
-          todayDecoration: BoxDecoration(
-            color: Colors.blueAccent,
-            shape: BoxShape.circle,
-          ),
-          selectedDecoration: BoxDecoration(
-            color: Colors.blue,
-            shape: BoxShape.circle,
-          ),
-          weekendTextStyle: TextStyle(color: Colors.white),
-          defaultTextStyle: TextStyle(color: Colors.white),
-          outsideTextStyle: TextStyle(color: Colors.grey),
-        ),
-        headerStyle: HeaderStyle(
-          formatButtonVisible: false,
-          titleCentered: true,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
-          rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),
-        ),
-        daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: TextStyle(color: Colors.white),
-          weekendStyle: TextStyle(color: Colors.white),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // if (_selectedDayData != null)
+            Card(
+              color: Colors.grey[900],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              margin: EdgeInsets.only(bottom: 20),
+              elevation: 4,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      leading:
+                          Icon(Icons.directions_walk, color: Colors.blueAccent),
+                      title: Text(
+                        'Steps',
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      trailing: Text(
+                        '${_selectedDayData?['step'] ?? 0}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    Divider(color: Colors.white12),
+                    ListTile(
+                      leading: Icon(Icons.local_drink,
+                          color: Colors.lightBlueAccent),
+                      title: Text(
+                        'Water Intake',
+                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                      trailing: Text(
+                        '${_selectedDayData?['water'] ?? 0} ml',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // else if (_selectedDay != null)
+            //   Padding(
+            //     padding: const EdgeInsets.only(bottom: 12),
+            //     child: Text(
+            //       "No data for selected date.",
+            //       style: TextStyle(color: Colors.white, fontSize: 16),
+            //     ),
+            //   ),
+            TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+                _filterDataForSelectedDate();
+              },
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  shape: BoxShape.circle,
+                ),
+                selectedDecoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                weekendTextStyle: TextStyle(color: Colors.white),
+                defaultTextStyle: TextStyle(color: Colors.white),
+                outsideTextStyle: TextStyle(color: Colors.grey),
+              ),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+                titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
+                rightChevronIcon:
+                    Icon(Icons.chevron_right, color: Colors.white),
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: TextStyle(color: Colors.white),
+                weekendStyle: TextStyle(color: Colors.white),
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
         ),
       ),
     );

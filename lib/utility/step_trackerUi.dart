@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/api_url.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,16 +17,16 @@ class StepsTakenScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Text("Steps Taken",
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark)),
+                color: Colors.black)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: AppColors.textDark),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
       ),
@@ -35,17 +36,17 @@ class StepsTakenScreen extends StatelessWidget {
               2,
               controller.caloriesBurned.value,
               '${(controller.caloriesBurned.value / 500 * 100).toInt()}%',
-              AppColors.blue60),
+              Colors.orange),
           ChartData(
               1,
               controller.distanceInKm.value * 1000,
               '${(controller.distanceInKm.value / 10 * 100).toInt()}%',
-              AppColors.gray80),
+              Colors.grey),
           ChartData(
               0,
               controller.todaySteps.value.toDouble(),
               '${(controller.todaySteps.value / 10000 * 100).toInt()}%',
-              AppColors.primaryorange),
+              Colors.blue),
         ];
 
         return Column(
@@ -74,15 +75,12 @@ class StepsTakenScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text("${controller.todaySteps.value}",
-                style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark)),
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
             Text("total steps",
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.gray)),
+                    color: Colors.grey)),
             SizedBox(height: 80),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -92,15 +90,15 @@ class StepsTakenScreen extends StatelessWidget {
                   _buildInfoCard(
                       "${controller.caloriesBurned.value.toStringAsFixed(1)}",
                       "kcal",
-                      AppColors.primaryorange,
+                      Colors.orange,
                       Icons.local_fire_department),
                   _buildInfoCard(
                       "${controller.distanceInKm.value.toStringAsFixed(2)}",
                       "km",
-                      AppColors.gray80,
+                      Colors.grey,
                       Icons.place),
                   _buildInfoCard("${controller.minutesWalked.value}", "minutes",
-                      AppColors.blue60, Icons.access_time),
+                      Colors.blue, Icons.access_time),
                 ],
               ),
             ),
@@ -119,15 +117,12 @@ class StepsTakenScreen extends StatelessWidget {
           height: 60,
           decoration: BoxDecoration(
               color: color, borderRadius: BorderRadius.circular(15)),
-          child: Icon(icon, color: AppColors.textLight, size: 30),
+          child: Icon(icon, color: Colors.white, size: 30),
         ),
         SizedBox(height: 8),
         Text(value,
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textDark)),
-        Text(label, style: TextStyle(fontSize: 14, color: AppColors.gray)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }
@@ -138,7 +133,7 @@ class StepsController extends GetxController {
   RxInt minutesWalked = 0.obs;
   RxDouble distanceInKm = 0.0.obs;
   RxDouble caloriesBurned = 0.0.obs;
-  RxString status = '?'.obs;
+  RxBool hasSentDataToday = false.obs;
 
   Map<String, int> stepHistory = {};
   String selectedDate = DateTime.now().toIso8601String().substring(0, 10);
@@ -153,11 +148,11 @@ class StepsController extends GetxController {
   void onInit() {
     super.onInit();
     _loadStepHistory();
+    _loadSendStatus();
     initPlatformState();
   }
 
   Future<void> _loadStepHistory() async {
-    log(selectedDate.toString());
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? stepData = prefs.getString("step_history");
     if (stepData != null) {
@@ -186,17 +181,39 @@ class StepsController extends GetxController {
     todaySteps.value = (currentSteps - savedInitialSteps) < 0
         ? 0
         : currentSteps - savedInitialSteps;
-
     minutesWalked.value = (todaySteps.value / stepsPerMinute).toInt();
     stepHistory[selectedDate] = todaySteps.value;
     await _saveStepHistory();
     updateMetrics();
-    await sendStepDataToApi(); // <-- 🔁 Send data to API
+    final userid = await SharedPrefHelper.getString('userid');
+
+    if (!hasSentDataToday.value) {
+      final success = await sendUserData(
+        userId: userid.toString(), // Replace with dynamic userId
+        date: DateTime.now().toIso8601String(),
+        step: todaySteps.value,
+        water: 100,
+      );
+
+      if (success) {
+        hasSentDataToday.value = true;
+        prefs.setBool("has_sent_data_$selectedDate", true);
+      }
+    }
   }
 
-  void onPedestrianStatusChanged(PedestrianStatus event) {
-    status.value = event.status;
+  void updateMetrics() {
+    distanceInKm.value = (todaySteps.value * stepLength) / 1000;
+    caloriesBurned.value = todaySteps.value * caloriesPerStep;
   }
+
+  Future<void> _loadSendStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    hasSentDataToday.value =
+        prefs.getBool("has_sent_data_$selectedDate") ?? false;
+  }
+
+  void onPedestrianStatusChanged(PedestrianStatus event) {}
 
   Future<bool> _checkActivityRecognitionPermission() async {
     bool granted = await Permission.activityRecognition.isGranted;
@@ -212,9 +229,9 @@ class StepsController extends GetxController {
     if (!granted) return;
 
     pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-    pedestrianStatusStream.listen(onPedestrianStatusChanged).onError((error) {
-      status.value = 'Status unavailable';
-    });
+    pedestrianStatusStream
+        .listen(onPedestrianStatusChanged)
+        .onError((error) {});
 
     stepCountStream = Pedometer.stepCountStream;
     stepCountStream.listen(onStepCount).onError((error) {
@@ -222,41 +239,39 @@ class StepsController extends GetxController {
     });
   }
 
-  void updateMetrics() {
-    distanceInKm.value = (todaySteps.value * stepLength) / 1000;
-    caloriesBurned.value = todaySteps.value * caloriesPerStep;
-  }
+  Future<bool> sendUserData({
+    required String userId,
+    required String date,
+    required int water,
+    required int step,
+  }) async {
+    final url = Uri.https(
+        ApiUrl.baseUrl, '/api/DailyActivity/create'); // Change to your API
 
-  /// ✅ API sending logic
-  Future<void> sendStepDataToApi() async {
-    final url = Uri.parse("https://your.api.endpoint/steps"); // Replace this
-
-    final data = {
-      "date": selectedDate,
-      "steps": todaySteps.value,
-      "kcal": caloriesBurned.value.toStringAsFixed(1),
-      "km": distanceInKm.value.toStringAsFixed(2),
-      "minutes": minutesWalked.value,
+    final Map<String, dynamic> payload = {
+      "userId": userId,
+      "date": date,
+      "water": water,
+      "step": step,
     };
 
     try {
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer YOUR_TOKEN', // Uncomment if needed
-        },
-        body: json.encode(data),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
       );
-
-      if (response.statusCode == 200) {
-        log("✅ Step data successfully sent to API.");
+      log(response.body.toString());
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log('✅ Data sent successfully');
+        return true;
       } else {
-        log("❌ Failed to send data: ${response.statusCode}");
-        log("Response: ${response.body}");
+        log('❌ API error: ${response.statusCode}');
+        return false;
       }
     } catch (e) {
-      log("❗ Error sending step data: $e");
+      log('❗ Exception during API call: $e');
+      return false;
     }
   }
 }
