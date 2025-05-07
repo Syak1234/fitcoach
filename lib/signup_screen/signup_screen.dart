@@ -214,11 +214,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           onPressed: () async {
                             if (gk.currentState!.validate()) {
-                              await signUp(
-                                      context,
-                                      _emailController.text,
-                                      _passwordController.text,
-                                      _confirmPasswordController.text)
+                              await signUp(context, _emailController.text,
+                                      _passwordController.text, "Credentials")
                                   .then((val) async {
                                 SharedPreferences prefs =
                                     await SharedPreferences.getInstance();
@@ -261,33 +258,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     await SharedPrefHelper.getString('age') ??
                                         "";
 
-                                await loginApi(
-                                  context,
-                                  _emailController.text,
-                                  _passwordController.text,
-                                ).then((val) async {
-                                  String userid =
-                                      await SharedPrefHelper.getString(
-                                              "userid") ??
-                                          "";
-                                  await createUserDetails(
-                                    context: context,
-                                    userId: userid,
-                                    age: age,
-                                    calorieyGoal: calorieyGoal,
-                                    daysCommit: daysCommit,
-                                    fitnessGoal: fitnessGoal,
-                                    gender: gender,
-                                    height: height,
-                                    weight: weight,
-                                    previousFitnessExperience:
-                                        previousFitnessExperience,
-                                    sleepQuality: sleepQuality,
-                                    specificDiet: specificDiet,
-                                    specificExperiencePreferance:
-                                        specificExperiencePreferance.toString(),
-                                  );
-                                });
+                                await createUserDetails(
+                                  context: context,
+                                  userId: getx.userid.value,
+                                  age: age,
+                                  calorieyGoal: calorieyGoal,
+                                  daysCommit: daysCommit,
+                                  fitnessGoal: fitnessGoal,
+                                  gender: gender,
+                                  height: height,
+                                  weight: weight,
+                                  previousFitnessExperience:
+                                      previousFitnessExperience,
+                                  sleepQuality: sleepQuality,
+                                  specificDiet: specificDiet,
+                                  specificExperiencePreferance:
+                                      specificExperiencePreferance.toString(),
+                                );
                               });
                             }
                           },

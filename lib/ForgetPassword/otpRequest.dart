@@ -71,6 +71,7 @@ class _OTPRequestScreenState extends State<OTPRequestScreen> {
                   'We will send a one time SMS message.\nCarrier rates may apply!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -128,17 +129,18 @@ class _OTPRequestScreenState extends State<OTPRequestScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (emailFeildController.text.contains("@")) {
-                        Get.toNamed(AppRoutes.otpConfirmPage);
+                        getx.emailFP.value = emailFeildController.text;
+                        // Get.toNamed(AppRoutes.otpConfirmPage);
 
-                        // genarateFPcode(context,
-                        //         email: emailFeildController.text)
-                        //     .then((val) {
-                        //   if (val) {
-                        //     Get.toNamed(AppRoutes.otpConfirmPage);
-                        //   } else {
-                        //     Fluttertoast.showToast(msg: "Failed!!");
-                        //   }
-                        // });
+                        genarateFPcode(context,
+                                email: emailFeildController.text)
+                            .then((val) {
+                          if (val) {
+                            Get.toNamed(AppRoutes.otpConfirmPage);
+                          } else {
+                            Fluttertoast.showToast(msg: "Failed!!");
+                          }
+                        });
                       } else {
                         Fluttertoast.showToast(msg: "Enter a valid email!");
                       }

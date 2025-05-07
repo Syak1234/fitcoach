@@ -62,8 +62,8 @@ class SharedPrefHelper {
   }
 }
 
-Future signUp(BuildContext context, String userName, String pass,
-    String confirmPass) async {
+Future signUp(
+    BuildContext context, String userName, String pass, String type) async {
   try {
     showDialog(
       context: context,
@@ -73,7 +73,7 @@ Future signUp(BuildContext context, String userName, String pass,
     Map obj = {
       "userName": userName,
       "password": pass,
-      "confirmPassword": confirmPass,
+      "type": type,
     };
 
     final Map<String, String> headers = {
@@ -99,6 +99,14 @@ Future signUp(BuildContext context, String userName, String pass,
     log(res.statusCode.toString());
 
     if (res.statusCode == 200) {
+      var result = jsondata['result'];
+      getx.token.value = result['token'].toString();
+      getx.username.value = result['userName'].toString();
+      getx.userid.value = result['id'].toString();
+      await SharedPrefHelper.setString("userid", result['id'].toString());
+      await SharedPrefHelper.setString(
+          "username", result['userName'].toString());
+      await SharedPrefHelper.setString("token", result['token'].toString());
       toastification.show(
         context: context,
         title: const Text('Signup Successful!'),
@@ -137,7 +145,8 @@ Future signUp(BuildContext context, String userName, String pass,
   }
 }
 
-Future loginApi(BuildContext context, String userName, String pass) async {
+Future loginApi(
+    BuildContext context, String userName, String pass, String type) async {
   try {
     showDialog(
       context: context,
@@ -147,6 +156,7 @@ Future loginApi(BuildContext context, String userName, String pass) async {
     Map obj = {
       "userName": userName,
       "password": pass,
+      "type": type,
     };
 
     final headers = {
@@ -174,6 +184,9 @@ Future loginApi(BuildContext context, String userName, String pass) async {
       final jsondata = data["result"];
 
       log(jsondata['id'] + "hjhjhjhj");
+      getx.token.value = jsondata['token'].toString();
+      getx.username.value = jsondata['userName'].toString();
+      getx.userid.value = jsondata['id'].toString();
 
       await SharedPrefHelper.setString("userid", jsondata['id']);
       await SharedPrefHelper.setString("username", jsondata['userName']);
@@ -445,7 +458,7 @@ Future createUserDetails({
 }) async {
   try {
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
-    String? token = await SharedPrefHelper.getString('token');
+    String? token = getx.token.value;
 
     final ioClient = HttpClient()
       ..badCertificateCallback =
@@ -656,7 +669,11 @@ Future getUserDetails() async {
           specificExperiencePreferance: specificExperienceList ?? [],
           calorieyGoal: result['calorieyGoal'].toString(),
           sleepQuality: result['sleepQuality'].toString(),
-          age: await SharedPrefHelper.getString("age").toString());
+          age: result["age"].toString(),
+          profileimage: result["profileImageUrl"].toString());
+      if (getx.userAssessmentDetaiils.length != 0) {
+        getx.userAssessmentDetaiils.clear();
+      }
 
       getx.userAssessmentDetaiils.add(details);
 
@@ -823,7 +840,146 @@ Future<bool> genarateFPcode(
     }
   } catch (e) {
     Get.back(); // Close loading dialog
-    log("Update Error: $e");
+    log("OTP send Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
+  }
+  return false;
+}
+
+Future<bool> resetPassword(BuildContext context,
+    {required String email, required String otp, required String newPassword
+    // Replace 'dynamic' with the actual type if known
+    }) async {
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    Map obj = {"email": email, "otp": otp, "newPassword": newPassword};
+
+    log("Update Request: $obj");
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final res = await client.post(
+      Uri.https(ApiUrl.baseUrl, ApiUrl.resetPassword),
+      headers: headers,
+      body: jsonEncode(obj),
+    );
+
+    Get.back(); // Close loading dialog
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('Password Reset successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+      return true;
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text(' Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+    }
+  } catch (e) {
+    Get.back(); // Close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
+  }
+  return false;
+}
+
+Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Map obj = {"email": email, "otp": otp, "newPassword": newPassword};
+
+    // log("Update Request: $obj");
+
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.getUserdeatils + email);
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final res = await client.post(
+      url,
+      headers: headers,
+      body: jsonEncode({}),
+    );
+
+    Get.back(); // Close loading dialog
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
+      // toastification.show(
+      //   context: context,
+      //   title: const Text('Password Reset successfully!'),
+      //   autoCloseDuration: const Duration(seconds: 3),
+      //   type: ToastificationType.success,
+      //   style: ToastificationStyle.fillColored,
+      // );
+      return true;
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text(' Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+    }
+  } catch (e) {
+    Get.back(); // Close loading dialog
+    log("Error: $e");
     toastification.show(
       context: context,
       title: const Text('Error'),

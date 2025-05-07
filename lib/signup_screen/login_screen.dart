@@ -161,7 +161,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                             if (gk.currentState!.validate()) {
                               loginApi(context, _emailController.text,
-                                      _passwordController.text)
+                                      _passwordController.text, "Credentials")
                                   .then((val) async {
                                 SharedPreferences prefs =
                                     await SharedPreferences.getInstance();
@@ -309,50 +309,68 @@ class _SignInScreenState extends State<SignInScreen> {
                                 String age =
                                     await SharedPrefHelper.getString('age') ??
                                         "";
-                                String userid =
-                                    await SharedPrefHelper.getString(
-                                            "userid") ??
-                                        "";
-                                // Userdetails userdetails = Userdetails(
-                                //   username: user!.email.toString(),
-                                //   userId: user!.uid.toString(),
-                                //   name: user!.displayName.toString(),
-                                //   userimg: user!.photoURL.toString() ?? '',
-                                // );
 
-                                signUp(
-                                    context,
-                                    user!.email.toString(),
-                                    passwordGanaretor(
-                                      user!.email.toString(),
-                                    ),
-                                    passwordGanaretor(
-                                      user!.email.toString(),
-                                    )).then((_) async {
-                                  loginApi(
-                                    context,
-                                    user!.email.toString(),
-                                    passwordGanaretor(
-                                      user!.email.toString(),
-                                    ),
-                                  );
-                                  createUserDetails(
-                                    context: context,
-                                    userId: userid,
-                                    age: age,
-                                    calorieyGoal: calorieyGoal,
-                                    daysCommit: daysCommit,
-                                    fitnessGoal: fitnessGoal,
-                                    gender: gender,
-                                    height: height,
-                                    weight: weight,
-                                    previousFitnessExperience:
-                                        previousFitnessExperience,
-                                    sleepQuality: sleepQuality,
-                                    specificDiet: specificDiet,
-                                    specificExperiencePreferance:
-                                        specificExperiencePreferance.toString(),
-                                  );
+                                checkEmailExistOrNot(
+                                  user!.email.toString(),
+                                  context,
+                                ).then((val) {
+                                  if (val) {
+                                    loginApi(
+                                            context,
+                                            user!.email.toString(),
+                                            passwordGanaretor(
+                                              user!.email.toString(),
+                                            ),
+                                            "Google")
+                                        .then((onValue) {
+                                      createUserDetails(
+                                        context: context,
+                                        userId: getx.userid.value,
+                                        age: age,
+                                        calorieyGoal: calorieyGoal,
+                                        daysCommit: daysCommit,
+                                        fitnessGoal: fitnessGoal,
+                                        gender: gender,
+                                        height: height,
+                                        weight: weight,
+                                        previousFitnessExperience:
+                                            previousFitnessExperience,
+                                        sleepQuality: sleepQuality,
+                                        specificDiet: specificDiet,
+                                        specificExperiencePreferance:
+                                            specificExperiencePreferance
+                                                .toString(),
+                                      );
+                                    });
+                                  } else {
+                                    signUp(
+                                            context,
+                                            user!.email.toString(),
+                                            passwordGanaretor(
+                                              user!.email.toString(),
+                                            ),
+                                            "Google")
+                                        .then((onValue) {
+                                      createUserDetails(
+                                        context: context,
+                                        userId: getx.userid.value,
+                                        age: age,
+                                        calorieyGoal: calorieyGoal,
+                                        daysCommit: daysCommit,
+                                        fitnessGoal: fitnessGoal,
+                                        gender: gender,
+                                        height: height,
+                                        weight: weight,
+                                        previousFitnessExperience:
+                                            previousFitnessExperience,
+                                        sleepQuality: sleepQuality,
+                                        specificDiet: specificDiet,
+                                        specificExperiencePreferance:
+                                            specificExperiencePreferance
+                                                .toString(),
+                                      );
+                                    });
+                                  }
                                 });
                               }
                               // user!.email.toString();
@@ -421,51 +439,68 @@ class _SignInScreenState extends State<SignInScreen> {
                                 String age =
                                     await SharedPrefHelper.getString('age') ??
                                         "";
-                                String userid =
-                                    await SharedPrefHelper.getString(
-                                            "userid") ??
-                                        "";
-                                // Userdetails userdetails = Userdetails(
-                                //   email: facebookdata!['email'] ?? ' ',
-                                //   name: facebookdata!['name'] ?? ' ',
-                                //   userId: '',
-                                //   userimg: facebookdata!['picture']['data']
-                                //           ['url'] ??
-                                //       ' ',
-                                // );
 
-                                signUp(
-                                        context,
-                                        facebookdata!['email'] ?? "",
-                                        passwordGanaretor(
-                                            facebookdata!['email'] ?? ""),
-                                        passwordGanaretor(
-                                            facebookdata!['email'] ?? ""))
-                                    .then((_) async {
-                                  loginApi(
-                                    context,
-                                    user!.email.toString(),
-                                    passwordGanaretor(
-                                      user!.email.toString(),
-                                    ),
-                                  );
-                                  createUserDetails(
-                                    context: context,
-                                    userId: userid,
-                                    age: age,
-                                    calorieyGoal: calorieyGoal,
-                                    daysCommit: daysCommit,
-                                    fitnessGoal: fitnessGoal,
-                                    gender: gender,
-                                    height: height,
-                                    weight: weight,
-                                    previousFitnessExperience:
-                                        previousFitnessExperience,
-                                    sleepQuality: sleepQuality,
-                                    specificDiet: specificDiet,
-                                    specificExperiencePreferance:
-                                        specificExperiencePreferance.toString(),
-                                  );
+                                checkEmailExistOrNot(
+                                  facebookdata!['email'] ?? "",
+                                  context,
+                                ).then((val) {
+                                  if (val) {
+                                    loginApi(
+                                            context,
+                                            facebookdata!['email'] ?? "",
+                                            passwordGanaretor(
+                                              facebookdata!['email'] ?? "",
+                                            ),
+                                            "Facebook")
+                                        .then((onValue) {
+                                      createUserDetails(
+                                        context: context,
+                                        userId: getx.userid.value,
+                                        age: age,
+                                        calorieyGoal: calorieyGoal,
+                                        daysCommit: daysCommit,
+                                        fitnessGoal: fitnessGoal,
+                                        gender: gender,
+                                        height: height,
+                                        weight: weight,
+                                        previousFitnessExperience:
+                                            previousFitnessExperience,
+                                        sleepQuality: sleepQuality,
+                                        specificDiet: specificDiet,
+                                        specificExperiencePreferance:
+                                            specificExperiencePreferance
+                                                .toString(),
+                                      );
+                                    });
+                                  } else {
+                                    signUp(
+                                            context,
+                                            facebookdata!['email'] ?? "",
+                                            passwordGanaretor(
+                                              facebookdata!['email'] ?? "",
+                                            ),
+                                            "Facebook")
+                                        .then((onValue) {
+                                      createUserDetails(
+                                        context: context,
+                                        userId: getx.userid.value,
+                                        age: age,
+                                        calorieyGoal: calorieyGoal,
+                                        daysCommit: daysCommit,
+                                        fitnessGoal: fitnessGoal,
+                                        gender: gender,
+                                        height: height,
+                                        weight: weight,
+                                        previousFitnessExperience:
+                                            previousFitnessExperience,
+                                        sleepQuality: sleepQuality,
+                                        specificDiet: specificDiet,
+                                        specificExperiencePreferance:
+                                            specificExperiencePreferance
+                                                .toString(),
+                                      );
+                                    });
+                                  }
                                 });
                               }
                             },
