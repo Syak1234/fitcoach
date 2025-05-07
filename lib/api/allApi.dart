@@ -167,6 +167,8 @@ Future loginApi(BuildContext context, String userName, String pass) async {
 
     Get.back();
 
+    log(res.body);
+
     if (res.statusCode == 200) {
       Map data = jsonDecode(res.body.toString());
       final jsondata = data["result"];
@@ -833,13 +835,17 @@ Future<bool> genarateFPcode(
   return false;
 }
 
-Future<void> sendUserData({required String userId,required String date,required int water,required int step }) async {
+Future<void> sendUserData(
+    {required String userId,
+    required String date,
+    required int water,
+    required int step}) async {
   final url = Uri.parse(
       '${ApiUrl.baseUrl}/api/DailyActivity/create'); // Replace with your API URL
 
   final Map<String, dynamic> payload = {
-    "userId":userId,
-    "date":date,
+    "userId": userId,
+    "date": date,
     //  DateTime.now()
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
     "water": water,
@@ -868,13 +874,17 @@ Future<void> sendUserData({required String userId,required String date,required 
   }
 }
 
-Future<void> updateData({required String userId,required String date,required int water,required int step }) async {
+Future<void> updateData(
+    {required String userId,
+    required String date,
+    required int water,
+    required int step}) async {
   final url = Uri.parse(
       '${ApiUrl.baseUrl}/api/DailyActivity/update'); // Replace with your API endpoint
 
- final Map<String, dynamic> requestBody = {
-    "userId":userId,
-    "date":date,
+  final Map<String, dynamic> requestBody = {
+    "userId": userId,
+    "date": date,
     //  DateTime.now()
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
     "water": water,
@@ -918,8 +928,6 @@ Future<void> fetchServiceData() async {
     print('Error: $e');
   }
 }
-
-
 
 Future<void> fetchstepandwaterlist({required String userId}) async {
   // final String userId = 'hjhjjh';
