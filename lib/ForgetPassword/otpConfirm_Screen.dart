@@ -169,9 +169,12 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                     overflow: TextOverflow.ellipsis),
               ),
               SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(6, (index) => buildOTPField(index)),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(6, (index) => buildOTPField(index)),
+                ),
               ),
               SizedBox(height: 20),
 
@@ -264,7 +267,9 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                           TextSpan(
                             text: 'Send again',
                             style: TextStyle(
-                              color: Colors.orange,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.primaryorange,
+                              color: AppColors.primaryorange,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

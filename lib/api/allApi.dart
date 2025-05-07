@@ -669,11 +669,11 @@ Future getUserDetails() async {
           sleepQuality: result['sleepQuality'].toString(),
           age: result["age"].toString(),
           profileimage: result["profileImageUrl"].toString());
-      if (getx.userAssessmentDetaiils.length != 0) {
-        getx.userAssessmentDetaiils.clear();
-      }
+      // if (getx.userAssessmentDetaiils.isNotEmpty) {
+      //   getx.userAssessmentDetaiils.clear();
+      // }
 
-      getx.userAssessmentDetaiils.add(details);
+      getx.userAssessmentDetaiils.value = [details];
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('fitness_goal', result['fitnessGoal'].toString());
@@ -989,13 +989,17 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
   return false;
 }
 
-Future<void> sendUserData({required String userId,required String date,required int water,required int step }) async {
+Future<void> sendUserData(
+    {required String userId,
+    required String date,
+    required int water,
+    required int step}) async {
   final url = Uri.parse(
       '${ApiUrl.baseUrl}/api/DailyActivity/create'); // Replace with your API URL
 
   final Map<String, dynamic> payload = {
-    "userId":userId,
-    "date":date,
+    "userId": userId,
+    "date": date,
     //  DateTime.now()
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
     "water": water,
@@ -1024,13 +1028,17 @@ Future<void> sendUserData({required String userId,required String date,required 
   }
 }
 
-Future<void> updateData({required String userId,required String date,required int water,required int step }) async {
+Future<void> updateData(
+    {required String userId,
+    required String date,
+    required int water,
+    required int step}) async {
   final url = Uri.parse(
       '${ApiUrl.baseUrl}/api/DailyActivity/update'); // Replace with your API endpoint
 
- final Map<String, dynamic> requestBody = {
-    "userId":userId,
-    "date":date,
+  final Map<String, dynamic> requestBody = {
+    "userId": userId,
+    "date": date,
     //  DateTime.now()
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
     "water": water,
@@ -1075,8 +1083,6 @@ Future<void> fetchServiceData() async {
   }
 }
 
-
-
 Future<void> fetchstepandwaterlist({required String userId}) async {
   // final String userId = 'hjhjjh';
   final Uri url = Uri.parse(
@@ -1095,4 +1101,65 @@ Future<void> fetchstepandwaterlist({required String userId}) async {
   } catch (e) {
     print('Error: $e');
   }
+}
+
+Future<String> getInternalService({required String serviceName}) async {
+  String serviceValue = "";
+  getx.loadingWidget.value = true;
+
+  try {
+    String? token = await SharedPrefHelper.getString('token');
+    final url =
+        Uri.https(ApiUrl.baseUrl, ApiUrl.getInternalService + serviceName);
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+    final response = await client.get(
+      url,
+      headers: headers,
+    );
+    // Get.back();
+    log(response.body.toString());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      // final result = decoded['result'];/
+
+      // Check if `result` is a list
+      final resultList = decoded['result'] as List<dynamic>;
+
+      if (resultList.length == 1) {
+        // Only one item → take its serviceValue
+        serviceValue = resultList[0]['serviceValue'];
+        log('Only one item. Service Value: $serviceValue');
+      } else {
+        // Multiple items → find the one with id == 4
+        final targetItem = resultList.firstWhere(
+          (item) => item['id'] == 4,
+          orElse: () => null,
+        );
+
+        if (targetItem != null) {
+          serviceValue = targetItem['serviceValue'];
+          log('Found item with id == 4. Service Value: $serviceValue');
+        } else {
+          log('No item found with id == 4');
+        }
+      }
+      log(response.body.toString());
+    } else {
+      log(response.body.toString());
+      log(response.statusCode.toString());
+    }
+  } catch (e) {
+    // Get.back();
+    log(e.toString());
+  }
+  getx.loadingWidget.value = false;
+  return serviceValue;
 }

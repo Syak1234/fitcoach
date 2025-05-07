@@ -49,6 +49,7 @@ class Getx extends GetxController {
   RxString username = "".obs;
 
   RxString emailFP = "".obs;
+  RxBool loadingWidget = false.obs;
   RxString otpFP = "".obs;
 
   RxList<Userdetails> userdetails = <Userdetails>[].obs;

@@ -132,7 +132,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
   @override
   void initState() {
     getProfileDetails();
-    // selectedGender = getx.userAssessmentDetaiils[0].gender;
+    // selectedGender.value = getx.userAssessmentDetaiils[0].gender;
     // selectedFitnessGoal.value = getx.userAssessmentDetaiils[0].fitnessGoal;
     // selectedDiet.value = getx.userAssessmentDetaiils[0].specificDiet;
     // selectedDay.value = getx.userAssessmentDetaiils[0].daysCommit;
