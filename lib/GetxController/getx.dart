@@ -48,6 +48,10 @@ class Getx extends GetxController {
   RxString userid = "".obs;
   RxString username = "".obs;
 
+  RxString profileImageUrl = "".obs;
+  RxString profileImageFullUrl = "".obs;
+  RxString bmi = "".obs;
+
   RxString emailFP = "".obs;
   RxBool loadingWidget = false.obs;
   RxString otpFP = "".obs;

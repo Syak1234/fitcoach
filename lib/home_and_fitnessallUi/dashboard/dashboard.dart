@@ -28,9 +28,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-Getx getx = Get.put(Getx());
-
 class _HomeScreenState extends State<HomeScreen> {
+  Getx getx = Get.put(Getx());
+
   @override
   void initState() {
     getUserData();
@@ -56,11 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       token: await SharedPrefHelper.getString('token') ?? '',
     );
 
-    if (getx.userdetails.length > 0) {
-      getx.userdetails.clear();
-    }
-
-    getx.userdetails.add(userdetails);
+    getx.userdetails.value = [userdetails];
   }
 
   @override
@@ -94,6 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   PreferredSizeWidget customAppBar() {
+// Getx getx = Get.put(Getx());
+
     DateTime now = DateTime.now();
 
     // Format the current date as "JUN 25, 2025"
@@ -105,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Background Image
           Container(
             height: 214,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
@@ -182,10 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         // Profile Picture
-                        userImage.value != ""
+                        getx.profileImageUrl.value != ""
                             ? CircleAvatar(
-                                radius: 28,
-                                backgroundImage: NetworkImage(userImage.value),
+                                backgroundColor: AppColors.primaryBlue,
+                                radius: 31,
+                                child: CircleAvatar(
+                                  radius: 28,
+                                  backgroundImage: NetworkImage(
+                                      getx.profileImageFullUrl.value),
+                                ),
                               )
                             : CircleAvatar(
                                 radius: 28,
@@ -218,10 +221,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const Icon(Icons.local_fire_department,
                                     color: AppColors.primaryorange, size: 16),
                                 const SizedBox(width: 4),
-                                const Text("88% Healthy",
-                                    style: TextStyle(
-                                        color: AppColors.textLight,
-                                        fontSize: 14)),
+                                Obx(
+                                  () => Text(
+                                      getx.bmi.value != ""
+                                          ? "BMI: ${getx.bmi.value}"
+                                          : "88% Healthy",
+                                      style: TextStyle(
+                                          color: AppColors.textLight,
+                                          fontSize: 14)),
+                                ),
                                 const SizedBox(width: 8),
                                 const Icon(Icons.star,
                                     color: AppColors.primaryBlue, size: 16),

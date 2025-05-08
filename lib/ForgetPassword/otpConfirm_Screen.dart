@@ -14,8 +14,8 @@ class OTPConfirmationPage extends StatefulWidget {
 }
 
 class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
-  final _controllers = List.generate(6, (_) => TextEditingController());
-  final _focusNodes = List.generate(6, (_) => FocusNode());
+  final _controllers = List.generate(4, (_) => TextEditingController());
+  final _focusNodes = List.generate(4, (_) => FocusNode());
   RxBool invalidOTP = false.obs;
   int focusedIndex = 0;
 
@@ -28,7 +28,7 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
     super.initState();
     startTimer();
     // Set listeners to track focus changes
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 4; i++) {
       _focusNodes[i].addListener(() {
         if (_focusNodes[i].hasFocus) {
           setState(() {
@@ -173,7 +173,7 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (index) => buildOTPField(index)),
+                  children: List.generate(4, (index) => buildOTPField(index)),
                 ),
               ),
               SizedBox(height: 20),
@@ -209,7 +209,7 @@ class _OTPConfirmationPageState extends State<OTPConfirmationPage> {
                 child: ElevatedButton(
                   onPressed: () {
                     String enteredOTP = _controllers.map((c) => c.text).join();
-                    if (enteredOTP.length < 6) {
+                    if (enteredOTP.length < 4) {
                       invalidOTP.value = true;
                     } else {
                       getx.otpFP.value = enteredOTP;

@@ -219,20 +219,15 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     alignment: Alignment.center,
                     children: [
                       Obx(() {
-                        if (getx.profileImage.value != null) {
-                          return ClipOval(
-                            child: Image.file(
-                              getx.profileImage.value!,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage:
-                                      AssetImage('assets/profile/img1.png'),
-                                );
-                              },
+                        if (getx.profileImageUrl.value != "") {
+                          return CircleAvatar(
+                            backgroundColor: AppColors.primaryBlue,
+                            radius: 50,
+                            child: CircleAvatar(
+                              radius: 45,
+                              backgroundImage: NetworkImage(
+                                getx.profileImageFullUrl.value,
+                              ),
                             ),
                           );
                         } else {
@@ -810,14 +805,21 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                           Container(
                             width: 200,
                             child: Obx(
-                              () => Text(
-                                overflow: TextOverflow.ellipsis,
-                                getx.selectedExcersiceList
-                                    .toString()
-                                    .replaceAll("[", "")
-                                    .replaceAll("]", ""),
-                                style:
-                                    const TextStyle(color: AppColors.textDark),
+                              () => SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      getx.selectedExcersiceList
+                                          .toString()
+                                          .replaceAll("[", "")
+                                          .replaceAll("]", ""),
+                                      style: const TextStyle(
+                                          color: AppColors.textDark),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

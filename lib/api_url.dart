@@ -15,6 +15,6 @@ class ApiUrl {
   static const deleteworkOut = "/api/WorkoutImage/delete/";
   static const genarateFPotp = "/api/User/forgot-password";
   static const resetPassword = "/api/User/reset-password";
-  static const checkuserEmail = "/api/User/is-user-exists/";
+  static const checkuserEmail = "/api/User/is-user-exists";
   static const getInternalService = "/api/InternalService/get-servicename/";
 }

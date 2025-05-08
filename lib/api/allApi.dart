@@ -178,9 +178,9 @@ Future loginApi(
     Get.back();
 
     log(res.body);
+    Map data = jsonDecode(res.body.toString());
 
     if (res.statusCode == 200) {
-      Map data = jsonDecode(res.body.toString());
       final jsondata = data["result"];
 
       log(jsondata['id'] + "hjhjhjhj");
@@ -210,7 +210,7 @@ Future loginApi(
         context: context,
         title: const Text('Login Failed'),
         description:
-            Text(jsonDecode(res.body)['message'] ?? 'Something went wrong'),
+            Text(data['errorMessages'].toString() ?? 'Something went wrong'),
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.error,
       );
@@ -509,7 +509,7 @@ Future createUserDetails({
         context: context,
         title: const Text('Error'),
         description:
-            Text(jsondata['message'] ?? 'Failed to create user details'),
+            Text(jsondata['errorMessages'] ?? 'Failed to create user details'),
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.error,
       );
@@ -519,7 +519,7 @@ Future createUserDetails({
     toastification.show(
       context: context,
       title: const Text('Error'),
-      description: Text(e.toString()),
+      description: Text("SomeThing went Wrong!!"),
       autoCloseDuration: const Duration(seconds: 3),
       type: ToastificationType.error,
     );
@@ -670,10 +670,15 @@ Future getUserDetails() async {
           calorieyGoal: result['calorieyGoal'].toString(),
           sleepQuality: result['sleepQuality'].toString(),
           age: result["age"].toString(),
-          profileimage: result["profileImageUrl"].toString());
+          profileimage: result["profileImageUrl"].toString(),
+          bmi: result["bmi"].toString());
       // if (getx.userAssessmentDetaiils.isNotEmpty) {
       //   getx.userAssessmentDetaiils.clear();
       // }
+      getx.bmi.value = result["bmi"].toString();
+      getx.profileImageUrl.value = result["profileImageUrl"].toString();
+      getx.profileImageFullUrl.value =
+          "https://" + ApiUrl.baseUrl + result["profileImageUrl"].toString();
 
       getx.userAssessmentDetaiils.value = [details];
 
@@ -933,7 +938,8 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
 
     // log("Update Request: $obj");
 
-    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.getUserdeatils + email);
+    final url =
+        Uri.https(ApiUrl.baseUrl, ApiUrl.checkuserEmail, {"email": email});
 
     final headers = {
       'Content-Type': 'application/json',
@@ -945,10 +951,9 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
           (X509Certificate cert, String host, int port) => true;
     final client = IOClient(ioClient);
 
-    final res = await client.post(
+    final res = await client.get(
       url,
       headers: headers,
-      body: jsonEncode({}),
     );
 
     Get.back(); // Close loading dialog
@@ -956,7 +961,7 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
     var jsondata = jsonDecode(res.body);
     log("Update Response: $jsondata");
 
-    if (res.statusCode == 200) {
+    if (res.statusCode == 200 && jsondata["result"] ?? false) {
       // toastification.show(
       //   context: context,
       //   title: const Text('Password Reset successfully!'),
