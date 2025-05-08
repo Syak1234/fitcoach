@@ -24,6 +24,7 @@ class UserAssessmentDetaiils {
   String calorieyGoal = "";
   String sleepQuality = "";
   String profileimage = "";
+  String bmi = "";
 
   UserAssessmentDetaiils({
     required this.fitnessGoal,
@@ -38,5 +39,6 @@ class UserAssessmentDetaiils {
     required this.sleepQuality,
     required this.age,
     required this.profileimage,
+    required this.bmi,
   });
 }

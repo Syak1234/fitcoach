@@ -74,6 +74,7 @@ dependencies:
   share_plus: ^11.0.0
   fluttertoast: ^8.2.12
   table_calendar:
+  flutter_widget_from_html_core: ^0.16.0
   # flutter_foreground_service: ^0.4.1
   # android_alarm_manager_plus:
  

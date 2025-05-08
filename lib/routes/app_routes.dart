@@ -25,6 +25,8 @@ import 'package:fitcoach/meal_create/mealUi/searchMealItem.dart';
 import 'package:fitcoach/profile_setting/account_setting/about_us.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/profile_setting/account_setting/linked_device.dart';
+import 'package:fitcoach/profile_setting/account_setting/privacy_policy.dart';
+import 'package:fitcoach/profile_setting/account_setting/term_condition.dart';
 import 'package:fitcoach/profile_setting/notification/notificationUi.dart';
 import 'package:fitcoach/profile_setting/profile_screen/finger_print_setup.dart';
 import 'package:fitcoach/profile_setting/profile_screen/profile_screen1.dart';
@@ -100,6 +102,8 @@ class AppRoutes {
       "/requestEmailOtpForForgetPassword";
   static const otpConfirmPage = "/OtpConfirmPage";
   static const resetPassword = "/ResetPassword";
+  static const termAndCondition = "/TermAndCondition";
+  static const privacyPolicy = "/PrivacyPolicy";
 
   // Define routes here
   static final pages = [
@@ -383,6 +387,16 @@ class AppRoutes {
     GetPage(
       name: resetPassword,
       page: () => PasswordScreen(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: privacyPolicy,
+      page: () => PrivacyPolicy(),
+      transition: Transition.rightToLeft, // Optional: Add transition animations
+    ),
+    GetPage(
+      name: termAndCondition,
+      page: () => TermAndCondition(),
       transition: Transition.rightToLeft, // Optional: Add transition animations
     ),
   ];

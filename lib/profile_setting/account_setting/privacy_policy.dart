@@ -1,24 +1,25 @@
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
-import 'package:fitcoach/profile_setting/account_setting/privacy_policy.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/app_colors.dart';
 
-class AccountDashboard extends StatefulWidget {
-  AccountDashboard({super.key});
+class PrivacyPolicy extends StatefulWidget {
+  PrivacyPolicy({super.key});
 
   @override
-  State<AccountDashboard> createState() => _AccountDashboardState();
+  State<PrivacyPolicy> createState() => _PrivacyPolicyState();
 }
 
-class _AccountDashboardState extends State<AccountDashboard> {
-  RxBool ischange = false.obs;
+class _PrivacyPolicyState extends State<PrivacyPolicy> {
+  RxString privacyPolicy =
+      "<center><p>Does not have any privacy policy</p></center>".obs;
   Getx getx = Get.put(Getx());
   @override
   void initState() {
@@ -28,7 +29,8 @@ class _AccountDashboardState extends State<AccountDashboard> {
   }
 
   callData() async {
-    ischange.value = await getx.isBioMatricEnable();
+    privacyPolicy.value =
+        await getInternalService(serviceName: 'Privacy Policy');
   }
 
   @override
@@ -36,111 +38,22 @@ class _AccountDashboardState extends State<AccountDashboard> {
     return Scaffold(
       appBar: customAppBar(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle('General'),
-            // _buildSettingsItem(
-            //   Icons.notifications,
-            //   'Notifications',
-            //   ontap: () {
-            //     Get.toNamed(AppRoutes.notification);
-            //   },
-            // ),
-            _buildSettingsItem(
-              Icons.person,
-              'Personal Information',
-              ontap: () {
-                Get.toNamed(AppRoutes.profilescreen1);
-              },
-            ),
-            // _buildSettingsItem(Icons.call, 'Coach Contact', trailing: '15+'),
-            // _buildSettingsItem(Icons.language, 'Language',
-            //     trailing: 'English (EN)'),
-            // _buildSettingsItem(Icons.dark_mode, 'Dark Mode', switchValue: true),
-            // _buildSettingsItem(
-            //   Icons.devices,
-            //   'Linked Devices',
-            //   trailing: 'Apple Watch',
-            //   ontap: () {
-            //     Get.toNamed(AppRoutes.linkDevice);
-            //   },
-            // ),
-            // _buildSettingsItem(Icons.emoji_events, 'Achievements'),
-            _buildSectionTitle('Security & Privacy', beta: true),
-            // _buildSettingsItem(Icons.security, 'Main Security'),
-            Obx(
-              () => _buildSettingsItem(
-                Icons.fingerprint,
-                'Enable Biometric',
-                switchValue: ischange.value,
-                onChanged: (p0) async {
-                  if (p0 == true) {
-                    ischange.value = await getx.authBioMatric();
-                  } else {
-                    SharedPreferences sp =
-                        await SharedPreferences.getInstance();
-                    sp.setBool("isAuthentication", false);
-                    ischange.value = p0;
-                  }
-                },
-              ),
-            ),
-            _buildSettingsItem(Icons.policy, 'Privacy Policy', trailing: "",
-                ontap: () {
-              Get.toNamed(AppRoutes.privacyPolicy);
-            }),
-            _buildSettingsItem(
-                Icons.do_not_disturb_on_total_silence, 'Term & Condition',
-                trailing: "", ontap: () {
-              Get.toNamed(AppRoutes.termAndCondition);
-            }),
-
-            _buildSectionTitle('Help & Support'),
-            _buildSettingsItem(
-              Icons.info,
-              'About Us',
-              ontap: () {
-                Get.toNamed(AppRoutes.aboutUs);
-              },
-            ),
-            // _buildSettingsItem(Icons.help, 'Help Center'),
-            // _buildSettingsItem(Icons.feedback, 'Submit Feedback'),
-            // _buildSectionTitle('Danger Zone', warning: true),
-            // _buildSettingsItem(Icons.delete, 'Close Account', isDanger: true),
-            _buildSectionTitle('Log Out'),
-            InkWell(
-                onTap: () {
-                  showSignoutConfirmDialog(context, () async {
-                    if (await logoutFunction()) {
-                      Fluttertoast.showToast(msg: "Successfully sign out!");
-                      Get.offNamed(
-                        AppRoutes.splash,
-                      );
-                    } else {
-                      Fluttertoast.showToast(msg: "Faild to sign out!");
-                    }
-                  });
-                },
-                child: _buildSettingsItem(Icons.logout, 'Sign Out')),
-            const SizedBox(height: 20),
-            Center(
-              child: Column(
-                children: const [
-                  Text(
-                    'Fitcoach v1.0.0',
-                    style: TextStyle(
-                        color: AppColors.textDark, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '\u00A9 All Rights Reserved, 2025',
-                    style: TextStyle(color: AppColors.gray, fontSize: 12),
-                  ),
-                ],
-              ),
-            )
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Obx(
+          () => Column(
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: privacyPolicy.value == ""
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: [
+              getx.loadingWidget.value
+                  ? Center(child: CircularProgressIndicator())
+                  : getx.loadingWidget.value == false &&
+                          privacyPolicy.value == ""
+                      ? Center(child: Text("Does not have any policy"))
+                      : HtmlWidget(privacyPolicy.value),
+            ],
+          ),
         ),
       ),
     );
@@ -153,7 +66,7 @@ class _AccountDashboardState extends State<AccountDashboard> {
         children: [
           // Background Image
           Container(
-            height: 200,
+            height: 120,
             decoration: const BoxDecoration(
               color: AppColors.backgroundDark,
               borderRadius: BorderRadius.only(
@@ -174,44 +87,32 @@ class _AccountDashboardState extends State<AccountDashboard> {
                   SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Date Icon + Date
-                      InkWell(
-                        onTap: () {
-                          Get.back();
-                        },
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_back,
-                                color: AppColors.textLight, size: 18),
-                            const SizedBox(width: 6),
-                          ],
+
+                  // Spacer(),
+
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: Icon(Icons.arrow_back,
+                              color: AppColors.textLight, size: 25),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  Spacer(),
-
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "Account Settings",
-                            style: TextStyle(
-                              color: AppColors.textLight,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        const SizedBox(width: 20),
+                        const Text(
+                          "Privacy Policy",
+                          style: TextStyle(
+                            color: AppColors.textLight,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 30,

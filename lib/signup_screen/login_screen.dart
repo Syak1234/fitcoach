@@ -210,7 +210,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                                 createUserDetails(
                                   context: context,
-                                  userId: userid,
+                                  userId: getx.userid.value,
                                   age: age,
                                   calorieyGoal: calorieyGoal,
                                   daysCommit: daysCommit,
