@@ -1,4 +1,6 @@
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/utility/step_trackerUi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,31 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 // hydration_controller.dart
 import 'package:get/get.dart';
 
-class HydrationController extends GetxController {
-  var totalIntake = 0.obs;
-  var dailyGoal = 2000.obs;
-
-  Future<void> fetchHydrationData() async {
-    // Simulate API call
-    await Future.delayed(Duration(seconds: 1));
-    totalIntake.value = 500; // Replace with actual API response
-  }
-
-  Future<void> addWater(int amount) async {
-    // Simulate insert API call
-    await Future.delayed(Duration(milliseconds: 500));
-    totalIntake.value += amount;
-    // You can refresh data from API after inserting
-  }
-}
-
 class HydrationScreen extends StatelessWidget {
-  final HydrationController controller = Get.put(HydrationController());
+  final StepsController controller = Get.put(StepsController());
   final TextEditingController waterInputController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchHydrationData(); // fetch once
+    // fetch once
 
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -210,12 +194,13 @@ class HydrationScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {
+              onPressed: () async {
                 final amount = int.tryParse(waterInputController.text);
                 if (amount != null && amount > 0) {
-                  controller.addWater(amount);
                   Get.back();
-                  waterInputController.clear();
+                  String userid =
+                      await SharedPrefHelper.getString('userid') ?? '';
+                  // updateData(userId: userid, date: DateTime.now().toIso8601String(), water:int.parse( waterInputController.text), step: controller.ste, minutes: minutes, km: km, kcal: kcal, id: id)
                 }
               },
               icon: Icon(Icons.add, color: Colors.white),

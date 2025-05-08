@@ -367,77 +367,77 @@ Future<List<Meal>> allListMealApi(BuildContext context) async {
 
 Future updateMealApi(
   BuildContext context, {
-  required int id,
+  required String id,
   required String mealname,
   required Getx
       mealController, // Replace 'dynamic' with the actual type if known
 }) async {
-  try {
-    String? token = await SharedPrefHelper.getString('token');
-    List<Map<String, dynamic>> mealItemsJson =
-        mealController.mealItems.map((item) => item.toJson()).toList();
+  // try {
+  String? token = await SharedPrefHelper.getString('token');
+  List<Map<String, dynamic>> mealItemsJson =
+      mealController.mealItems.map((item) => item.toJson()).toList();
 
-    showDialog(
-      context: context,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+  showDialog(
+    context: context,
+    builder: (context) => const Center(child: CircularProgressIndicator()),
+  );
 
-    Map obj = {"id": id, "mealName": mealname, "mealItems": mealItemsJson};
+  Map obj = {"id": id, "mealName": mealname, "mealItems": mealItemsJson};
 
-    log("Update Request: $obj");
+  log("Update Request: $obj");
 
-    final headers = {
-      'Content-Type': 'application/json',
-      'accept': '*/*',
-      // 'Authorization': 'Bearer $token'
-    };
+  final headers = {
+    'Content-Type': 'application/json',
+    'accept': '*/*',
+    // 'Authorization': 'Bearer $token'
+  };
 
-    final ioClient = HttpClient()
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-    final client = IOClient(ioClient);
+  final ioClient = HttpClient()
+    ..badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+  final client = IOClient(ioClient);
 
-    log(obj.toString());
+  log(obj.toString());
 
-    final res = await client.post(
-      Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
-      headers: headers,
-      body: jsonEncode(obj),
-    );
+  final res = await client.post(
+    Uri.https(ApiUrl.baseUrl, ApiUrl.updatemela),
+    headers: headers,
+    body: jsonEncode(obj),
+  );
 
-    Get.back(); // Close loading dialog
+  Get.back(); // Close loading dialog
 
-    var jsondata = jsonDecode(res.body);
-    log("Update Response: $jsondata");
+  var jsondata = jsonDecode(res.body.toString());
+  log("Update Response: $jsondata");
 
-    if (res.statusCode == 200) {
-      toastification.show(
-        context: context,
-        title: const Text('Meal Updated'),
-        autoCloseDuration: const Duration(seconds: 3),
-        type: ToastificationType.success,
-        style: ToastificationStyle.fillColored,
-      );
-    } else {
-      toastification.show(
-        context: context,
-        title: const Text('Update Failed'),
-        description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
-        autoCloseDuration: const Duration(seconds: 3),
-        type: ToastificationType.error,
-      );
-    }
-  } catch (e) {
-    Get.back(); // Close loading dialog
-    log("Update Error: $e");
+  if (res.statusCode == 200) {
     toastification.show(
       context: context,
-      title: const Text('Error'),
-      description: Text(e.toString()),
+      title: const Text('Meal Updated'),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.success,
+      style: ToastificationStyle.fillColored,
+    );
+  } else {
+    toastification.show(
+      context: context,
+      title: const Text('Update Failed'),
+      description: Text(jsondata['message'] ?? 'Unexpected error occurred'),
       autoCloseDuration: const Duration(seconds: 3),
       type: ToastificationType.error,
     );
   }
+  // } catch (e) {
+  //   Get.back(); // Close loading dialog
+  //   log("Update Error: $e");
+  //   toastification.show(
+  //     context: context,
+  //     title: const Text('Error'),
+  //     description: Text(e.toString()),
+  //     autoCloseDuration: const Duration(seconds: 3),
+  //     type: ToastificationType.error,
+  //   );
+  // }
 }
 
 Future createUserDetails({
@@ -748,6 +748,77 @@ Future<List<Map<String, dynamic>>> getAllWorkout() async {
   }
 }
 
+Future<bool> deleteMeal(BuildContext context, {required String id}) async {
+  try {
+    // Uncomment if your API requires authentication
+    // String? token = await SharedPrefHelper.getString('token');
+    showDialog(
+      context: context,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+    final url = Uri.https(ApiUrl.baseUrl, '${ApiUrl.deletemeal}$id');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token',
+    };
+
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final response = await client.post(
+      // Change to .delete() if API supports DELETE
+      url,
+      headers: headers,
+    );
+    Get.back();
+    Get.back();
+    log(response.body);
+
+    if (response.statusCode == 200) {
+      Get.back();
+      toastification.show(
+        context: context,
+        title: const Text('Meal deleted successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+      return true;
+    } else {
+      final jsonData = jsonDecode(response.body);
+      toastification.show(
+        context: context,
+        title: const Text('Delete Failed'),
+        description: Text(
+          jsonData['errorMessages']
+                  ?.toString()
+                  .replaceAll('[', '')
+                  .replaceAll(']', '') ??
+              'An unknown error occurred',
+        ),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+      return false;
+    }
+  } catch (e) {
+    log('Delete error: $e');
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      type: ToastificationType.error,
+    );
+    return false;
+  }
+}
+
 Future deleteworkout({required int id}) async {
   try {
     // String? token = await SharedPrefHelper.getString('token');
@@ -995,22 +1066,29 @@ Future<void> updateData(
     {required String userId,
     required String date,
     required int water,
-    required int step}) async {
-  final url = Uri.parse(
-      '${ApiUrl.baseUrl}/api/DailyActivity/update'); // Replace with your API endpoint
+    required int step,
+    required dynamic minutes,
+    required dynamic km,
+    required dynamic kcal,
+    required dynamic id}) async {
+  final url = Uri.https(ApiUrl.baseUrl,
+      '/api/DailyActivity/update'); // Replace with your API endpoint
 
   final Map<String, dynamic> requestBody = {
     "userId": userId,
     "date": date,
     //  DateTime.now()
     //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
-    "water": water,
-    "step": step,
-    // "id":
+    "water": water.toString(),
+    "step": step.toString(),
+    'minutes': minutes.toString(),
+    "km": km.toString(),
+    'kcal': kcal.toString(),
+    "id": id
   };
 
   try {
-    final response = await http.put(
+    final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(requestBody),

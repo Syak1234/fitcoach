@@ -214,7 +214,7 @@ class _CustomMealsScreenState extends State<CustomMealsScreen> {
                         onTap: () {
                           Get.to(() => CreateMealScreen(
                                 meal: Meal(
-                                    id: 0,
+                                    id: '0',
                                     mealName: '',
                                     userId: '',
                                     mealItems: []),

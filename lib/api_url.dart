@@ -4,7 +4,7 @@ class ApiUrl {
   static const register = "/api/User/registration";
   static const createMeal = "/api/Meal/create-meal";
   static const getMealList = "/api/Meal/get-meal/";
-  static const updatemela = "/Meal/update-meal";
+  static const updatemela = "/api/Meal/update-meal";
   static const deletemeal = "/api/Meal/delete-meal/";
   static const createuserdetails = '/api/UserDetails/create-user-details';
   static const getUserdeatils = "/api/UserDetails/get-user-details/";

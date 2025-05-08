@@ -6,6 +6,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/workout/workoutListUi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:toastification/toastification.dart';
 
 class WorkoutLogSetScreen extends StatefulWidget {
   RxList<dynamic> workoutList;
@@ -204,7 +205,15 @@ class _WorkoutLogSetScreenState extends State<WorkoutLogSetScreen> {
                     ),
                     SizedBox(height: 15),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        toastification.show(
+                          context: context,
+                          title: const Text('Workout set saved successfully'),
+                          autoCloseDuration: const Duration(seconds: 3),
+                          type: ToastificationType.success,
+                          style: ToastificationStyle.fillColored,
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.backgroundDark,
                         minimumSize: const Size(double.infinity, 55),
@@ -434,6 +443,14 @@ class CrunchExcludeSheet extends StatelessWidget {
                 Constant.imagebaseUrl + workoutimg,
                 width: 100,
                 height: 100,
+                errorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return Icon(
+                    Icons.broken_image,
+                    size: 100,
+                    color: Colors.grey,
+                  );
+                },
               ),
               // Image.asset(
               //   'assets/crunch_icon.png', // Replace with your asset

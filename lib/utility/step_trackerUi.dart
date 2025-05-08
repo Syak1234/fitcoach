@@ -130,6 +130,8 @@ class StepsTakenScreen extends StatelessWidget {
 
 class StepsController extends GetxController {
   RxInt todaySteps = 0.obs;
+   var totalIntake = 0.obs;
+  var dailyGoal = 2000.obs;
   RxInt minutesWalked = 0.obs;
   RxDouble distanceInKm = 0.0.obs;
   RxDouble caloriesBurned = 0.0.obs;
@@ -150,6 +152,20 @@ class StepsController extends GetxController {
     _loadStepHistory();
     _loadSendStatus();
     initPlatformState();
+    call();
+  }
+
+  call() async {
+    String userid = await SharedPrefHelper.getString('userid') ?? '';
+
+    await updateData(
+        userId: userid.toString(), // Replace with dynamic userId
+        date: DateTime.now().toIso8601String(),
+        step: todaySteps.value,
+        water: 100,
+        kcal: caloriesBurned.value,
+        km: distanceInKm.value,
+        minutes: minutesWalked.value,id: 19);
   }
 
   Future<void> _loadStepHistory() async {
@@ -189,11 +205,13 @@ class StepsController extends GetxController {
 
     if (!hasSentDataToday.value) {
       final success = await sendUserData(
-        userId: userid.toString(), // Replace with dynamic userId
-        date: DateTime.now().toIso8601String(),
-        step: todaySteps.value,
-        water: 100,
-      );
+          userId: userid.toString(), // Replace with dynamic userId
+          date: DateTime.now().toIso8601String(),
+          step: todaySteps.value,
+          water: 100,
+          kcal: caloriesBurned.value,
+          km: distanceInKm.value,
+          minutes: minutesWalked.value);
 
       if (success) {
         hasSentDataToday.value = true;
@@ -244,16 +262,22 @@ class StepsController extends GetxController {
     required String date,
     required int water,
     required int step,
+    required dynamic minutes,
+    required dynamic km,
+    required dynamic kcal,
   }) async {
-    final url = Uri.https(
-        ApiUrl.baseUrl, '/api/DailyActivity/create'); // Change to your API
+    final url = Uri.https(ApiUrl.baseUrl, '/api/DailyActivity/create');
 
     final Map<String, dynamic> payload = {
       "userId": userId,
       "date": date,
-      "water": water,
-      "step": step,
+      "water": water.toString(), // Convert to String
+      "step": step.toString(),
+      "minutes": minutes.toString(),
+      "km": km.toString(),
+      "kcal": kcal.toString()
     };
+    log(payload.toString());
 
     try {
       final response = await http.post(
@@ -262,6 +286,7 @@ class StepsController extends GetxController {
         body: jsonEncode(payload),
       );
       log(response.body.toString());
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         log('✅ Data sent successfully');
         return true;

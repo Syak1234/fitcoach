@@ -173,7 +173,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                         if (gk.currentState!.validate()) {
                           widget.update
                               ? updateMealApi(context,
-                                  id: widget.meal!.id ?? 0,
+                                  id: widget.meal!.id.toString(),
                                   mealname: mealNameController.text,
                                   mealController: mealController)
                               : createMealApi(context,
@@ -230,7 +230,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                 foregroundColor: AppColors.textLight,
               ),
               onPressed: () {
-                // deleteMeal(context,id: id);
+                deleteMeal(context,id: id);
               },
               child: const Text("Delete"),
             ),
