@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         // Profile Picture
-                        getx.profileImageUrl.value != ""
+                        getx.profileImageUrl.value != "null"
                             ? CircleAvatar(
                                 backgroundColor: AppColors.primaryBlue,
                                 radius: 31,
