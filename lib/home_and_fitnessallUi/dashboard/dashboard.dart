@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   () => Text(
                                       getx.bmi.value != ""
                                           ? "BMI: ${getx.bmi.value}"
-                                          : "88% Healthy",
+                                          : "BMI:0",
                                       style: TextStyle(
                                           color: AppColors.textLight,
                                           fontSize: 14)),

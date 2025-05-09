@@ -516,13 +516,13 @@ Future createUserDetails({
     }
   } catch (e) {
     log("Error: $e");
-    toastification.show(
-      context: context,
-      title: const Text('Error'),
-      description: Text("SomeThing went Wrong!!"),
-      autoCloseDuration: const Duration(seconds: 3),
-      type: ToastificationType.error,
-    );
+    // toastification.show(
+    //   context: context,
+    //   title: const Text('Error'),
+    //   description: Text("SomeThing went Wrong!!"),
+    //   autoCloseDuration: const Duration(seconds: 3),
+    //   type: ToastificationType.error,
+    // );
   }
 }
 

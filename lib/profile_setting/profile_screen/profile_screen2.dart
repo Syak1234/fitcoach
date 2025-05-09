@@ -194,14 +194,6 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
             Get.back();
           },
         ),
-        actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.more_vert_rounded,
-                color: AppColors.textDark,
-              ))
-        ],
       ),
       body: SingleChildScrollView(
         child: SafeArea(
