@@ -219,7 +219,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     alignment: Alignment.center,
                     children: [
                       Obx(() {
-                        if (getx.profileImageUrl.value != "") {
+                        if (getx.profileImageUrl.value != "null") {
                           return CircleAvatar(
                             backgroundColor: AppColors.primaryBlue,
                             radius: 50,
