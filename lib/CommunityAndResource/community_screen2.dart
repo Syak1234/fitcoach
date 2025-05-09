@@ -71,21 +71,21 @@ class _PostsScreenState extends State<PostsScreen> {
                         ],
                       ),
                       Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: AppColors.gray80,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 15),
-                          child: Icon(
-                            Icons.notifications,
-                            color: AppColors.backgroundLight,
-                          ),
-                        ),
-                      )
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 15),
+                      //   child: Container(
+                      //     decoration: BoxDecoration(
+                      //         color: AppColors.gray80,
+                      //         borderRadius:
+                      //             BorderRadius.all(Radius.circular(15))),
+                      //     padding: EdgeInsets.symmetric(
+                      //         horizontal: 15, vertical: 15),
+                      //     child: Icon(
+                      //       Icons.notifications,
+                      //       color: AppColors.backgroundLight,
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
                 ),
@@ -392,6 +392,8 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    ;
+    log(widget.postId.toString());
     return Padding(
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom), // For keyboard
@@ -413,43 +415,40 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               child: StreamBuilder<List<Map<String, dynamic>>>(
                 stream: fetchComments(widget.postId),
                 builder: (context, snapshot) {
-                  log(snapshot.connectionState.toString());
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  log(snapshot.connectionState.toString());
+                  log('Stream state: ${snapshot.connectionState}');
 
                   if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
 
-                  if (!snapshot.hasData ||
-                      snapshot.data!.isEmpty ||
-                      snapshot.data!.length == 0) {
-                    return Center(child: Text('No Comments available.'));
+                  if (snapshot.connectionState == ConnectionState.waiting &&
+                      (snapshot.data == null || snapshot.data!.isEmpty)) {
+                    return const Center(child: CircularProgressIndicator());
                   }
 
-                  final comments = snapshot.data!;
+                  final comments = snapshot.data ?? [];
 
-                  return ListView(
-                    reverse: false,
-                    children: comments.map((comment) {
+                  if (comments.isEmpty) {
+                    return const Center(child: Text('No Comments available.'));
+                  }
+
+                  return ListView.builder(
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      final comment = comments[index];
+                      final isOwnComment = getx.userdetails[0].userId ==
+                          comment['userId'].toString();
+
                       return Padding(
                         padding: EdgeInsets.only(
-                            left: getx.userdetails[0].userId ==
-                                    comment['userId'].toString()
-                                ? 30
-                                : 10,
-                            right: getx.userdetails[0].userId !=
-                                    comment['userId'].toString()
-                                ? 30
-                                : 10,
-                            top: 15,
-                            bottom: 15),
+                          left: isOwnComment ? 30 : 10,
+                          right: isOwnComment ? 10 : 30,
+                          top: 15,
+                          bottom: 15,
+                        ),
                         child: InkWell(
                           onLongPress: () {
-                            if (getx.userdetails[0].userId ==
-                                comment['userId'].toString()) {
+                            if (isOwnComment) {
                               showDeleteCommentDialog(
                                 context: context,
                                 commentId: comment['commentId'] ?? "",
@@ -459,24 +458,21 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                             }
                           },
                           child: CommentCard(
-                              postId: comment["postID"] ?? "",
-                              content: comment["comment"] ?? "",
-                              // caption: post["caption"] ?? "No caption",
-                              likeIdList: comment['LikedId'] ?? [],
-                              imageUrl: "",
-                              // postType: post['postType'],
-                              time: comment['postTime'].toString(),
-                              username:
-                                  comment['username'] ?? "name not public",
-                              userId: comment['userId'] ?? "",
-                              commentId: comment['commentId'] ?? "",
-                              color: getx.userdetails[0].userId ==
-                                      comment['userId'].toString()
-                                  ? AppColors.primaryBlue
-                                  : AppColors.primaryorange),
+                            postId: comment["postID"] ?? "",
+                            content: comment["comment"] ?? "",
+                            likeIdList: comment['LikedId'] ?? [],
+                            imageUrl: "",
+                            time: comment['postTime'].toString(),
+                            username: comment['username'] ?? "name not public",
+                            userId: comment['userId'] ?? "",
+                            commentId: comment['commentId'] ?? "",
+                            color: isOwnComment
+                                ? AppColors.primaryBlue
+                                : AppColors.primaryorange,
+                          ),
                         ),
                       );
-                    }).toList(),
+                    },
                   );
                 },
               ),
