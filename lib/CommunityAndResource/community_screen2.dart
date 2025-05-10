@@ -631,7 +631,7 @@ class CommentCard extends StatelessWidget {
   }
 }
 
-Future<void> showDeleteCommentDialog({
+Future<void> showDeleteCommentDialogold({
   required BuildContext context,
   required String commentId,
   required String postId,
@@ -661,5 +661,51 @@ Future<void> showDeleteCommentDialog({
         ),
       ],
     ),
+  );
+}
+
+void showDeleteCommentDialog({
+  required BuildContext context,
+  required String commentId,
+  required String postId,
+  required Future<bool> Function(String commentId, String postId) deleteComment,
+}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppColors.backgroundLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        title: const Text("Delete Comment",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to delete this comment?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: AppColors.red,
+              foregroundColor: AppColors.textLight,
+            ),
+            onPressed: () async {
+              bool success = await deleteComment(commentId, postId);
+              Navigator.of(context).pop();
+              if (success) {
+                Fluttertoast.showToast(msg: "Comment deleted!");
+              } else {
+                Fluttertoast.showToast(msg: "Failed to delete comment.");
+              }
+            },
+            child: const Text("Yes"),
+          ),
+        ],
+      );
+    },
   );
 }

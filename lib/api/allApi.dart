@@ -624,7 +624,7 @@ Future updateUserDetails({
   }
 }
 
-Future getUserDetails() async {
+Future<bool> getUserDetails() async {
   try {
     String? token = await SharedPrefHelper.getString('token');
     String userid = await SharedPrefHelper.getString('userid') ?? '';
@@ -672,8 +672,7 @@ Future getUserDetails() async {
           age: result["age"].toString(),
           profileimage: result["profileImageUrl"].toString(),
           bmi: result["bmi"].toString());
-      // if (getx.userAssessmentDetaiils.isNotEmpty) {
-      //   getx.userAssessmentDetaiils.clear();
+
       // }
       getx.bmi.value = result["bmi"].toString();
       getx.profileImageUrl.value = result["profileImageUrl"].toString();
@@ -701,13 +700,16 @@ Future getUserDetails() async {
       await prefs.setString('age', result['age'].toString());
 
       log(response.body.toString());
+      return true;
     } else {
       log(response.body.toString());
       log(response.statusCode.toString());
+      return false;
     }
   } catch (e) {
     // Get.back();
     log(e.toString());
+    return false;
   }
 }
 

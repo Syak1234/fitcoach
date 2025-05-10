@@ -595,6 +595,7 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
       ),
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
