@@ -191,13 +191,13 @@ class WorkoutMobileView extends StatelessWidget {
                   //   ),
                   // ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _customButton("Equipment", Icons.fitness_center),
-                      _customButton("Muscle Groups", Icons.add),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     _customButton("Equipment", Icons.fitness_center),
+                  //     _customButton("Muscle Groups", Icons.add),
+                  //   ],
+                  // ),
                   const SizedBox(height: 20),
                   Obx(() => Text(
                         "${controller.workoutList.length} Exercises",

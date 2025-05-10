@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
             FitnessMetricsWidget(),
             SizedBox(height: 16),
             SizedBox(
-              height: 450, // Set height for the chart
+              // height: , // Set height for the chart
               child: HistoryCalendar(),
             ),
           ],
@@ -339,41 +339,38 @@ class FitnessMetricsWidget extends StatelessWidget {
   final StepsController controller = Get.put(StepsController());
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // ✅ Center the cards
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Obx(
-              () => _buildMetricCard(
-                title: 'Steps',
-                value: controller.todaySteps.value.toString(),
-                subvalue: ' steps today',
-                color: AppColors.primaryorange,
-                icon: Icons.add,
-                child: _buildStepChart(),
-                onTap: () {
-                  Get.toNamed(AppRoutes.stepUi);
-                },
-              ),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // ✅ Center the cards
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Obx(
+            () => _buildMetricCard(
+              title: 'Steps',
+              value: controller.todaySteps.value.toString(),
+              subvalue: ' steps today',
+              color: AppColors.primaryorange,
+              icon: Icons.add,
+              child: _buildStepChart(),
+              onTap: () {
+                Get.toNamed(AppRoutes.stepUi);
+              },
             ),
-            const SizedBox(width: 8),
-            _buildMetricCard(
-                title: 'Hydration',
-                value: '781',
-                subvalue: 'ml',
-                color: AppColors.primaryBlue,
-                icon: Icons.water_drop,
-                child: _buildHydrationChart(),
-                onTap: () {
-                  Get.toNamed(AppRoutes.hydrationScreen);
-                },
-                context: context),
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          _buildMetricCard(
+              title: 'Hydration',
+              value: '781',
+              subvalue: 'ml',
+              color: AppColors.primaryBlue,
+              icon: Icons.water_drop,
+              child: _buildHydrationChart(),
+              onTap: () {
+                Get.toNamed(AppRoutes.hydrationScreen);
+              },
+              context: context),
+        ],
       ),
     );
   }
@@ -594,114 +591,110 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
         color: Colors.black,
       ),
       padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // if (_selectedDayData != null)
-            Card(
-              color: Colors.grey[900],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              margin: EdgeInsets.only(bottom: 20),
-              elevation: 4,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading:
-                          Icon(Icons.directions_walk, color: Colors.blueAccent),
-                      title: Text(
-                        'Steps',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      trailing: Text(
-                        '${_selectedDayData?['step'] ?? 0}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // if (_selectedDayData != null)
+          Card(
+            color: Colors.grey[900],
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: EdgeInsets.only(bottom: 20),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    leading:
+                        Icon(Icons.directions_walk, color: Colors.blueAccent),
+                    title: Text(
+                      'Steps',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                    trailing: Text(
+                      '${_selectedDayData?['step'] ?? 0}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
                     ),
-                    Divider(color: Colors.white12),
-                    ListTile(
-                      leading: Icon(Icons.local_drink,
-                          color: Colors.lightBlueAccent),
-                      title: Text(
-                        'Water Intake',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      trailing: Text(
-                        '${_selectedDayData?['water'] ?? 0} ml',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                  ),
+                  Divider(color: Colors.white12),
+                  ListTile(
+                    leading:
+                        Icon(Icons.local_drink, color: Colors.lightBlueAccent),
+                    title: Text(
+                      'Water Intake',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                    trailing: Text(
+                      '${_selectedDayData?['water'] ?? 0} ml',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            // else if (_selectedDay != null)
-            //   Padding(
-            //     padding: const EdgeInsets.only(bottom: 12),
-            //     child: Text(
-            //       "No data for selected date.",
-            //       style: TextStyle(color: Colors.white, fontSize: 16),
-            //     ),
-            //   ),
-            TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-                _filterDataForSelectedDate();
-              },
-              calendarStyle: CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
-                weekendTextStyle: TextStyle(color: Colors.white),
-                defaultTextStyle: TextStyle(color: Colors.white),
-                outsideTextStyle: TextStyle(color: Colors.grey),
+          ),
+          // else if (_selectedDay != null)
+          //   Padding(
+          //     padding: const EdgeInsets.only(bottom: 12),
+          //     child: Text(
+          //       "No data for selected date.",
+          //       style: TextStyle(color: Colors.white, fontSize: 16),
+          //     ),
+          //   ),
+          TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            // shouldFillViewport: true,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+              _filterDataForSelectedDate();
+            },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.blueAccent,
+                shape: BoxShape.circle,
               ),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-                titleTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
-                rightChevronIcon:
-                    Icon(Icons.chevron_right, color: Colors.white),
+              selectedDecoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
               ),
-              daysOfWeekStyle: DaysOfWeekStyle(
-                weekdayStyle: TextStyle(color: Colors.white),
-                weekendStyle: TextStyle(color: Colors.white),
-              ),
+              weekendTextStyle: TextStyle(color: Colors.white),
+              defaultTextStyle: TextStyle(color: Colors.white),
+              outsideTextStyle: TextStyle(color: Colors.grey),
             ),
-            SizedBox(height: 20),
-          ],
-        ),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
+              rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),
+            ),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: Colors.white),
+              weekendStyle: TextStyle(color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }

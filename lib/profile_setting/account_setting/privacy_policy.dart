@@ -52,7 +52,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
                           privacyPolicy.value == ""
                       ? Center(child: Text("Does not have any policy"))
                       : HtmlWidget(privacyPolicy.value),
-            ],
+            ], 
           ),
         ),
       ),
