@@ -298,27 +298,48 @@ Future<bool> deleteComment(String commentId, String postId) async {
   }
 }
 
-Stream<List<Map<String, dynamic>>> fetchComments(String postId) {
-  return FirebaseFirestore.instance
+// Stream<List<Map<String, dynamic>>> fetchComments(String postId) {
+//   return FirebaseFirestore.instance
+//       .collection('comments')
+//       .where('postID', isEqualTo: postId) // Filter by postId
+//       .orderBy('postTime', descending: false)
+//       .snapshots()
+//       .map((snapshot) {
+//     List<Map<String, dynamic>> allPosts =
+//         snapshot.docs.map((doc) => doc.data()).toList();
+
+//     // Filter posts by userId (if needed)
+//     getx.userCommentId.value = allPosts
+//         .where((post) => post['userId'] == getx.userdetails[0].userId)
+//         .map((post) => post['commentId'] as String)
+//         .toList();
+
+//     print(allPosts);
+
+//     return allPosts;
+//   }).handleError((error) {
+//     print('Stream error: $error');
+//   });
+// }
+
+Stream<List<Map<String, dynamic>>> streamCommentsByPostId(String postId) {
+  return _firestore
       .collection('comments')
-      .where('postID', isEqualTo: postId) // Filter by postId
-      .orderBy('postTime', descending: false)
+      .where('postID', isEqualTo: postId)
+      // .orderBy('postTime', descending: false)
       .snapshots()
       .map((snapshot) {
-    List<Map<String, dynamic>> allPosts =
-        snapshot.docs.map((doc) => doc.data()).toList();
-
-    // Filter posts by userId (if needed)
-    getx.userCommentId.value = allPosts
-        .where((post) => post['userId'] == getx.userdetails[0].userId)
-        .map((post) => post['commentId'] as String)
-        .toList();
-
-    print(allPosts);
-
-    return allPosts;
-  }).handleError((error) {
-    print('Stream error: $error');
+    return snapshot.docs.map((doc) {
+      return {
+        'commentId': doc.id,
+        'userId': doc['userId'],
+        'username': doc['username'],
+        'comment': doc['comment'],
+        'likeCount': doc['likeCount'],
+        'LikedId': List<String>.from(doc['LikedId']),
+        'postTime': doc['postTime'],
+      };
+    }).toList();
   });
 }
 

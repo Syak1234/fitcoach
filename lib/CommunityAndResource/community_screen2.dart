@@ -413,7 +413,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
             SizedBox(height: 10),
             Expanded(
               child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: fetchComments(widget.postId),
+                stream: streamCommentsByPostId(widget.postId),
                 builder: (context, snapshot) {
                   log('Stream state: ${snapshot.connectionState}');
 
