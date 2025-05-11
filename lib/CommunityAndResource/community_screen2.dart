@@ -453,7 +453,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                 context: context,
                                 commentId: comment['commentId'] ?? "",
                                 postId: comment['postID'] ?? "",
-                                deleteComment: deleteComment,
+                                // deleteComment: deleteComment,
                               );
                             }
                           },
@@ -664,7 +664,7 @@ void showDeleteCommentDialog({
   required BuildContext context,
   required String commentId,
   required String postId,
-  required Future<bool> Function(String commentId, String postId) deleteComment,
+  // required Future<bool> Function(String commentId, String postId) deleteComment,
 }) {
   showDialog(
     context: context,
