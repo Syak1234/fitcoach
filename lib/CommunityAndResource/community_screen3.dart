@@ -126,15 +126,20 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                          color: const Color.fromARGB(221, 227, 226, 226)),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_outlined,
-                        size: 25,
-                        color: AppColors.gray80,
+                    InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            color: const Color.fromARGB(221, 227, 226, 226)),
+                        child: Icon(
+                          Icons.arrow_back_ios_new_outlined,
+                          size: 25,
+                          color: AppColors.gray80,
+                        ),
                       ),
                     ),
                     // Spacer(),
