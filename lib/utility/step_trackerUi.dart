@@ -130,7 +130,7 @@ class StepsTakenScreen extends StatelessWidget {
 
 class StepsController extends GetxController {
   RxInt todaySteps = 0.obs;
-   var totalIntake = 0.obs;
+  var totalIntake = 0.obs;
   var dailyGoal = 2000.obs;
   RxInt minutesWalked = 0.obs;
   RxDouble distanceInKm = 0.0.obs;
@@ -165,7 +165,8 @@ class StepsController extends GetxController {
         water: 100,
         kcal: caloriesBurned.value,
         km: distanceInKm.value,
-        minutes: minutesWalked.value,id: 19);
+        minutes: minutesWalked.value,
+        id: 19);
   }
 
   Future<void> _loadStepHistory() async {
@@ -266,12 +267,11 @@ class StepsController extends GetxController {
     required dynamic km,
     required dynamic kcal,
   }) async {
-    final url = Uri.https(ApiUrl.baseUrl, '/api/DailyActivity/create');
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createStep);
 
     final Map<String, dynamic> payload = {
       "userId": userId,
       "date": date,
-      "water": water.toString(), // Convert to String
       "step": step.toString(),
       "minutes": minutes.toString(),
       "km": km.toString(),
