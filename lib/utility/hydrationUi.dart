@@ -64,7 +64,8 @@ class HydrationScreen extends StatelessWidget {
           Text("Hydration",
               style: GoogleFonts.poppins(
                   fontSize: 18, fontWeight: FontWeight.bold)),
-          _iconButton(Icons.settings),
+          // _iconButton(Icons.settings),
+          SizedBox()
         ],
       ),
     );

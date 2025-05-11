@@ -411,19 +411,21 @@ class FitnessMetricsWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          _buildMetricCard(
-              title: 'Hydration',
-              value: getx.waterList.length != 0
-                  ? getx.waterList[0].water ?? "0"
-                  : "0",
-              subvalue: 'ml',
-              color: AppColors.primaryBlue,
-              icon: Icons.water_drop,
-              child: _buildHydrationChart(),
-              onTap: () {
-                Get.toNamed(AppRoutes.hydrationScreen);
-              },
-              context: context),
+          Obx(
+            () => _buildMetricCard(
+                title: 'Hydration',
+                value: getx.waterList.length != 0
+                    ? getx.waterList[0].water ?? "0"
+                    : "0",
+                subvalue: 'ml',
+                color: AppColors.primaryBlue,
+                icon: Icons.water_drop,
+                child: _buildHydrationChart(),
+                onTap: () {
+                  Get.toNamed(AppRoutes.hydrationScreen);
+                },
+                context: context),
+          ),
         ],
       ),
     );
