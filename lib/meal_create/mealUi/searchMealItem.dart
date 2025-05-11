@@ -154,7 +154,7 @@ class FoodSearchScreen extends StatelessWidget {
       "proteinPercentage": proteinPercentage.toStringAsFixed(2),
       "fatPercentage": fatPercentage.toStringAsFixed(2),
       "carbohydratePercentage": carbohydratePercentage.toStringAsFixed(2),
-    });
+    }); 
   }
 
   double _getNutrientValue(Nutrient nutrient, _product) {
@@ -168,7 +168,7 @@ class FoodSearchScreen extends StatelessWidget {
     final controller = Get.put(FoodSearchController());
 
     return DefaultTabController(
-      length: 3,
+      length: 1,
       child: Scaffold(
         appBar: AppBar(
           titleSpacing: 0,
@@ -232,14 +232,14 @@ class FoodSearchScreen extends StatelessWidget {
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 5,
                 indicatorColor: Colors.blue,
-                tabAlignment: TabAlignment.center,
+                tabAlignment: TabAlignment.start,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.grey,
                 onTap: controller.updateTabData,
                 tabs: [
                   Tab(text: 'All'),
-                  Tab(text: 'Fevorite'),
-                  Tab(text: 'Custom'),
+                  // Tab(text: 'Fevorite'),
+                  // Tab(text: 'Custom'),
                 ],
               ),
             ),

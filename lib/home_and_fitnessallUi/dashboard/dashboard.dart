@@ -504,8 +504,6 @@ Widget _buildCaloriesChart() {
 // }
 
 class HistoryCalendar extends StatefulWidget {
-  HistoryCalendar();
-
   @override
   _HistoryCalendarState createState() => _HistoryCalendarState();
 }
@@ -513,34 +511,32 @@ class HistoryCalendar extends StatefulWidget {
 class _HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  List<dynamic> _allActivities = [];
+  List<dynamic> _stepList = [];
+  List<dynamic> _waterList = [];
   Map<String, dynamic>? _selectedDayData;
-  Getx getx = Get.put(Getx());
+
   @override
   void initState() {
-    call();
     super.initState();
+    _callApi();
   }
 
-  Future call() async {
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
-
-    fetchStepAndWaterList(userId: userid);
+  Future<void> _callApi() async {
+    String userId = await SharedPrefHelper.getString('userid') ?? '';
+    await _fetchStepAndWaterList(userId: userId);
   }
 
-  Future<void> fetchStepAndWaterList({required String userId}) async {
-    // Show loading dialog
+  Future<void> _fetchStepAndWaterList({required String userId}) async {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+        return Center(child: CircularProgressIndicator());
       },
     );
 
-    final Uri url = Uri.https(ApiUrl.baseUrl, '/api/DailyActivity/$userId');
+    final Uri url = Uri.https(ApiUrl.baseUrl,
+        '/api/DailyStepActivity/GetStepAndActivityByUser/$userId');
 
     try {
       final response = await http.get(url);
@@ -548,23 +544,22 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final result = data['result'] as List<dynamic>;
+        final result = data['result'] as Map<String, dynamic>;
 
         setState(() {
-          _allActivities = result;
+          _stepList = result['dailyStepActivityList'] ?? [];
+          _waterList = result['dailyActivityList'] ?? [];
         });
 
         if (_selectedDay != null) {
           _filterDataForSelectedDate();
         }
       } else {
-        log(response.request.toString());
         print('Failed with status: ${response.statusCode}');
       }
     } catch (e) {
       print('Error: $e');
     } finally {
-      // Dismiss the loading dialog
       Navigator.of(context).pop();
     }
   }
@@ -575,14 +570,23 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
     final formattedSelectedDate =
         DateFormat('yyyy-MM-dd').format(_selectedDay!);
 
-    final match = _allActivities.firstWhere(
+    final stepData = _stepList.firstWhere(
+      (activity) =>
+          activity['date'].toString().startsWith(formattedSelectedDate),
+      orElse: () => null,
+    );
+
+    final waterData = _waterList.firstWhere(
       (activity) =>
           activity['date'].toString().startsWith(formattedSelectedDate),
       orElse: () => null,
     );
 
     setState(() {
-      _selectedDayData = match;
+      _selectedDayData = {
+        'step': stepData != null ? stepData['step'] : '0',
+        'water': waterData != null ? waterData['water'] : '0',
+      };
     });
   }
 
@@ -598,64 +602,52 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // if (_selectedDayData != null)
-            Card(
-              color: Colors.grey[900],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              margin: EdgeInsets.only(bottom: 20),
-              elevation: 4,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading:
-                          Icon(Icons.directions_walk, color: Colors.blueAccent),
-                      title: Text(
-                        'Steps',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      trailing: Text(
-                        '${_selectedDayData?['step'] ?? 0}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+            if (_selectedDayData != null)
+              Card(
+                color: Colors.grey[900],
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                margin: EdgeInsets.only(bottom: 20),
+                elevation: 4,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.directions_walk,
+                            color: Colors.blueAccent),
+                        title: Text('Steps',
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 16)),
+                        trailing: Text(
+                          '${_selectedDayData?['step'] ?? 0}',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
                         ),
                       ),
-                    ),
-                    Divider(color: Colors.white12),
-                    ListTile(
-                      leading: Icon(Icons.local_drink,
-                          color: Colors.lightBlueAccent),
-                      title: Text(
-                        'Water Intake',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      trailing: Text(
-                        '${_selectedDayData?['water'] ?? 0} ml',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                      Divider(color: Colors.white12),
+                      ListTile(
+                        leading: Icon(Icons.local_drink,
+                            color: Colors.lightBlueAccent),
+                        title: Text('Water Intake',
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 16)),
+                        trailing: Text(
+                          '${_selectedDayData?['water'] ?? 0} ml',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // else if (_selectedDay != null)
-            //   Padding(
-            //     padding: const EdgeInsets.only(bottom: 12),
-            //     child: Text(
-            //       "No data for selected date.",
-            //       style: TextStyle(color: Colors.white, fontSize: 16),
-            //     ),
-            //   ),
             TableCalendar(
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
@@ -670,13 +662,9 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
               },
               calendarStyle: CalendarStyle(
                 todayDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
+                    color: Colors.blueAccent, shape: BoxShape.circle),
+                selectedDecoration:
+                    BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
                 weekendTextStyle: TextStyle(color: Colors.white),
                 defaultTextStyle: TextStyle(color: Colors.white),
                 outsideTextStyle: TextStyle(color: Colors.grey),
@@ -685,10 +673,9 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
                 formatButtonVisible: false,
                 titleCentered: true,
                 titleTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
                 leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
                 rightChevronIcon:
                     Icon(Icons.chevron_right, color: Colors.white),

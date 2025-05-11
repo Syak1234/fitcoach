@@ -128,6 +128,24 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                                 final item = mealController.mealItems[index];
 
                                 return ListTile(
+                                  onTap: () {
+                                    Get.toNamed(
+                                        AppRoutes.nutritionSummaryScreen,
+                                        arguments: {
+                                          'protein': item.protein,
+                                          'fat': item.fat,
+                                          "carbohydrates": item.carbohydrates,
+                                          "kcal": item.kcal,
+                                          "servingSize": item.servingSize,
+                                          "dataSource": item.dataSource,
+                                          "name": item.name,
+                                          "proteinPercentage":
+                                              item.proteinPercentage,
+                                          "fatPercentage": item.fatPercentage,
+                                          "carbohydratePercentage":
+                                              item.carbohydratePercentage,
+                                        });
+                                  },
                                   title: Text(
                                     item.name ??
                                         'No Name', // Default to 'No Name' if null
@@ -230,7 +248,7 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                 foregroundColor: AppColors.textLight,
               ),
               onPressed: () {
-                deleteMeal(context,id: id);
+                deleteMeal(context, id: id);
               },
               child: const Text("Delete"),
             ),
