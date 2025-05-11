@@ -647,16 +647,22 @@ class HistoryCalendarState extends State<HistoryCalendar> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _infoTile(Icons.directions_walk, 'Steps',
-                        '${_selectedDayData?['step']}'),
-                    _infoTile(Icons.timer, 'Minutes',
-                        '${_selectedDayData?['minutes']} min'),
+                        '${_selectedDayData?['step']}', Colors.blueAccent),
                     _infoTile(
-                        Icons.map, 'Distance', '${_selectedDayData?['km']} km'),
+                        Icons.timer,
+                        'Minutes',
+                        '${_selectedDayData?['minutes']} min',
+                        Colors.orangeAccent),
+                    _infoTile(Icons.map, 'Distance',
+                        '${_selectedDayData?['km']} km', Colors.greenAccent),
                     _infoTile(Icons.local_fire_department, 'Calories Burned',
-                        '${_selectedDayData?['kcal']} kcal'),
+                        '${_selectedDayData?['kcal']} kcal', Colors.redAccent),
                     Divider(color: Colors.white12),
-                    _infoTile(Icons.local_drink, 'Water Intake',
-                        '${_selectedDayData?['water']} ml'),
+                    _infoTile(
+                        Icons.local_drink,
+                        'Water Intake',
+                        '${_selectedDayData?['water']} ml',
+                        Colors.lightBlueAccent),
                   ],
                 ),
               ),
@@ -702,13 +708,9 @@ class HistoryCalendarState extends State<HistoryCalendar> {
     );
   }
 
-  Widget _infoTile(
-    IconData icon,
-    String title,
-    String value,
-  ) {
+  Widget _infoTile(IconData icon, String title, String value, Color? color) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
+      leading: Icon(icon, color: color),
       title: Text(title, style: TextStyle(color: Colors.white70, fontSize: 16)),
       trailing: Text(
         value,
