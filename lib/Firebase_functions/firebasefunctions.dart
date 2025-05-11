@@ -287,6 +287,8 @@ Future<bool> deleteComment(String commentId, String postId) async {
 
     DocumentReference postRef = _firestore.collection('posts').doc(postId);
 
+    print("");
+
     await postRef.update({
       'commentId': FieldValue.arrayRemove([commentId]),
     });
@@ -332,6 +334,7 @@ Stream<List<Map<String, dynamic>>> streamCommentsByPostId(String postId) {
     return snapshot.docs.map((doc) {
       return {
         'commentId': doc.id,
+        "postID": doc['postID'],
         'userId': doc['userId'],
         'username': doc['username'],
         'comment': doc['comment'],
