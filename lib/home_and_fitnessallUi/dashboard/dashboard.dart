@@ -503,10 +503,10 @@ Widget _buildCaloriesChart() {
 
 class HistoryCalendar extends StatefulWidget {
   @override
-  _HistoryCalendarState createState() => _HistoryCalendarState();
+  HistoryCalendarState createState() => HistoryCalendarState();
 }
 
-class _HistoryCalendarState extends State<HistoryCalendar> {
+class HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   Map<String, dynamic>? _selectedDayData;
@@ -521,10 +521,10 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
 
   Future<void> _callApi() async {
     String userId = await SharedPrefHelper.getString('userid') ?? '';
-    await _fetchStepAndWaterList(userId: userId);
+    await fetchStepAndWaterList(userId: userId);
   }
 
-  Future<void> _fetchStepAndWaterList({required String userId}) async {
+  Future<void> fetchStepAndWaterList({required String userId}) async {
     try {
       showDialog(
         context: context,
@@ -573,7 +573,8 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
         );
       }
     } finally {
-      if (context.mounted) Navigator.of(context).pop();
+      // if (context.mounted) Navigator.of(context).pop();
+      Get.back();
     }
   }
 
@@ -701,7 +702,11 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
     );
   }
 
-  Widget _infoTile(IconData icon, String title, String value,) {
+  Widget _infoTile(
+    IconData icon,
+    String title,
+    String value,
+  ) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
       title: Text(title, style: TextStyle(color: Colors.white70, fontSize: 16)),

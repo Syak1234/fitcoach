@@ -1,4 +1,5 @@
 import 'package:fitcoach/api/allApi.dart';
+import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard_bottom.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/utility/step_trackerUi.dart';
 import 'package:flutter/material.dart';
@@ -26,15 +27,23 @@ class HydrationScreen extends StatelessWidget {
           children: [
             _buildHeader(),
             SizedBox(height: screenHeight * 0.02),
-            Obx(() => _buildWaterText(controller.totalIntake.value)),
+            Obx(() => getx.waterList.length != 0
+                ? _buildWaterText(int.parse(getx.waterList[0].water ?? "0"))
+                : _buildWaterText(0)),
             SizedBox(height: 10),
-            Obx(() => Text(
-                  "You need ${controller.dailyGoal.value - controller.totalIntake.value}ml for today.",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.gray,
-                      fontWeight: FontWeight.bold),
-                )),
+            Obx(() => getx.waterList.length != 0
+                ? Text(
+                    controller.dailyGoal.value -
+                                int.parse(getx.waterList[0].water ?? "0") <
+                            0
+                        ? "You took extra ${int.parse(getx.waterList[0].water ?? "0") - controller.dailyGoal.value} ml for today. "
+                        : "You need ${controller.dailyGoal.value - int.parse(getx.waterList[0].water ?? "0")}ml for today.",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.gray,
+                        fontWeight: FontWeight.bold),
+                  )
+                : Text("no data")),
             SizedBox(height: screenHeight * 0.05),
             Expanded(
                 child:
@@ -126,13 +135,15 @@ class HydrationScreen extends StatelessWidget {
                   Text("Current",
                       style: GoogleFonts.poppins(
                           fontSize: 14, color: AppColors.textLight)),
-                  Obx(() => Text(
-                        "${controller.totalIntake.value}ml",
-                        style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textLight),
-                      )),
+                  Obx(() => getx.waterList.length != 0
+                      ? Text(
+                          "${getx.waterList[0].water} ml",
+                          style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textLight),
+                        )
+                      : Text("0 ml")),
                   SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -200,7 +211,8 @@ class HydrationScreen extends StatelessWidget {
               onPressed: () async {
                 final amount = int.tryParse(waterInputController.text);
                 if (amount != null && amount > 0) {
-                  Get.back();
+                  Get.back(); // Close loading dialog
+
                   String userid =
                       await SharedPrefHelper.getString('userid') ?? '';
                   createWaterDetails(
@@ -208,8 +220,27 @@ class HydrationScreen extends StatelessWidget {
                     context,
                     amount.toString(),
                     DateTime.now().toIso8601String(),
-                  );
+                  ).then((val) {
+                    if (val == 409) {
+                      updateWaterDetails(
+                        getx.userdetails[0].userId,
+                        context,
+                        getx.waterList[0].id ?? 0,
+                        amount.toString(),
+                        DateTime.now().toIso8601String(),
+                      ).then((b) {
+                        fetchStepAndWaterList(
+                            userId: getx.userdetails[0].userId,
+                            context: context);
+                      });
+                    } else {
+                      fetchStepAndWaterList(
+                          userId: getx.userdetails[0].userId, context: context);
 
+                      // Get.offAll(() => DashboardBottom());
+                    }
+                    // Get.back();
+                  });
                   // updateData(userId: userid, date: DateTime.now().toIso8601String(), water:int.parse( waterInputController.text), step: controller.ste, minutes: minutes, km: km, kcal: kcal, id: id)
                 }
               },

@@ -4,7 +4,9 @@ import 'dart:developer';
 import 'package:fitcoach/Comprehensive_screen/com_screen1.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api_url.dart';
+import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard.dart';
 import 'package:fitcoach/modelClass/mealItemList.dart';
+import 'package:fitcoach/modelClass/stepandwatermodelclass.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/signup_screen/login_screen.dart';
@@ -1245,8 +1247,6 @@ Future<int> createWaterDetails(String userId, BuildContext context,
 
     final res = await client.post(url, headers: headers, body: jsonEncode(obj));
 
-    Get.back(); // Close loading dialog
-
     var jsondata = jsonDecode(res.body);
     log("Update Response: $jsondata");
 
@@ -1258,8 +1258,12 @@ Future<int> createWaterDetails(String userId, BuildContext context,
         type: ToastificationType.success,
         style: ToastificationStyle.fillColored,
       );
+      Get.back(); // Close loading dialog
+
       return res.statusCode;
     } else if (res.statusCode == 409) {
+      Get.back(); // Close loading dialog
+
       return res.statusCode;
     } else {
       toastification.show(
@@ -1272,6 +1276,8 @@ Future<int> createWaterDetails(String userId, BuildContext context,
         autoCloseDuration: const Duration(seconds: 3),
         type: ToastificationType.error,
       );
+      Get.back(); // Close loading dialog
+
       return res.statusCode;
     }
   } catch (e) {
@@ -1326,5 +1332,147 @@ Future<bool> createStepData({
   } catch (e) {
     log('❗ Exception during API call: $e');
     return false;
+  }
+}
+
+Future<int> updateWaterDetails(String userId, BuildContext context, int waterid,
+    String waterQuantity, String date) async {
+  HistoryCalendarState new_obj = HistoryCalendarState();
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    Map obj = {
+      "userId": userId,
+      "date": date,
+      "water": waterQuantity,
+      "id": waterid
+    };
+
+    // log("Update Request: $obj");
+
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.addWater);
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final res = await client.post(url, headers: headers, body: jsonEncode(obj));
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('Add Water intake Successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+
+      Get.back(); // Close loading dialog
+
+      return res.statusCode;
+    } else if (res.statusCode == 409) {
+      Get.back(); // Close loading dialog
+
+      return res.statusCode;
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text(' Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+      Get.back(); // Close loading dialog
+
+      return res.statusCode;
+    }
+  } catch (e) {
+    Get.back(); // Close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
+    return 500;
+  }
+}
+
+Future<void> fetchStepAndWaterList(
+    {required String userId, required BuildContext context}) async {
+  try {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final Uri url = Uri.https(ApiUrl.baseUrl,
+        '/api/DailyStepActivity/GetStepAndActivityByUser/$userId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data['result'] is Map<String, dynamic>) {
+        final result = data['result'] as Map<String, dynamic>;
+
+        final stepList = (result['dailyStepActivityList'] as List<dynamic>?)
+                ?.map((e) => StepActivity.fromJson(e))
+                .toList() ??
+            [];
+
+        final waterList = (result['dailyActivityList'] as List<dynamic>?)
+                ?.map((e) => WaterActivity.fromJson(e))
+                .toList() ??
+            [];
+
+        getx.setStepList(stepList);
+        getx.setWaterList(waterList);
+
+        print(getx.waterList[0].water);
+
+        Get.back();
+
+        // if (_selectedDay != null) {
+        //   _filterDataForSelectedDate();
+        // }
+      } else {
+        Get.back();
+
+        print('Unexpected result format');
+      }
+    } else {
+      Get.back();
+
+      print('Failed with status code: ${response.statusCode}');
+    }
+  } catch (e, stack) {
+    Get.back();
+
+    print('Fetch error: $e');
+    print('StackTrace: $stack');
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching data. Please try again.')),
+      );
+    }
   }
 }
