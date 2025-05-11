@@ -144,7 +144,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                     ),
                     // Spacer(),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.back();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.blue10,
                         shape: RoundedRectangleBorder(
