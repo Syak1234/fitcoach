@@ -1331,13 +1331,13 @@ Future<bool> createStepData({
       );
       return true;
     } else {
-      toastification.show(
-        context: context,
-        title: Text('Failed to Insert Step Data (${response.statusCode})'),
-        type: ToastificationType.error,
-        autoCloseDuration: Duration(seconds: 3),
-        style: ToastificationStyle.fillColored,
-      );
+      // toastification.show(
+      //   context: context,
+      //   title: Text('Failed to Insert Step Data (${response.statusCode})'),
+      //   type: ToastificationType.error,
+      //   autoCloseDuration: Duration(seconds: 3),
+      //   style: ToastificationStyle.fillColored,
+      // );
       return false;
     }
   } catch (e) {

@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: 230,
+                              width: 200,
                               child: Text(
                                 "Hello, ${name.value}!",
                                 style: TextStyle(
@@ -245,10 +245,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         const Spacer(),
+                        // InkWell(
+                        //   onTap: () {
+                        //     Get.toNamed(AppRoutes.profilescreen1);
+                        //   },
+                        //   child: ,
+                        // ),
 
                         // Forward Arrow Icon
-                        const Icon(Icons.arrow_forward_ios,
-                            color: AppColors.textLight, size: 18),
+                        IconButton(
+                            iconSize: 4,
+                            onPressed: () {
+                              Get.toNamed(AppRoutes.profilescreen1);
+                            },
+                            icon: const Icon(Icons.arrow_forward_ios,
+                                color: AppColors.textLight, size: 12))
                       ],
                     ),
                   ],
@@ -371,6 +382,7 @@ class FitnessMetricsWidget extends StatelessWidget {
             Get.toNamed(AppRoutes.stepUi);
           } else {
             print("No entry found for today's date.");
+            Get.toNamed(AppRoutes.stepUi);
           }
         } else {
           print("Invalid data structure.");
