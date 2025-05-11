@@ -72,21 +72,21 @@ class _DashboardBottomState extends State<DashboardBottom> {
       body: Obx(() {
         return pages[getx.pagesIndex.value];
       }),
-      floatingActionButton: Obx(() {
-        // Show FAB only when the current index is 0
-        return getx.pagesIndex.value == 0
-            ? FloatingActionButton(
-                backgroundColor: AppColors.primaryorange,
-                shape: ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(31)),
-                child:
-                    const Icon(Icons.add, size: 28, color: AppColors.textLight),
-                onPressed: () {
-                  // Action for FAB
-                },
-              )
-            : SizedBox(); // Return an empty widget when FAB should be hidden
-      }),
+      // floatingActionButton: Obx(() {
+      //   // Show FAB only when the current index is 0
+      //   return getx.pagesIndex.value == 0
+      //       ? FloatingActionButton(
+      //           backgroundColor: AppColors.primaryorange,
+      //           shape: ContinuousRectangleBorder(
+      //               borderRadius: BorderRadius.circular(31)),
+      //           child:
+      //               const Icon(Icons.add, size: 28, color: AppColors.textLight),
+      //           onPressed: () {
+      //             // Action for FAB
+      //           },
+      //         )
+      //       : SizedBox(); // Return an empty widget when FAB should be hidden
+      // }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavBar(),
     );

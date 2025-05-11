@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:fitcoach/modelClass/mealItemList.dart';
+import 'package:fitcoach/modelClass/stepandwatermodelclass.dart';
 
 import 'package:fitcoach/modelClass/userDetails.dart';
 
@@ -15,6 +16,22 @@ import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Getx extends GetxController {
+
+  var stepList = <StepActivity>[].obs;
+  var waterList = <WaterActivity>[].obs;
+
+  void setStepList(List<StepActivity> steps) {
+    stepList.value = steps;
+  }
+
+  void setWaterList(List<WaterActivity> water) {
+    waterList.value = water;
+  }
+
+  void clearData() {
+    stepList.clear();
+    waterList.clear();
+  }
   RxInt isCom_select_Option = 0.obs;
   var selectedDays = 5.obs;
 

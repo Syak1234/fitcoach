@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/api_url.dart';
+import 'package:fitcoach/modelClass/stepandwatermodelclass.dart';
 import 'package:fitcoach/modelClass/userDetails.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/routes/app_routes.dart';
@@ -508,9 +509,9 @@ class HistoryCalendar extends StatefulWidget {
 class _HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  List<dynamic> _stepList = [];
-  List<dynamic> _waterList = [];
   Map<String, dynamic>? _selectedDayData;
+
+  final Getx activityController = Get.put(Getx());
 
   @override
   void initState() {
@@ -524,67 +525,100 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
   }
 
   Future<void> _fetchStepAndWaterList({required String userId}) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(child: CircularProgressIndicator());
-      },
-    );
-
-    final Uri url = Uri.https(ApiUrl.baseUrl,
-        '/api/DailyStepActivity/GetStepAndActivityByUser/$userId');
-
     try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final Uri url = Uri.https(ApiUrl.baseUrl,
+          '/api/DailyStepActivity/GetStepAndActivityByUser/$userId');
       final response = await http.get(url);
-      log(response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final result = data['result'] as Map<String, dynamic>;
 
-        setState(() {
-          _stepList = result['dailyStepActivityList'] ?? [];
-          _waterList = result['dailyActivityList'] ?? [];
-        });
+        if (data['result'] is Map<String, dynamic>) {
+          final result = data['result'] as Map<String, dynamic>;
 
-        if (_selectedDay != null) {
-          _filterDataForSelectedDate();
+          final stepList = (result['dailyStepActivityList'] as List<dynamic>?)
+                  ?.map((e) => StepActivity.fromJson(e))
+                  .toList() ??
+              [];
+
+          final waterList = (result['dailyActivityList'] as List<dynamic>?)
+                  ?.map((e) => WaterActivity.fromJson(e))
+                  .toList() ??
+              [];
+
+          activityController.setStepList(stepList);
+          activityController.setWaterList(waterList);
+
+          if (_selectedDay != null) {
+            _filterDataForSelectedDate();
+          }
+        } else {
+          print('Unexpected result format');
         }
       } else {
-        print('Failed with status: ${response.statusCode}');
+        print('Failed with status code: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Error: $e');
+    } catch (e, stack) {
+      print('Fetch error: $e');
+      print('StackTrace: $stack');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching data. Please try again.')),
+        );
+      }
     } finally {
-      Navigator.of(context).pop();
+      if (context.mounted) Navigator.of(context).pop();
     }
   }
 
   void _filterDataForSelectedDate() {
-    if (_selectedDay == null) return;
+    try {
+      if (_selectedDay == null) return;
 
-    final formattedSelectedDate =
-        DateFormat('yyyy-MM-dd').format(_selectedDay!);
+      final formattedSelectedDate =
+          DateFormat('yyyy-MM-dd').format(_selectedDay!);
 
-    final stepData = _stepList.firstWhere(
-      (activity) =>
-          activity['date'].toString().startsWith(formattedSelectedDate),
-      orElse: () => null,
-    );
+      final stepData = activityController.stepList.firstWhereOrNull(
+        (activity) =>
+            activity.date != null &&
+            DateFormat('yyyy-MM-dd').format(activity.date!) ==
+                formattedSelectedDate,
+      );
 
-    final waterData = _waterList.firstWhere(
-      (activity) =>
-          activity['date'].toString().startsWith(formattedSelectedDate),
-      orElse: () => null,
-    );
+      final waterData = activityController.waterList.firstWhereOrNull(
+        (activity) =>
+            activity.date != null &&
+            DateFormat('yyyy-MM-dd').format(activity.date!) ==
+                formattedSelectedDate,
+      );
 
-    setState(() {
-      _selectedDayData = {
-        'step': stepData != null ? stepData['step'] : '0',
-        'water': waterData != null ? waterData['water'] : '0',
-      };
-    });
+      setState(() {
+        _selectedDayData = {
+          'step': stepData?.step ?? '0',
+          'minutes': stepData?.minutes ?? '0',
+          'km': stepData?.km ?? '0',
+          'kcal': stepData?.kcal ?? '0',
+          'water': waterData?.water ?? '0',
+        };
+      });
+    } catch (e) {
+      print('Error filtering selected date: $e');
+      setState(() {
+        _selectedDayData = {
+          'step': '0',
+          'minutes': '0',
+          'km': '0',
+          'kcal': '0',
+          'water': '0',
+        };
+      });
+    }
   }
 
   @override
@@ -598,68 +632,38 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // if (_selectedDayData != null)
-          Card(
-            color: Colors.grey[900],
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.only(bottom: 20),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    leading:
-                        Icon(Icons.directions_walk, color: Colors.blueAccent),
-                    title: Text(
-                      'Steps',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
-                    trailing: Text(
-                      '${_selectedDayData?['step'] ?? 0}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  Divider(color: Colors.white12),
-                  ListTile(
-                    leading:
-                        Icon(Icons.local_drink, color: Colors.lightBlueAccent),
-                    title: Text(
-                      'Water Intake',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
-                    trailing: Text(
-                      '${_selectedDayData?['water'] ?? 0} ml',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ],
+          if (_selectedDayData != null)
+            Card(
+              color: Colors.grey[900],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              margin: EdgeInsets.only(bottom: 20),
+              elevation: 4,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _infoTile(Icons.directions_walk, 'Steps',
+                        '${_selectedDayData?['step']}'),
+                    _infoTile(Icons.timer, 'Minutes',
+                        '${_selectedDayData?['minutes']} min'),
+                    _infoTile(
+                        Icons.map, 'Distance', '${_selectedDayData?['km']} km'),
+                    _infoTile(Icons.local_fire_department, 'Calories Burned',
+                        '${_selectedDayData?['kcal']} kcal'),
+                    Divider(color: Colors.white12),
+                    _infoTile(Icons.local_drink, 'Water Intake',
+                        '${_selectedDayData?['water']} ml'),
+                  ],
+                ),
               ),
             ),
-          ),
-          // else if (_selectedDay != null)
-          //   Padding(
-          //     padding: const EdgeInsets.only(bottom: 12),
-          //     child: Text(
-          //       "No data for selected date.",
-          //       style: TextStyle(color: Colors.white, fontSize: 16),
-          //     ),
-          //   ),
           TableCalendar(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
-            // shouldFillViewport: true,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
@@ -670,13 +674,9 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
             },
             calendarStyle: CalendarStyle(
               todayDecoration: BoxDecoration(
-                color: Colors.blueAccent,
-                shape: BoxShape.circle,
-              ),
-              selectedDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
+                  color: Colors.blueAccent, shape: BoxShape.circle),
+              selectedDecoration:
+                  BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
               weekendTextStyle: TextStyle(color: Colors.white),
               defaultTextStyle: TextStyle(color: Colors.white),
               outsideTextStyle: TextStyle(color: Colors.grey),
@@ -685,10 +685,9 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
               formatButtonVisible: false,
               titleCentered: true,
               titleTextStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
               leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
               rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),
             ),
@@ -697,8 +696,19 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
               weekendStyle: TextStyle(color: Colors.white),
             ),
           ),
-          SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  Widget _infoTile(IconData icon, String title, String value,) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(title, style: TextStyle(color: Colors.white70, fontSize: 16)),
+      trailing: Text(
+        value,
+        style: TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
