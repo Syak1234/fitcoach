@@ -501,8 +501,6 @@ Widget _buildCaloriesChart() {
 // }
 
 class HistoryCalendar extends StatefulWidget {
-  HistoryCalendar();
-
   @override
   _HistoryCalendarState createState() => _HistoryCalendarState();
 }
@@ -510,34 +508,32 @@ class HistoryCalendar extends StatefulWidget {
 class _HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  List<dynamic> _allActivities = [];
+  List<dynamic> _stepList = [];
+  List<dynamic> _waterList = [];
   Map<String, dynamic>? _selectedDayData;
-  Getx getx = Get.put(Getx());
+
   @override
   void initState() {
-    call();
     super.initState();
+    _callApi();
   }
 
-  Future call() async {
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
-
-    fetchStepAndWaterList(userId: userid);
+  Future<void> _callApi() async {
+    String userId = await SharedPrefHelper.getString('userid') ?? '';
+    await _fetchStepAndWaterList(userId: userId);
   }
 
-  Future<void> fetchStepAndWaterList({required String userId}) async {
-    // Show loading dialog
+  Future<void> _fetchStepAndWaterList({required String userId}) async {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+        return Center(child: CircularProgressIndicator());
       },
     );
 
-    final Uri url = Uri.https(ApiUrl.baseUrl, '/api/DailyActivity/$userId');
+    final Uri url = Uri.https(ApiUrl.baseUrl,
+        '/api/DailyStepActivity/GetStepAndActivityByUser/$userId');
 
     try {
       final response = await http.get(url);
@@ -545,23 +541,22 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final result = data['result'] as List<dynamic>;
+        final result = data['result'] as Map<String, dynamic>;
 
         setState(() {
-          _allActivities = result;
+          _stepList = result['dailyStepActivityList'] ?? [];
+          _waterList = result['dailyActivityList'] ?? [];
         });
 
         if (_selectedDay != null) {
           _filterDataForSelectedDate();
         }
       } else {
-        log(response.request.toString());
         print('Failed with status: ${response.statusCode}');
       }
     } catch (e) {
       print('Error: $e');
     } finally {
-      // Dismiss the loading dialog
       Navigator.of(context).pop();
     }
   }
@@ -572,14 +567,23 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
     final formattedSelectedDate =
         DateFormat('yyyy-MM-dd').format(_selectedDay!);
 
-    final match = _allActivities.firstWhere(
+    final stepData = _stepList.firstWhere(
+      (activity) =>
+          activity['date'].toString().startsWith(formattedSelectedDate),
+      orElse: () => null,
+    );
+
+    final waterData = _waterList.firstWhere(
       (activity) =>
           activity['date'].toString().startsWith(formattedSelectedDate),
       orElse: () => null,
     );
 
     setState(() {
-      _selectedDayData = match;
+      _selectedDayData = {
+        'step': stepData != null ? stepData['step'] : '0',
+        'water': waterData != null ? waterData['water'] : '0',
+      };
     });
   }
 

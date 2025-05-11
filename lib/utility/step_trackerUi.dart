@@ -10,8 +10,33 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
-class StepsTakenScreen extends StatelessWidget {
+class StepsTakenScreen extends StatefulWidget {
+  @override
+  State<StepsTakenScreen> createState() => _StepsTakenScreenState();
+}
+
+class _StepsTakenScreenState extends State<StepsTakenScreen> {
   final StepsController controller = Get.put(StepsController());
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future uploadStepData() async {
+    if (controller.todaySteps.value != 0) {
+      await createStepData(
+              userId: getx.userdetails[0].userId, // Replace with dynamic userId
+              date: DateTime.now().toIso8601String(),
+              step: controller.todaySteps.value,
+              kcal: controller.caloriesBurned.value,
+              km: controller.distanceInKm.value,
+              minutes: controller.minutesWalked.value)
+          .then((val) {
+        if (val == false) {}
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +160,7 @@ class StepsController extends GetxController {
   RxInt minutesWalked = 0.obs;
   RxDouble distanceInKm = 0.0.obs;
   RxDouble caloriesBurned = 0.0.obs;
-  RxBool hasSentDataToday = false.obs;
+  // RxBool hasSentDataToday = false.obs;
 
   Map<String, int> stepHistory = {};
   String selectedDate = DateTime.now().toIso8601String().substring(0, 10);
@@ -150,7 +175,7 @@ class StepsController extends GetxController {
   void onInit() {
     super.onInit();
     _loadStepHistory();
-    _loadSendStatus();
+    // _loadSendStatus();
     initPlatformState();
     call();
   }
@@ -204,21 +229,10 @@ class StepsController extends GetxController {
     updateMetrics();
     final userid = await SharedPrefHelper.getString('userid');
 
-    if (!hasSentDataToday.value) {
-      final success = await sendUserData(
-          userId: userid.toString(), // Replace with dynamic userId
-          date: DateTime.now().toIso8601String(),
-          step: todaySteps.value,
-          water: 100,
-          kcal: caloriesBurned.value,
-          km: distanceInKm.value,
-          minutes: minutesWalked.value);
-
-      if (success) {
-        hasSentDataToday.value = true;
-        prefs.setBool("has_sent_data_$selectedDate", true);
-      }
-    }
+    // if (success) {
+    //   hasSentDataToday.value = true;
+    //   prefs.setBool("has_sent_data_$selectedDate", true);
+    // }
   }
 
   void updateMetrics() {
@@ -226,11 +240,11 @@ class StepsController extends GetxController {
     caloriesBurned.value = todaySteps.value * caloriesPerStep;
   }
 
-  Future<void> _loadSendStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    hasSentDataToday.value =
-        prefs.getBool("has_sent_data_$selectedDate") ?? false;
-  }
+  // Future<void> _loadSendStatus() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   // hasSentDataToday.value =
+  //   //     prefs.getBool("has_sent_data_$selectedDate") ?? false;
+  // }
 
   void onPedestrianStatusChanged(PedestrianStatus event) {}
 
@@ -256,48 +270,6 @@ class StepsController extends GetxController {
     stepCountStream.listen(onStepCount).onError((error) {
       todaySteps.value = 0;
     });
-  }
-
-  Future<bool> sendUserData({
-    required String userId,
-    required String date,
-    required int water,
-    required int step,
-    required dynamic minutes,
-    required dynamic km,
-    required dynamic kcal,
-  }) async {
-    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createStep);
-
-    final Map<String, dynamic> payload = {
-      "userId": userId,
-      "date": date,
-      "step": step.toString(),
-      "minutes": minutes.toString(),
-      "km": km.toString(),
-      "kcal": kcal.toString()
-    };
-    log(payload.toString());
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(payload),
-      );
-      log(response.body.toString());
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        log('✅ Data sent successfully');
-        return true;
-      } else {
-        log('❌ API error: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      log('❗ Exception during API call: $e');
-      return false;
-    }
   }
 }
 

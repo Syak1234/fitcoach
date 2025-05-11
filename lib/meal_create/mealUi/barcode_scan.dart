@@ -171,7 +171,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                   icon: Icon(Icons.flash_on, color: Colors.white),
                   onPressed: () {
                     cameraController.toggleTorch();
-                  },
+                  }, 
                 ),
                 IconButton(
                   icon: Icon(Icons.edit, color: Colors.white),

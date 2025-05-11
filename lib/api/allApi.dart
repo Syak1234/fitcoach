@@ -1287,3 +1287,44 @@ Future<int> createWaterDetails(String userId, BuildContext context,
     return 500;
   }
 }
+
+Future<bool> createStepData({
+  required String userId,
+  required String date,
+  required int step,
+  required dynamic minutes,
+  required dynamic km,
+  required dynamic kcal,
+}) async {
+  final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createStep);
+
+  final Map<String, dynamic> payload = {
+    "userId": userId,
+    "date": date,
+    "step": step.toString(),
+    "minutes": minutes.toString(),
+    "km": km.toString(),
+    "kcal": kcal.toString()
+  };
+  log(payload.toString());
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+    log(response.body.toString());
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      log('✅ Data sent successfully');
+      return true;
+    } else {
+      log('❌ API error: ${response.statusCode}');
+      return false;
+    }
+  } catch (e) {
+    log('❗ Exception during API call: $e');
+    return false;
+  }
+}
