@@ -36,7 +36,9 @@ class HydrationScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                 )),
             SizedBox(height: screenHeight * 0.05),
-            Expanded(child: _buildStackedSection(screenHeight, screenWidth)),
+            Expanded(
+                child:
+                    _buildStackedSection(screenHeight, screenWidth, context)),
           ],
         ),
       ),
@@ -83,7 +85,8 @@ class HydrationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStackedSection(double screenHeight, double screenWidth) {
+  Widget _buildStackedSection(
+      double screenHeight, double screenWidth, BuildContext context) {
     return Stack(
       children: [
         Align(
@@ -139,7 +142,7 @@ class HydrationScreen extends StatelessWidget {
                       backgroundColor: AppColors.textLight,
                     ),
                     onPressed: () {
-                      _showAddWaterDialog();
+                      _showAddWaterDialog(context);
                     },
                     child: Icon(Icons.add, size: 30, color: AppColors.blue60),
                   ),
@@ -152,7 +155,7 @@ class HydrationScreen extends StatelessWidget {
     );
   }
 
-  void _showAddWaterDialog() {
+  void _showAddWaterDialog(BuildContext context) {
     Get.defaultDialog(
       titlePadding: EdgeInsets.only(top: 20),
       contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -200,6 +203,13 @@ class HydrationScreen extends StatelessWidget {
                   Get.back();
                   String userid =
                       await SharedPrefHelper.getString('userid') ?? '';
+                  createWaterDetails(
+                    getx.userdetails[0].userId,
+                    context,
+                    amount.toString(),
+                    DateTime.now().toIso8601String(),
+                  );
+
                   // updateData(userId: userid, date: DateTime.now().toIso8601String(), water:int.parse( waterInputController.text), step: controller.ste, minutes: minutes, km: km, kcal: kcal, id: id)
                 }
               },

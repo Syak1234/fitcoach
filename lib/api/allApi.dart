@@ -1212,3 +1212,119 @@ Future<String> getInternalService({required String serviceName}) async {
   getx.loadingWidget.value = false;
   return serviceValue;
 }
+
+Future<int> createWaterDetails(String userId, BuildContext context,
+    String waterQuantity, String date) async {
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    Map obj = {
+      "userId": userId,
+      // "date": "2025-05-11T07:21:43.571Z",
+      "date": date,
+
+      "water": waterQuantity
+    };
+
+    // log("Update Request: $obj");
+
+    final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createWater);
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      // 'Authorization': 'Bearer $token'
+    };
+    final ioClient = HttpClient()
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    final client = IOClient(ioClient);
+
+    final res = await client.post(url, headers: headers, body: jsonEncode(obj));
+
+    Get.back(); // Close loading dialog
+
+    var jsondata = jsonDecode(res.body);
+    log("Update Response: $jsondata");
+
+    if (res.statusCode == 200) {
+      toastification.show(
+        context: context,
+        title: const Text('Insert Water Details Successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
+      return res.statusCode;
+    } else if (res.statusCode == 409) {
+      return res.statusCode;
+    } else {
+      toastification.show(
+        context: context,
+        title: const Text(' Failed'),
+        description: Text(jsondata['errorMessages']
+            .toString()
+            .replaceAll('[', "")
+            .replaceAll("]", "")),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+      return res.statusCode;
+    }
+  } catch (e) {
+    Get.back(); // Close loading dialog
+    log("Error: $e");
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(e.toString()),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
+    return 500;
+  }
+}
+
+Future<bool> createStepData({
+  required String userId,
+  required String date,
+  required int step,
+  required dynamic minutes,
+  required dynamic km,
+  required dynamic kcal,
+}) async {
+  final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createStep);
+
+  final Map<String, dynamic> payload = {
+    "userId": userId,
+    "date": date,
+    "step": step.toString(),
+    "minutes": minutes.toString(),
+    "km": km.toString(),
+    "kcal": kcal.toString()
+  };
+  log(payload.toString());
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+    log(response.body.toString());
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      log('✅ Data sent successfully');
+      return true;
+    } else {
+      log('❌ API error: ${response.statusCode}');
+      return false;
+    }
+  } catch (e) {
+    log('❗ Exception during API call: $e');
+    return false;
+  }
+}
