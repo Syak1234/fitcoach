@@ -19,6 +19,8 @@ class ApiUrl {
   static const getInternalService = "/api/InternalService/get-servicename/";
   static const createWater = "/api/DailyActivity/create";
   static const createStep = "/api/DailyStepActivity/create";
+  static const updateWater = "/api/DailyActivity/update";
+  static const addWater = "/api/DailyActivity/addWater";
 
   // '/api/DailyActivity/create
 }

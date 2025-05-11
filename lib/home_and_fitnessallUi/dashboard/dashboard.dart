@@ -413,7 +413,9 @@ class FitnessMetricsWidget extends StatelessWidget {
           const SizedBox(width: 8),
           _buildMetricCard(
               title: 'Hydration',
-              value: '781',
+              value: getx.waterList.length != 0
+                  ? getx.waterList[0].water ?? "0"
+                  : "0",
               subvalue: 'ml',
               color: AppColors.primaryBlue,
               icon: Icons.water_drop,
@@ -554,10 +556,10 @@ Widget _buildCaloriesChart() {
 
 class HistoryCalendar extends StatefulWidget {
   @override
-  _HistoryCalendarState createState() => _HistoryCalendarState();
+  HistoryCalendarState createState() => HistoryCalendarState();
 }
 
-class _HistoryCalendarState extends State<HistoryCalendar> {
+class HistoryCalendarState extends State<HistoryCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   Map<String, dynamic>? _selectedDayData;
@@ -572,10 +574,10 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
 
   Future<void> _callApi() async {
     String userId = await SharedPrefHelper.getString('userid') ?? '';
-    await _fetchStepAndWaterList(userId: userId);
+    await fetchStepAndWaterList(userId: userId);
   }
 
-  Future<void> _fetchStepAndWaterList({required String userId}) async {
+  Future<void> fetchStepAndWaterList({required String userId}) async {
     try {
       showDialog(
         context: context,
@@ -626,7 +628,8 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
         );
       }
     } finally {
-      if (context.mounted) Navigator.of(context).pop();
+      // if (context.mounted) Navigator.of(context).pop();
+      Get.back();
     }
   }
 
