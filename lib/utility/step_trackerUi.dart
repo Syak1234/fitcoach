@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/api_url.dart';
 import 'package:flutter/material.dart';
@@ -16,24 +17,28 @@ class StepsTakenScreen extends StatefulWidget {
 }
 
 class _StepsTakenScreenState extends State<StepsTakenScreen> {
-  final StepsController controller = Get.put(StepsController());
-
+  final StepsController controller = Get.find<StepsController>();
+  Getx getx = Get.put(Getx());
   @override
   void initState() {
     super.initState();
+    uploadStepData();
   }
 
   Future uploadStepData() async {
     if (controller.todaySteps.value != 0) {
       await createStepData(
+              context: context,
               userId: getx.userdetails[0].userId, // Replace with dynamic userId
               date: DateTime.now().toIso8601String(),
               step: controller.todaySteps.value,
-              kcal: controller.caloriesBurned.value,
-              km: controller.distanceInKm.value,
+              kcal: controller.caloriesBurned.value.toStringAsFixed(1),
+              km: controller.distanceInKm.value.toStringAsFixed(2),
               minutes: controller.minutesWalked.value)
           .then((val) {
-        if (val == false) {}
+        if (val == false) {
+          controller.call();
+        }
       });
     }
   }
@@ -176,22 +181,24 @@ class StepsController extends GetxController {
     super.onInit();
     _loadStepHistory();
     // _loadSendStatus();
-    initPlatformState();
-    call();
+    initPlatformState().whenComplete(
+      () {
+        call();
+      },
+    );
   }
 
   call() async {
-    String userid = await SharedPrefHelper.getString('userid') ?? '';
+    log("message" + getx.steptodayid.value);
 
     await updateData(
-        userId: userid.toString(), // Replace with dynamic userId
+        // Replace with dynamic userId
         date: DateTime.now().toIso8601String(),
         step: todaySteps.value,
-        water: 100,
-        kcal: caloriesBurned.value,
-        km: distanceInKm.value,
+        kcal: caloriesBurned.value.toStringAsFixed(1),
+        km: distanceInKm.value.toStringAsFixed(2),
         minutes: minutesWalked.value,
-        id: 19);
+        id: getx.steptodayid.value);
   }
 
   Future<void> _loadStepHistory() async {

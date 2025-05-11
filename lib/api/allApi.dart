@@ -1069,29 +1069,22 @@ Future<bool> checkEmailExistOrNot(String email, BuildContext context) async {
   return false;
 }
 
-Future<void> updateData(
-    {required String userId,
-    required String date,
-    required int water,
-    required int step,
-    required dynamic minutes,
-    required dynamic km,
-    required dynamic kcal,
-    required dynamic id}) async {
-  final url = Uri.https(ApiUrl.baseUrl,
-      '/api/DailyActivity/update'); // Replace with your API endpoint
+Future<bool> updateData({
+  required String date,
+  required int step,
+  required dynamic minutes,
+  required dynamic km,
+  required dynamic kcal,
+  required dynamic id,
+}) async {
+  final url = Uri.https(ApiUrl.baseUrl, '/api/DailyStepActivity/update/$id');
 
   final Map<String, dynamic> requestBody = {
-    "userId": userId,
     "date": date,
-    //  DateTime.now()
-    //     .toIso8601String(), // or a fixed date like "2025-05-06T05:01:23.164Z"
-    "water": water.toString(),
     "step": step.toString(),
-    'minutes': minutes.toString(),
+    "minutes": minutes.toString(),
     "km": km.toString(),
-    'kcal': kcal.toString(),
-    "id": id
+    "kcal": kcal.toString(),
   };
 
   try {
@@ -1101,14 +1094,17 @@ Future<void> updateData(
       body: jsonEncode(requestBody),
     );
 
+    log(response.body);
+
     if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Success: ${response.body}');
+      return true;
     } else {
-      print('Failed with status: ${response.statusCode}');
-      print('Response: ${response.body}');
+      log('Failed: ${response.statusCode}, ${response.body}');
+      return false;
     }
   } catch (e) {
-    print('Error: $e');
+    log('Exception: $e');
+    return false;
   }
 }
 
@@ -1289,6 +1285,7 @@ Future<int> createWaterDetails(String userId, BuildContext context,
 }
 
 Future<bool> createStepData({
+  required BuildContext context,
   required String userId,
   required String date,
   required int step,
@@ -1306,7 +1303,8 @@ Future<bool> createStepData({
     "km": km.toString(),
     "kcal": kcal.toString()
   };
-  log(payload.toString());
+
+  log("Request Payload: $payload");
 
   try {
     final response = await http.post(
@@ -1314,17 +1312,39 @@ Future<bool> createStepData({
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(payload),
     );
-    log(response.body.toString());
+
+    log("Response: ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      log('✅ Data sent successfully');
+      toastification.show(
+        context: context,
+        title: const Text('Insert Step Details Successfully!'),
+        autoCloseDuration: const Duration(seconds: 3),
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+      );
       return true;
     } else {
-      log('❌ API error: ${response.statusCode}');
+      toastification.show(
+        context: context,
+        title: Text('Failed to Insert Step Data (${response.statusCode})'),
+        type: ToastificationType.error,
+        autoCloseDuration: Duration(seconds: 3),
+        style: ToastificationStyle.fillColored,
+      );
       return false;
     }
   } catch (e) {
-    log('❗ Exception during API call: $e');
+    log('Exception during API call: $e');
+
+    toastification.show(
+      context: context,
+      title: Text('Error: $e'),
+      type: ToastificationType.error,
+      autoCloseDuration: Duration(seconds: 3),
+      style: ToastificationStyle.fillColored,
+    );
+
     return false;
   }
 }

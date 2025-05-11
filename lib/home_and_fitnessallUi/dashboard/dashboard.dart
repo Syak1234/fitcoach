@@ -337,6 +337,52 @@ class LineChartSample extends StatelessWidget {
 }
 
 class FitnessMetricsWidget extends StatelessWidget {
+  Getx getx = Get.put(Getx());
+  Future<void> fetchAndCheckTodayEntry() async {
+    String userId = await SharedPrefHelper.getString('userid') ?? '';
+    final Uri url =
+        Uri.https(ApiUrl.baseUrl, '/api/DailyStepActivity/get-by-user/$userId');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data['isSuccess'] == true && data['result'] is List) {
+          final List<dynamic> results = data['result'];
+
+          final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+          final matchingItem = results.firstWhere(
+            (item) {
+              final itemDate = item['date'];
+              if (itemDate == null) return false;
+              final String formattedItemDate =
+                  DateFormat('yyyy-MM-dd').format(DateTime.parse(itemDate));
+              return formattedItemDate == today;
+            },
+            orElse: () => null,
+          );
+
+          if (matchingItem != null) {
+            print("Found match! ID: ${matchingItem['id']}");
+            getx.steptodayid.value = matchingItem['id'].toString();
+            Get.toNamed(AppRoutes.stepUi);
+          } else {
+            print("No entry found for today's date.");
+          }
+        } else {
+          print("Invalid data structure.");
+        }
+      } else {
+        print("Failed to fetch data. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
   final StepsController controller = Get.put(StepsController());
   @override
   Widget build(BuildContext context) {
@@ -355,7 +401,12 @@ class FitnessMetricsWidget extends StatelessWidget {
               icon: Icons.add,
               child: _buildStepChart(),
               onTap: () {
-                Get.toNamed(AppRoutes.stepUi);
+                if (getx.steptodayid.value.isEmpty) {
+                  fetchAndCheckTodayEntry();
+                } else {
+                  Get.toNamed(AppRoutes.stepUi);
+                }
+                //
               },
             ),
           ),
@@ -538,6 +589,8 @@ class _HistoryCalendarState extends State<HistoryCalendar> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+        log(data.toString());
 
         if (data['result'] is Map<String, dynamic>) {
           final result = data['result'] as Map<String, dynamic>;

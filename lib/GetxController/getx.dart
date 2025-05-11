@@ -16,7 +16,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Getx extends GetxController {
-
+  RxString steptodayid = "".obs;
   var stepList = <StepActivity>[].obs;
   var waterList = <WaterActivity>[].obs;
 
@@ -32,6 +32,7 @@ class Getx extends GetxController {
     stepList.clear();
     waterList.clear();
   }
+
   RxInt isCom_select_Option = 0.obs;
   var selectedDays = 5.obs;
 
