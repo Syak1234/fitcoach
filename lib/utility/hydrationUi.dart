@@ -39,7 +39,11 @@ class HydrationScreen extends StatelessWidget {
                                 int.parse(getx.waterList[0].water ?? "0") <
                             0
                         ? "You took extra ${int.parse(getx.waterList[0].water ?? "0") - controller.dailyGoal.value} ml for today. "
-                        : "You need ${controller.dailyGoal.value - int.parse(getx.waterList[0].water ?? "0")}ml for today.",
+                        : controller.dailyGoal.value -
+                                    int.parse(getx.waterList[0].water ?? "0") ==
+                                0
+                            ? "Your water goal is complete for today."
+                            : "You need ${controller.dailyGoal.value - int.parse(getx.waterList[0].water ?? "0")}ml for today.",
                     style: TextStyle(
                         fontSize: 16,
                         color: AppColors.gray,
@@ -232,11 +236,14 @@ class HydrationScreen extends StatelessWidget {
                         amount.toString(),
                         DateTime.now().toIso8601String(),
                       ).then((b) {
+                        waterInputController.clear();
+
                         fetchStepAndWaterList(
                             userId: getx.userdetails[0].userId,
                             context: context);
                       });
                     } else {
+                      waterInputController.clear();
                       fetchStepAndWaterList(
                           userId: getx.userdetails[0].userId, context: context);
 
