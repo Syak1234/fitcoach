@@ -1130,7 +1130,7 @@ Future<void> fetchServiceData() async {
   }
 }
 
-Future<void> fetchstepandwaterlist({required String userId}) async {
+Future<void> fetchstepandwaterlistAfterUpdate({required String userId}) async {
   // final String userId = 'hjhjjh';
   final Uri url = Uri.parse(
       '${ApiUrl.baseUrl}/api/DailyActivity/$userId'); // Replace with actual URL
