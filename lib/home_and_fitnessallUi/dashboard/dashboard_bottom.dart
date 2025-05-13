@@ -5,6 +5,7 @@ import 'package:fitcoach/CommunityAndResource/community_screen1.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/meal_create/mealUi/customMealsScreen.dart';
 import 'package:fitcoach/meal_create/mealUi/mealList.dart';
+import 'package:fitcoach/meal_diary/diary_page1.dart';
 import 'package:fitcoach/profile_setting/account_setting/account_dashboard.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/workout/workout_homeScreen.dart';
@@ -37,6 +38,7 @@ class _DashboardBottomState extends State<DashboardBottom> {
     HomeScreen(),
     WorkoutScreen(),
     CommunityScreen1(),
+    TrainingDayScreen(),
     CustomMealsScreen(),
     AccountDashboard()
   ];
@@ -114,7 +116,7 @@ class BottomNavBar extends StatelessWidget {
       height: 100,
       color: AppColors.gray10,
       shape: const CircularNotchedRectangle(),
-      notchMargin: 5,
+      notchMargin: 6,
       child: SizedBox(
         height: 80,
         child: Row(
@@ -126,8 +128,10 @@ class BottomNavBar extends StatelessWidget {
             _buildNavItem(Icons.forum, 2, 'Forum'),
             // const SizedBox(
             //     width: 50), // Space for FAB (adjustable based on your FAB size)
-            _buildNavItem(Icons.restaurant, 3, 'Meal'),
-            _buildNavItem(Icons.person, 4, 'Profile'),
+
+            _buildNavItem(Icons.menu_book_outlined, 3, 'Diary'),
+            _buildNavItem(Icons.restaurant, 4, 'Meal'),
+            _buildNavItem(Icons.person, 5, 'Profile'),
           ],
         ),
       ),

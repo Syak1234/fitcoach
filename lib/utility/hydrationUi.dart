@@ -1,3 +1,4 @@
+import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard_bottom.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
 class HydrationScreen extends StatelessWidget {
+  Getx getx = Get.put(Getx());
   final StepsController controller = Get.put(StepsController());
   final TextEditingController waterInputController = TextEditingController();
 

@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/profile_setting/profile_screen/finger_print_setup.dart';
@@ -211,7 +213,26 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     alignment: Alignment.center,
                     children: [
                       Obx(() {
-                        if (getx.profileImageUrl.value != "null") {
+                        if (getx.profileImage.value != null) {
+                          if (getx.profileImage.value!.existsSync()) {
+                            return CircleAvatar(
+                              backgroundColor: AppColors.primaryBlue,
+                              radius: 50,
+                              child: CircleAvatar(
+                                radius: 45,
+                                backgroundImage: NetworkImage(
+                                  getx.profileImageFullUrl.value,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  AssetImage('assets/profile/img1.png'),
+                            );
+                          }
+                        } else if (getx.profileImageUrl.value != "null") {
                           return CircleAvatar(
                             backgroundColor: AppColors.primaryBlue,
                             radius: 50,
@@ -871,24 +892,35 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      updateUserDetails(
-                              userId: getx.userdetails[0].userId,
-                              fitnessGoal: selectedFitnessGoal.value,
-                              gender: selectedGender.value,
-                              weight: getx.selectedWeight.value,
-                              height: getx.selectedHeight.value,
-                              previousFitnessExperience: isExperienced.value,
-                              specificDiet: selectedDiet.value,
-                              daysCommit: int.parse(selectedDay.value),
-                              specificExperiencePreferance:
-                                  getx.selectedExcersiceList.value,
-                              calorieyGoal: getx.selectedCalory.value,
-                              sleepQuality: selectedSleep.value,
-                              age: getx.selectedAge.value,
-                              context: context,
-                              profileImage: getx.profileImage.value)
-                          .then((val) async {
-                        await getUserDetails();
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
+
+                      uploadToUserProfileImageFolder(getx.userdetails[0].userId,
+                              getx.profileImage.value)
+                          .then((val) {
+                        Get.back();
+                        updateUserDetails(
+                                userId: getx.userdetails[0].userId,
+                                fitnessGoal: selectedFitnessGoal.value,
+                                gender: selectedGender.value,
+                                weight: getx.selectedWeight.value,
+                                height: getx.selectedHeight.value,
+                                previousFitnessExperience: isExperienced.value,
+                                specificDiet: selectedDiet.value,
+                                daysCommit: int.parse(selectedDay.value),
+                                specificExperiencePreferance:
+                                    getx.selectedExcersiceList.value,
+                                calorieyGoal: getx.selectedCalory.value,
+                                sleepQuality: selectedSleep.value,
+                                age: getx.selectedAge.value,
+                                context: context,
+                                profileImage: getx.profileImage.value)
+                            .then((val) async {
+                          await getUserDetails();
+                        });
                       });
                     },
                     style: ElevatedButton.styleFrom(

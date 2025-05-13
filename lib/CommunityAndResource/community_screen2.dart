@@ -44,9 +44,14 @@ class _PostsScreenState extends State<PostsScreen> {
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(
-                            'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png'),
+                        radius: 38,
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundImage: getx.profileImageUrl.value == "null"
+                              ? NetworkImage(
+                                  'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png')
+                              : NetworkImage(getx.profileImageFullUrl.value),
+                        ),
                       ),
                       SizedBox(width: 10),
                       Column(
@@ -126,21 +131,21 @@ class _PostsScreenState extends State<PostsScreen> {
                           top: 15,
                           bottom: 15),
                       child: PostCard(
-                        content: post["text"] ?? "",
-                        caption: post["caption"] ?? "No caption",
-                        likeIdList: post['LikedId'] ?? [],
-                        imageUrl: "",
-                        postType: post['postType'],
-                        time: post['postTime'].toString(),
-                        username: post['username'] ?? "name not public",
-                        userId: post['userId'] ?? "",
-                        postId: post['PostId'] ?? "",
-                        color: getx.userdetails[0].userId ==
-                                post['userId'].toString()
-                            ? AppColors.primaryBlue
-                            : AppColors.primaryorange,
-                        commentId: post['commentId'] ?? [],
-                      ),
+                          content: post["text"] ?? "",
+                          caption: post["caption"] ?? "No caption",
+                          likeIdList: post['LikedId'] ?? [],
+                          imageUrl: "",
+                          postType: post['postType'],
+                          time: post['postTime'].toString(),
+                          username: post['username'] ?? "name not public",
+                          userId: post['userId'] ?? "",
+                          postId: post['PostId'] ?? "",
+                          color: getx.userdetails[0].userId ==
+                                  post['userId'].toString()
+                              ? AppColors.primaryBlue
+                              : AppColors.primaryorange,
+                          commentId: post['commentId'] ?? [],
+                          imgurl: post['imgPath'] ?? ""),
                     );
                   }).toList(),
                 );
@@ -194,6 +199,7 @@ class PostCard extends StatelessWidget {
   final String postId;
   final Color color;
   final List commentId;
+  final String imgurl;
   const PostCard(
       {required this.username,
       required this.time,
@@ -205,7 +211,8 @@ class PostCard extends StatelessWidget {
       required this.userId,
       required this.postId,
       required this.color,
-      required this.commentId});
+      required this.commentId,
+      required this.imgurl});
 
   @override
   Widget build(BuildContext context) {
@@ -221,8 +228,10 @@ class PostCard extends StatelessWidget {
             Wrap(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png'),
+                  backgroundImage: imgurl == ""
+                      ? NetworkImage(
+                          'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png')
+                      : NetworkImage(imgurl),
                 ),
                 SizedBox(width: 10),
                 Column(

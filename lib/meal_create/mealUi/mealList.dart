@@ -130,21 +130,36 @@ class _CreateMealScreenState extends State<CreateMealScreen> {
                                 return ListTile(
                                   onTap: () {
                                     Get.toNamed(
-                                        AppRoutes.nutritionSummaryScreen,
-                                        arguments: {
-                                          'protein': item.protein,
-                                          'fat': item.fat,
-                                          "carbohydrates": item.carbohydrates,
-                                          "kcal": item.kcal,
-                                          "servingSize": item.servingSize,
-                                          "dataSource": item.dataSource,
-                                          "name": item.name,
-                                          "proteinPercentage":
-                                              item.proteinPercentage,
-                                          "fatPercentage": item.fatPercentage,
-                                          "carbohydratePercentage":
-                                              item.carbohydratePercentage,
-                                        });
+                                      AppRoutes.nutritionSummaryScreen,
+                                      arguments: {
+                                        'protein': item.protein,
+                                        'fat': item.fat,
+                                        'carbohydrates': item.carbohydrates,
+                                        'kcal': item.kcal,
+                                        'servingSize': item.servingSize,
+                                        'dataSource': item.dataSource,
+                                        'name': item.name,
+                                        'proteinPercentage': double.tryParse(
+                                                        item.proteinPercentage)
+                                                    ?.isNaN ==
+                                                true
+                                            ? '0.00'
+                                            : item.proteinPercentage,
+                                        'fatPercentage':
+                                            double.tryParse(item.fatPercentage)
+                                                        ?.isNaN ==
+                                                    true
+                                                ? '0.00'
+                                                : item.fatPercentage,
+                                        'carbohydratePercentage':
+                                            double.tryParse(item
+                                                            .carbohydratePercentage)
+                                                        ?.isNaN ==
+                                                    true
+                                                ? '0.00'
+                                                : item.carbohydratePercentage,
+                                      },
+                                    );
                                   },
                                   title: Text(
                                     item.name ??

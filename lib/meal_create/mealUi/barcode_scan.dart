@@ -110,14 +110,19 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     Get.toNamed(AppRoutes.nutritionSummaryScreen, arguments: {
       'protein': proteins.toStringAsFixed(2),
       'fat': fat.toStringAsFixed(2),
-      "carbohydrates": carbohydrates.toStringAsFixed(2),
-      "kcal": kcal.toStringAsFixed(2),
-      "servingSize": servingSize,
-      "dataSource": dataSource,
-      "name": productName,
-      "proteinPercentage": proteinPercentage.toStringAsFixed(2),
-      "fatPercentage": fatPercentage.toStringAsFixed(2),
-      "carbohydratePercentage": carbohydratePercentage.toStringAsFixed(2),
+      'carbohydrates': carbohydrates.toStringAsFixed(2),
+      'kcal': kcal.toStringAsFixed(2),
+      'servingSize': servingSize,
+      'dataSource': dataSource,
+      'name': productName,
+      'proteinPercentage': proteinPercentage.isNaN
+          ? '0.00'
+          : proteinPercentage.toStringAsFixed(2),
+      'fatPercentage':
+          fatPercentage.isNaN ? '0.00' : fatPercentage.toStringAsFixed(2),
+      'carbohydratePercentage': carbohydratePercentage.isNaN
+          ? '0.00'
+          : carbohydratePercentage.toStringAsFixed(2),
     });
   }
 
