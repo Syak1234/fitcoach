@@ -41,49 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC6lM03KvMkPzcY7l7799LKxkhPL1QnmhM',
-    appId: '1:739391181270:web:242f974173693b7631d477',
-    messagingSenderId: '739391181270',
-    projectId: 'fitcoach-62d1e',
-    authDomain: 'fitcoach-62d1e.firebaseapp.com',
-    storageBucket: 'fitcoach-62d1e.firebasestorage.app',
-    measurementId: 'G-N9B2W2TBM0',
+    apiKey: 'AIzaSyBZySLMc-H_BjpPDE-Why6F92Jr8nUaMHg',
+    appId: '1:1007397700408:web:940009b060e085491437cd',
+    messagingSenderId: '1007397700408',
+    projectId: 'fitcoach-89ccb',
+    authDomain: 'fitcoach-89ccb.firebaseapp.com',
+    storageBucket: 'fitcoach-89ccb.firebasestorage.app',
+    measurementId: 'G-9LGSXQJ9B8',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDEv6nSHOhoVRwkoAK-yCb5fhpsx8FZP5g',
-    appId: '1:739391181270:ios:3192496407845df231d477',
-    messagingSenderId: '739391181270',
-    projectId: 'fitcoach-62d1e',
-    storageBucket: 'fitcoach-62d1e.firebasestorage.app',
+    apiKey: 'AIzaSyD1ZJgAYdBDVHJigbgn0IM81Mqm3PVyRSc',
+    appId: '1:1007397700408:ios:58bd0c80ecce72431437cd',
+    messagingSenderId: '1007397700408',
+    projectId: 'fitcoach-89ccb',
+    storageBucket: 'fitcoach-89ccb.firebasestorage.app',
     iosBundleId: 'com.example.fitcoach',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyC6lM03KvMkPzcY7l7799LKxkhPL1QnmhM',
-    appId: '1:739391181270:web:69a16f81fbb153a631d477',
-    messagingSenderId: '739391181270',
-    projectId: 'fitcoach-62d1e',
-    authDomain: 'fitcoach-62d1e.firebaseapp.com',
-    storageBucket: 'fitcoach-62d1e.firebasestorage.app',
-    measurementId: 'G-V69ERPD93F',
+    apiKey: 'AIzaSyBZySLMc-H_BjpPDE-Why6F92Jr8nUaMHg',
+    appId: '1:1007397700408:web:a3a29be4aa5f56661437cd',
+    messagingSenderId: '1007397700408',
+    projectId: 'fitcoach-89ccb',
+    authDomain: 'fitcoach-89ccb.firebaseapp.com',
+    storageBucket: 'fitcoach-89ccb.firebasestorage.app',
+    measurementId: 'G-N92LTZCDW0',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDEv6nSHOhoVRwkoAK-yCb5fhpsx8FZP5g',
-    appId: '1:739391181270:ios:3192496407845df231d477',
-    messagingSenderId: '739391181270',
-    projectId: 'fitcoach-62d1e',
-    storageBucket: 'fitcoach-62d1e.firebasestorage.app',
+    apiKey: 'AIzaSyD1ZJgAYdBDVHJigbgn0IM81Mqm3PVyRSc',
+    appId: '1:1007397700408:ios:58bd0c80ecce72431437cd',
+    messagingSenderId: '1007397700408',
+    projectId: 'fitcoach-89ccb',
+    storageBucket: 'fitcoach-89ccb.firebasestorage.app',
     iosBundleId: 'com.example.fitcoach',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAiC4OF3xWKQgmFqQMuHrCD7hlyHNSvUis',
-    appId: '1:739391181270:android:ad9336bd10d65d1231d477',
-    messagingSenderId: '739391181270',
-    projectId: 'fitcoach-62d1e',
-    storageBucket: 'fitcoach-62d1e.firebasestorage.app',
+    apiKey: 'AIzaSyBR_YiYOCvJiiWba36HnRvBwrIHLaQmSB8',
+    appId: '1:1007397700408:android:e043fc7559d0046f1437cd',
+    messagingSenderId: '1007397700408',
+    projectId: 'fitcoach-89ccb',
+    storageBucket: 'fitcoach-89ccb.firebasestorage.app',
   );
 
 }

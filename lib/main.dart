@@ -1,15 +1,11 @@
 import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/io_client.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
-import 'CommunityAndResource/community_screen1.dart';
-import 'utility/step_trackerUi.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
