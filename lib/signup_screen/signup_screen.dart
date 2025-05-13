@@ -142,7 +142,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () => setState(
                               () => _passwordVisible = !_passwordVisible),
                         ),
-                        onChanged: (_) => _checkPasswords(),
+                        onChanged: (_) {},
                       ),
                       SizedBox(height: 20),
                       Row(

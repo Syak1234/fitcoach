@@ -623,15 +623,23 @@ class HistoryCalendarState extends State<HistoryCalendar> {
 
           activityController.setStepList(stepList);
           final today = DateTime.now();
-          final filteredWaterList = waterList.where((activity) {
-            final activityDate = DateTime.parse(
-                activity.date.toString()); // ensure this parses correctly
-            return activityDate.year == today.year &&
-                activityDate.month == today.month &&
-                activityDate.day == today.day;
-          }).toList();
+          final todayList = <WaterActivity>[];
+          final otherList = <WaterActivity>[];
 
-          activityController.setWaterList(filteredWaterList);
+          for (final activity in waterList) {
+            final activityDate = DateTime.parse(
+                activity.date.toString()); // adjust if already DateTime
+            if (activityDate.year == today.year &&
+                activityDate.month == today.month &&
+                activityDate.day == today.day) {
+              todayList.add(activity);
+            } else {
+              otherList.add(activity);
+            }
+          }
+
+          final reorderedWaterList = [...todayList, ...otherList];
+          getx.setWaterList(reorderedWaterList);
 
           if (_selectedDay != null) {
             _filterDataForSelectedDate();
