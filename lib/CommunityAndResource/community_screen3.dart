@@ -383,36 +383,40 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       postType = 'text';
     }
 
-    String imgurl = "";
-    getFileUrlByUserId(userid).then((val) {
-      imgurl = val;
-      createPost(userid, postType, caption, _textPost ?? "", username, imgurl)
-          .then((value) {
-        if (value!.isNotEmpty || value != "") {
-          Navigator.pop(context);
+    // getFileUrlByUserId(userid).then((val) {
 
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => resultDialog(
-                buttonText: "See My Post",
-                context: context,
-                icon: Icons.check,
-                iconBackgroundColor: AppColors.green10,
-                message:
-                    "You have Successfull posted a post.\n Let's see now. Shall we?🙌🏻",
-                title: "Post Successfull",
-                onButtonPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                }),
-          );
-        }
-        // else {
-        //   Navigator.pop(context);
-        // }
-      });
+    createPost(
+      userid,
+      postType,
+      caption,
+      _textPost ?? "",
+      username,
+    ).then((value) {
+      if (value!.isNotEmpty || value != "") {
+        Navigator.pop(context);
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => resultDialog(
+              buttonText: "See My Post",
+              context: context,
+              icon: Icons.check,
+              iconBackgroundColor: AppColors.green10,
+              message:
+                  "You have Successfull posted a post.\n Let's see now. Shall we?🙌🏻",
+              title: "Post Successfull",
+              onButtonPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }),
+        );
+      }
+      // else {
+      //   Navigator.pop(context);
+      // }
     });
+    // });
   }
 }
 

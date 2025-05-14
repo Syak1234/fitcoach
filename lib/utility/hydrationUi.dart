@@ -30,10 +30,18 @@ class HydrationScreen extends StatelessWidget {
             _buildHeader(),
             SizedBox(height: screenHeight * 0.02),
             Obx(() => getx.waterList.length != 0
-                ? _buildWaterText(int.parse(getx.waterList[0].water ?? "0"))
+                ? _buildWaterText(getx.waterList.length != 0 &&
+                        getx.waterList[0].date!.year == DateTime.now().year &&
+                        getx.waterList[0].date!.month == DateTime.now().month &&
+                        getx.waterList[0].date!.day == DateTime.now().day
+                    ? int.parse(getx.waterList[0].water ?? "0")
+                    : 0)
                 : _buildWaterText(0)),
             SizedBox(height: 10),
-            Obx(() => getx.waterList.length != 0
+            Obx(() => getx.waterList.length != 0 &&
+                    getx.waterList[0].date!.year == DateTime.now().year &&
+                    getx.waterList[0].date!.month == DateTime.now().month &&
+                    getx.waterList[0].date!.day == DateTime.now().day
                 ? Text(
                     controller.dailyGoal.value -
                                 int.parse(getx.waterList[0].water ?? "0") <
@@ -49,7 +57,7 @@ class HydrationScreen extends StatelessWidget {
                         color: AppColors.gray,
                         fontWeight: FontWeight.bold),
                   )
-                : Text("no data")),
+                : Text("0 ml")),
             SizedBox(height: screenHeight * 0.05),
             Expanded(
                 child:
@@ -144,7 +152,15 @@ class HydrationScreen extends StatelessWidget {
                           fontSize: 14, color: AppColors.textLight)),
                   Obx(() => getx.waterList.length != 0
                       ? Text(
-                          "${getx.waterList[0].water} ml",
+                          getx.waterList.length != 0 &&
+                                  getx.waterList[0].date!.year ==
+                                      DateTime.now().year &&
+                                  getx.waterList[0].date!.month ==
+                                      DateTime.now().month &&
+                                  getx.waterList[0].date!.day ==
+                                      DateTime.now().day
+                              ? "${getx.waterList[0].water} ml"
+                              : "0 ml",
                           style: GoogleFonts.poppins(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

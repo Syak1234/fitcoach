@@ -64,8 +64,13 @@ Getx getx = Get.put(Getx());
 // }
 
 // Function to create post table (collection)
-Future<String?> createPost(String userId, String postType, String caption,
-    String text, String username, String imagePath) async {
+Future<String?> createPost(
+  String userId,
+  String postType,
+  String caption,
+  String text,
+  String username,
+) async {
   String formattedTime =
       DateFormat('hh:mm a, dd MMM yyyy').format(DateTime.now());
   try {
@@ -79,7 +84,6 @@ Future<String?> createPost(String userId, String postType, String caption,
       'text': text,
       'likeCount': 0,
       'postTime': formattedTime,
-      'imgPath': imagePath,
     });
 
     String postId = docRef.id;
@@ -364,7 +368,7 @@ Future<void> deleteCollection(String collectionName,
   }
 }
 
-Future<void> uploadToUserProfileImageFolder(String userId, File? file) async {
+Future<void> uploadToUserProfileImageFold(String userId, File? file) async {
   try {
     if (file != null && file.existsSync()) {
       final storage = FirebaseStorage.instanceFor(
@@ -389,29 +393,13 @@ Future<void> uploadToUserProfileImageFolder(String userId, File? file) async {
       final collection = FirebaseFirestore.instance.collection('User_Images');
 
       // Query to check if a document for the given userId exists
-      final querySnapshot =
-          await collection.where('userId', isEqualTo: userId).limit(1).get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // If the user already has an image, update the existing document
-        final docId = querySnapshot.docs.first.id;
-
-        await collection.doc(docId).update({
-          'fileUrl': downloadUrl,
-          'uploadedAt': FieldValue.serverTimestamp(),
-        });
-
-        print('🔁 Updated existing user image record for userId: $userId');
-      } else {
-        // If no document exists, create a new one
-        await collection.add({
-          'userId': userId,
-          'fileUrl': downloadUrl,
-          'uploadedAt': FieldValue.serverTimestamp(),
-        });
-
-        print('🆕 Created new user image record for userId: $userId');
-      }
+      // If no document exists, create a new one
+      await collection.add({
+        'userId': userId,
+        'fileUrl': downloadUrl,
+        'uploadedAt': FieldValue.serverTimestamp(),
+      });
     } else {
       print('⚠️ No file provided or file does not exist.');
     }
@@ -422,26 +410,3 @@ Future<void> uploadToUserProfileImageFolder(String userId, File? file) async {
 }
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
-
-Future<String> getFileUrlByUserId(String userId) async {
-  try {
-    // Query the Firestore collection for the specific userId
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('User_Images')
-        .where('userId', isEqualTo: userId)
-        .get();
-
-    // If the query results in documents
-    if (querySnapshot.docs.isNotEmpty) {
-      // Retrieve the first document's 'fileUrl' field
-      final fileUrl = querySnapshot.docs.first['fileUrl'];
-      return fileUrl ?? ''; // Return the fileUrl or empty string if null
-    } else {
-      // Return empty string if no document found for the userId
-      return '';
-    }
-  } catch (e) {
-    print('❌ Error fetching fileUrl: $e');
-    return ''; // Return empty string in case of error
-  }
-}

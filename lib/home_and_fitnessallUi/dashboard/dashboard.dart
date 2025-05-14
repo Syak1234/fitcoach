@@ -426,10 +426,13 @@ class FitnessMetricsWidget extends StatelessWidget {
           Obx(
             () => _buildMetricCard(
                 title: 'Hydration',
-                value: getx.waterList.length != 0
+                value: getx.waterList.length != 0 &&
+                        getx.waterList[0].date!.year == DateTime.now().year &&
+                        getx.waterList[0].date!.month == DateTime.now().month &&
+                        getx.waterList[0].date!.day == DateTime.now().day
                     ? getx.waterList[0].water ?? "0"
                     : "0",
-                subvalue: 'ml',
+                subvalue: ' ml',
                 color: AppColors.primaryBlue,
                 icon: Icons.water_drop,
                 child: _buildHydrationChart(),

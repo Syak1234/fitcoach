@@ -892,36 +892,26 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) =>
-                            const Center(child: CircularProgressIndicator()),
-                      );
-
-                      uploadToUserProfileImageFolder(getx.userdetails[0].userId,
-                              getx.profileImage.value)
-                          .then((val) {
-                        Get.back();
-                        updateUserDetails(
-                                userId: getx.userdetails[0].userId,
-                                fitnessGoal: selectedFitnessGoal.value,
-                                gender: selectedGender.value,
-                                weight: getx.selectedWeight.value,
-                                height: getx.selectedHeight.value,
-                                previousFitnessExperience: isExperienced.value,
-                                specificDiet: selectedDiet.value,
-                                daysCommit: int.parse(selectedDay.value),
-                                specificExperiencePreferance:
-                                    getx.selectedExcersiceList.value,
-                                calorieyGoal: getx.selectedCalory.value,
-                                sleepQuality: selectedSleep.value,
-                                age: getx.selectedAge.value,
-                                context: context,
-                                profileImage: getx.profileImage.value)
-                            .then((val) async {
-                          await getUserDetails();
-                        });
+                      updateUserDetails(
+                              userId: getx.userdetails[0].userId,
+                              fitnessGoal: selectedFitnessGoal.value,
+                              gender: selectedGender.value,
+                              weight: getx.selectedWeight.value,
+                              height: getx.selectedHeight.value,
+                              previousFitnessExperience: isExperienced.value,
+                              specificDiet: selectedDiet.value,
+                              daysCommit: int.parse(selectedDay.value),
+                              specificExperiencePreferance:
+                                  getx.selectedExcersiceList.value,
+                              calorieyGoal: getx.selectedCalory.value,
+                              sleepQuality: selectedSleep.value,
+                              age: getx.selectedAge.value,
+                              context: context,
+                              profileImage: getx.profileImage.value)
+                          .then((val) async {
+                        await getUserDetails();
                       });
+                      // });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.backgroundDark,
