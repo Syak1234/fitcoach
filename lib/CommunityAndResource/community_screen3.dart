@@ -340,10 +340,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () {
-        if (captionController.text != "") {
-          submitPostinfo(captionController.text, getx.userdetails[0].userId,
-              getx.userdetails[0].username);
-        }
+        submitPostinfo(captionController.text, getx.userdetails[0].userId,
+            getx.userdetails[0].username);
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -371,11 +369,11 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     String postType;
 
     if (_selectedVideo != null) {
-      postType = "text";
+      postType = "video";
 
       attachedFile = _selectedVideo!;
     } else if (_selectedImage != null) {
-      postType = 'text';
+      postType = 'image';
       attachedFile = _selectedImage!;
     } else if (_isTextPost && _textPost != null && _textPost!.isNotEmpty) {
       postType = 'text';
@@ -391,6 +389,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       caption,
       _textPost ?? "",
       username,
+      attachedFile,
     ).then((value) {
       if (value!.isNotEmpty || value != "") {
         Navigator.pop(context);

@@ -70,10 +70,21 @@ Future<String?> createPost(
   String caption,
   String text,
   String username,
+  File? document,
 ) async {
   String formattedTime =
       DateFormat('hh:mm a, dd MMM yyyy').format(DateTime.now());
   try {
+    String documenturl = "";
+
+    if (document != null) {
+      if ((postType == "video" || postType == "image") &&
+          document.existsSync()) {
+        // Get the download URL
+        documenturl = await uploadToFirebasBucket("Community_files", document);
+      }
+    }
+
     DocumentReference docRef = await _firestore.collection('posts').add({
       'userId': userId,
       'username': username,
@@ -84,6 +95,7 @@ Future<String?> createPost(
       'text': text,
       'likeCount': 0,
       'postTime': formattedTime,
+      'documenturl': documenturl,
     });
 
     String postId = docRef.id;
@@ -368,7 +380,7 @@ Future<void> deleteCollection(String collectionName,
   }
 }
 
-Future<void> uploadToUserProfileImageFold(String userId, File? file) async {
+Future<String> uploadToFirebasBucket(String folderpath, File? file) async {
   try {
     if (file != null && file.existsSync()) {
       final storage = FirebaseStorage.instanceFor(
@@ -381,7 +393,7 @@ Future<void> uploadToUserProfileImageFold(String userId, File? file) async {
           '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
 
       // Define the path inside the bucket
-      final storageRef = storage.ref().child('user_ProfileImage/$fileName');
+      final storageRef = storage.ref().child('$folderpath/$fileName');
 
       // Upload the file
       final uploadTask = await storageRef.putFile(file);
@@ -389,23 +401,15 @@ Future<void> uploadToUserProfileImageFold(String userId, File? file) async {
       // Get the download URL
       final downloadUrl = await uploadTask.ref.getDownloadURL();
 
-      // Reference to the collection
-      final collection = FirebaseFirestore.instance.collection('User_Images');
-
-      // Query to check if a document for the given userId exists
-
-      // If no document exists, create a new one
-      await collection.add({
-        'userId': userId,
-        'fileUrl': downloadUrl,
-        'uploadedAt': FieldValue.serverTimestamp(),
-      });
+      return downloadUrl;
     } else {
       print('⚠️ No file provided or file does not exist.');
+
+      return "";
     }
   } catch (e) {
     print('❌ Error uploading: $e');
-    rethrow;
+    return "";
   }
 }
 

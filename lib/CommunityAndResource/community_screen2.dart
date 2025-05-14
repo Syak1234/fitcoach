@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:chewie/chewie.dart';
 import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
@@ -10,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:video_player/video_player.dart';
 
 class PostsScreen extends StatefulWidget {
   @override
@@ -134,7 +136,7 @@ class _PostsScreenState extends State<PostsScreen> {
                         content: post["text"] ?? "",
                         caption: post["caption"] ?? "No caption",
                         likeIdList: post['LikedId'] ?? [],
-                        imageUrl: "",
+                        documenturl: post['documenturl'] ?? "",
                         postType: post['postType'],
                         time: post['postTime'].toString(),
                         username: post['username'] ?? "name not public",
@@ -187,11 +189,11 @@ class _PostsScreenState extends State<PostsScreen> {
   }
 }
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final String username;
   final String time;
   final String content;
-  final String imageUrl;
+  final String documenturl;
   final String postType;
   final String caption;
   final List likeIdList;
@@ -204,7 +206,7 @@ class PostCard extends StatelessWidget {
     required this.username,
     required this.time,
     required this.content,
-    required this.imageUrl,
+    required this.documenturl,
     required this.postType,
     required this.caption,
     required this.likeIdList,
@@ -213,6 +215,38 @@ class PostCard extends StatelessWidget {
     required this.color,
     required this.commentId,
   });
+
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.postType == "video" && _videoController == null) {
+      _videoController =
+          VideoPlayerController.networkUrl(Uri.parse(widget.documenturl))
+            ..initialize().then((_) {
+              _chewieController = ChewieController(
+                videoPlayerController: _videoController!,
+                autoPlay: false,
+                looping: true,
+                allowFullScreen: false,
+              );
+              setState(() {});
+            });
+    }
+  }
+
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+    _chewieController?.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,39 +269,73 @@ class PostCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(username,
+                    Text(widget.username,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: color)),
-                    Text(processTimestampString(time),
+                            fontWeight: FontWeight.bold, color: widget.color)),
+                    Text(processTimestampString(widget.time),
                         style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
             ),
             SizedBox(height: 10),
-            Text(caption),
+            Text(widget.caption),
             SizedBox(height: 10),
-            postType != "text"
-                ? Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
+            widget.postType == "image"
+                ? InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              FullScreenImage(imageUrl: widget.documenturl),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(widget.documenturl),
+                          fit: BoxFit
+                              .cover, // Adjusts how the image fits (e.g., cover, contain)
+                        ),
                         border: Border.all(color: AppColors.gray),
-                        borderRadius: BorderRadius.all(Radius.circular(25))),
-                    child: Image.network(imageUrl))
-                : Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        border: content != ""
-                            ? Border.all(color: AppColors.gray)
-                            : null,
-                        borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: Padding(
-                      padding: content != ""
-                          ? EdgeInsets.symmetric(vertical: 20, horizontal: 10)
-                          : EdgeInsets.symmetric(vertical: 0),
-                      child: Text("$content"),
-                    )),
+                        borderRadius: BorderRadius.all(Radius.circular(25)),
+                      ),
+                      child: SizedBox(),
+                    ),
+                  )
+                : widget.postType == "video" &&
+                        _chewieController != null &&
+                        _chewieController!
+                            .videoPlayerController.value.isInitialized
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.gray),
+                          borderRadius: BorderRadius.all(Radius.circular(25)),
+                        ),
+                        height: 300,
+                        child: Chewie(
+                          controller: _chewieController!,
+                        ),
+                      )
+                    : Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            border: widget.content != ""
+                                ? Border.all(color: AppColors.gray)
+                                : null,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        child: Padding(
+                          padding: widget.content != ""
+                              ? EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 10)
+                              : EdgeInsets.symmetric(vertical: 0),
+                          child: Text("${widget.content}"),
+                        )),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -276,21 +344,24 @@ class PostCard extends StatelessWidget {
                   children: [
                     InkWell(
                         onTap: () {
-                          if (likeIdList.contains(getx.userdetails[0].userId)) {
+                          if (widget.likeIdList
+                              .contains(getx.userdetails[0].userId)) {
                             removeLikeFromPost(
-                                postId, getx.userdetails[0].userId);
+                                widget.postId, getx.userdetails[0].userId);
                           } else {
-                            addLikeToPost(postId, getx.userdetails[0].userId);
+                            addLikeToPost(
+                                widget.postId, getx.userdetails[0].userId);
                           }
                         },
-                        child: likeIdList.contains(getx.userdetails[0].userId)
+                        child: widget.likeIdList
+                                .contains(getx.userdetails[0].userId)
                             ? Icon(
                                 Icons.favorite_outlined,
                                 color: AppColors.red,
                               )
                             : Icon(Icons.favorite_border)),
                     SizedBox(width: 5),
-                    Text('${likeIdList.length}'),
+                    Text('${widget.likeIdList.length}'),
                   ],
                 ),
                 SizedBox(
@@ -308,7 +379,7 @@ class PostCard extends StatelessWidget {
                                 BorderRadius.vertical(top: Radius.circular(20)),
                           ),
                           builder: (context) =>
-                              CommentBottomSheet(postId: postId),
+                              CommentBottomSheet(postId: widget.postId),
                         );
                       },
                       child: Row(
@@ -316,7 +387,7 @@ class PostCard extends StatelessWidget {
                           Icon(Icons.comment),
                           SizedBox(width: 5),
                           Text(
-                              "${commentId.length ?? 0}"), // You can replace '0' with the comment count later
+                              "${widget.commentId.length ?? 0}"), // You can replace '0' with the comment count later
                         ],
                       ),
                     ),
@@ -331,9 +402,9 @@ class PostCard extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     String shareText =
-                        "$caption\n\n$content\n \n\n Post shared from Fitcoach by ${getx.userdetails[0].username}";
-                    if (postType != "text") {
-                      shareText += "\n\nImage: $imageUrl";
+                        "${widget.caption}\n\n${widget.content}\n \n\n Post shared from Fitcoach by ${getx.userdetails[0].username}";
+                    if (widget.postType != "text") {
+                      shareText += "\n\nImage: ${widget.documenturl}";
                     }
                     Share.share(shareText);
                   },
@@ -711,4 +782,34 @@ void showDeleteCommentDialog({
       );
     },
   );
+}
+
+class FullScreenImage extends StatelessWidget {
+  final String imageUrl;
+
+  const FullScreenImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+        ),
+        backgroundColor: Colors.black,
+        body: GestureDetector(
+          onTap: () => Navigator.pop(context), // Tap to close
+          child: Center(
+            child: InteractiveViewer(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Image.network(imageUrl),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
