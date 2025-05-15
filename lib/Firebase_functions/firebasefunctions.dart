@@ -414,3 +414,57 @@ Future<String> uploadToFirebasBucket(String folderpath, File? file) async {
 }
 
 // import 'package:cloud_firestore/cloud_firestore.dart';
+
+Future<bool> deletePost(String postId, BuildContext context) async {
+  try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+    if (postId != "") {
+      // Get the document reference
+      DocumentReference postRef = _firestore.collection('posts').doc(postId);
+      DocumentSnapshot postSnapshot = await postRef.get();
+
+      if (!postSnapshot.exists) {
+        print("❌ Post not found.");
+        return false;
+      }
+
+      // Get the document URL from the post
+      String? documentUrl = postSnapshot.get('documenturl');
+
+      // Delete file from Firebase Storage if documentUrl is not empty
+      if (documentUrl != null && documentUrl.isNotEmpty) {
+        try {
+          final storage = FirebaseStorage.instanceFor(
+            bucket: 'gs://fitcoach-89ccb.firebasestorage.app',
+          );
+
+          // Extract the file path from the URL
+          final ref = storage.refFromURL(documentUrl);
+          await ref.delete();
+          print("✅ File deleted from Firebase Storage.");
+        } catch (e) {
+          print("⚠️ Error deleting file from storage: $e");
+          // Continue to delete the post even if file deletion fails
+        }
+      }
+
+      // Delete the Firestore document
+      await postRef.delete();
+      print("✅ Post deleted from Firestore.");
+      Get.back();
+      return true;
+    } else {
+      Get.back();
+
+      return false;
+    }
+  } catch (e) {
+    print('❌ Error deleting post: $e');
+    Get.back();
+
+    return false;
+  }
+}

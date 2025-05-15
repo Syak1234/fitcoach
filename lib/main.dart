@@ -5,6 +5,7 @@ import 'package:fitcoach/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -21,6 +22,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  MediaKit.ensureInitialized();
   OpenFoodAPIConfiguration.userAgent = UserAgent(
     name: 'Fitcoach',
   );

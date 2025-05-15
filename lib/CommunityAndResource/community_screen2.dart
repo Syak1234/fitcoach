@@ -11,6 +11,8 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_player/video_player.dart';
 
 class PostsScreen extends StatefulWidget {
@@ -132,21 +134,34 @@ class _PostsScreenState extends State<PostsScreen> {
                               : 10,
                           top: 15,
                           bottom: 15),
-                      child: PostCard(
-                        content: post["text"] ?? "",
-                        caption: post["caption"] ?? "No caption",
-                        likeIdList: post['LikedId'] ?? [],
-                        documenturl: post['documenturl'] ?? "",
-                        postType: post['postType'],
-                        time: post['postTime'].toString(),
-                        username: post['username'] ?? "name not public",
-                        userId: post['userId'] ?? "",
-                        postId: post['PostId'] ?? "",
-                        color: getx.userdetails[0].userId ==
+                      child: InkWell(
+                        onLongPress: getx.userdetails[0].userId ==
                                 post['userId'].toString()
-                            ? AppColors.primaryBlue
-                            : AppColors.primaryorange,
-                        commentId: post['commentId'] ?? [],
+                            ? () {
+                                showDeletePostDialog(
+                                  context: context,
+                                  // commentId: comment['commentId'] ?? "",
+                                  postId: post['PostId'] ?? "",
+                                  // deleteComment: deleteComment,
+                                );
+                              }
+                            : null,
+                        child: PostCard(
+                          content: post["text"] ?? "",
+                          caption: post["caption"] ?? "No caption",
+                          likeIdList: post['LikedId'] ?? [],
+                          documenturl: post['documenturl'] ?? "",
+                          postType: post['postType'],
+                          time: post['postTime'].toString(),
+                          username: post['username'] ?? "name not public",
+                          userId: post['userId'] ?? "",
+                          postId: post['PostId'] ?? "",
+                          color: getx.userdetails[0].userId ==
+                                  post['userId'].toString()
+                              ? AppColors.primaryBlue
+                              : AppColors.primaryorange,
+                          commentId: post['commentId'] ?? [],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -189,7 +204,7 @@ class _PostsScreenState extends State<PostsScreen> {
   }
 }
 
-class PostCard extends StatefulWidget {
+class PostCard extends StatelessWidget {
   final String username;
   final String time;
   final String content;
@@ -217,38 +232,6 @@ class PostCard extends StatefulWidget {
   });
 
   @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  VideoPlayerController? _videoController;
-  ChewieController? _chewieController;
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.postType == "video" && _videoController == null) {
-      _videoController =
-          VideoPlayerController.networkUrl(Uri.parse(widget.documenturl))
-            ..initialize().then((_) {
-              _chewieController = ChewieController(
-                videoPlayerController: _videoController!,
-                autoPlay: false,
-                looping: true,
-                allowFullScreen: false,
-              );
-              setState(() {});
-            });
-    }
-  }
-
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
-    _chewieController?.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -269,73 +252,120 @@ class _PostCardState extends State<PostCard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.username,
+                    Text(username,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: widget.color)),
-                    Text(processTimestampString(widget.time),
+                            fontWeight: FontWeight.bold, color: color)),
+                    Text(processTimestampString(time),
                         style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
             ),
             SizedBox(height: 10),
-            Text(widget.caption),
+            Text(caption),
             SizedBox(height: 10),
-            widget.postType == "image"
-                ? InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              FullScreenImage(imageUrl: widget.documenturl),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 200,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.documenturl),
-                          fit: BoxFit
-                              .cover, // Adjusts how the image fits (e.g., cover, contain)
-                        ),
-                        border: Border.all(color: AppColors.gray),
-                        borderRadius: BorderRadius.all(Radius.circular(25)),
-                      ),
-                      child: SizedBox(),
+            if (postType == "image")
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          FullScreenImage(imageUrl: documenturl),
                     ),
-                  )
-                : widget.postType == "video" &&
-                        _chewieController != null &&
-                        _chewieController!
-                            .videoPlayerController.value.isInitialized
-                    ? Container(
+                  );
+                },
+                child: Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(documenturl),
+                      fit: BoxFit
+                          .cover, // Adjusts how the image fits (e.g., cover, contain)
+                    ),
+                    border: Border.all(color: AppColors.gray),
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
+                  ),
+                  child: SizedBox(),
+                ),
+              ),
+            if (postType == "video")
+              FutureBuilder(
+                future: _initializeVideo(documenturl),
+                builder: (context, AsyncSnapshot<ChewieController> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      height: 200,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                VideoPlayerScreen(documentUrl: documenturl),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: AppColors.gray80,
+                          border: Border.all(color: AppColors.gray),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.play_circle_fill,
+                          size: 25,
+                          color: AppColors.gray10,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                VideoPlayerScreen(documentUrl: documenturl),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 300,
                         decoration: BoxDecoration(
                           border: Border.all(color: AppColors.gray),
-                          borderRadius: BorderRadius.all(Radius.circular(25)),
+                          borderRadius: BorderRadius.circular(25),
                         ),
-                        height: 300,
-                        child: Chewie(
-                          controller: _chewieController!,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Chewie(controller: snapshot.data!),
                         ),
-                      )
-                    : Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            border: widget.content != ""
-                                ? Border.all(color: AppColors.gray)
-                                : null,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                        child: Padding(
-                          padding: widget.content != ""
-                              ? EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 10)
-                              : EdgeInsets.symmetric(vertical: 0),
-                          child: Text("${widget.content}"),
-                        )),
+                      ),
+                    );
+                  }
+                },
+              ),
+            if (postType == "text")
+              Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      border: content != ""
+                          ? Border.all(color: AppColors.gray)
+                          : null,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: Padding(
+                    padding: content != ""
+                        ? EdgeInsets.symmetric(vertical: 20, horizontal: 10)
+                        : EdgeInsets.symmetric(vertical: 0),
+                    child: Text("${content}"),
+                  )),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -344,24 +374,21 @@ class _PostCardState extends State<PostCard> {
                   children: [
                     InkWell(
                         onTap: () {
-                          if (widget.likeIdList
-                              .contains(getx.userdetails[0].userId)) {
+                          if (likeIdList.contains(getx.userdetails[0].userId)) {
                             removeLikeFromPost(
-                                widget.postId, getx.userdetails[0].userId);
+                                postId, getx.userdetails[0].userId);
                           } else {
-                            addLikeToPost(
-                                widget.postId, getx.userdetails[0].userId);
+                            addLikeToPost(postId, getx.userdetails[0].userId);
                           }
                         },
-                        child: widget.likeIdList
-                                .contains(getx.userdetails[0].userId)
+                        child: likeIdList.contains(getx.userdetails[0].userId)
                             ? Icon(
                                 Icons.favorite_outlined,
                                 color: AppColors.red,
                               )
                             : Icon(Icons.favorite_border)),
                     SizedBox(width: 5),
-                    Text('${widget.likeIdList.length}'),
+                    Text('${likeIdList.length}'),
                   ],
                 ),
                 SizedBox(
@@ -379,7 +406,7 @@ class _PostCardState extends State<PostCard> {
                                 BorderRadius.vertical(top: Radius.circular(20)),
                           ),
                           builder: (context) =>
-                              CommentBottomSheet(postId: widget.postId),
+                              CommentBottomSheet(postId: postId),
                         );
                       },
                       child: Row(
@@ -387,7 +414,7 @@ class _PostCardState extends State<PostCard> {
                           Icon(Icons.comment),
                           SizedBox(width: 5),
                           Text(
-                              "${widget.commentId.length ?? 0}"), // You can replace '0' with the comment count later
+                              "${commentId.length ?? 0}"), // You can replace '0' with the comment count later
                         ],
                       ),
                     ),
@@ -402,9 +429,9 @@ class _PostCardState extends State<PostCard> {
                 InkWell(
                   onTap: () {
                     String shareText =
-                        "${widget.caption}\n\n${widget.content}\n \n\n Post shared from Fitcoach by ${getx.userdetails[0].username}";
-                    if (widget.postType != "text") {
-                      shareText += "\n\nImage: ${widget.documenturl}";
+                        "${caption}\n\n${content}\n \n\n Post shared from Fitcoach by ${getx.userdetails[0].username}";
+                    if (postType != "text") {
+                      shareText += "\n\nImage: ${documenturl}";
                     }
                     Share.share(shareText);
                   },
@@ -422,6 +449,18 @@ class _PostCardState extends State<PostCard> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<ChewieController> _initializeVideo(String url) async {
+    final videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(url));
+    await videoPlayerController.initialize();
+    return ChewieController(
+      videoPlayerController: videoPlayerController,
+      autoPlay: false,
+      looping: false,
+      showControls: false,
     );
   }
 }
@@ -784,6 +823,52 @@ void showDeleteCommentDialog({
   );
 }
 
+void showDeletePostDialog({
+  required BuildContext context,
+  // required String commentId,
+  required String postId,
+  // required Future<bool> Function(String commentId, String postId) deleteComment,
+}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppColors.backgroundLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        title: const Text("Delete Post",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to delete this post?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              backgroundColor: AppColors.red,
+              foregroundColor: AppColors.textLight,
+            ),
+            onPressed: () async {
+              bool success = await deletePost(postId, context);
+              Navigator.of(context).pop();
+              if (success) {
+                Fluttertoast.showToast(msg: "Post deleted!");
+              } else {
+                Fluttertoast.showToast(msg: "Failed to delete post.");
+              }
+            },
+            child: const Text("Yes"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
 
@@ -807,6 +892,64 @@ class FullScreenImage extends StatelessWidget {
                 child: Image.network(imageUrl),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class VideoPlayerScreen extends StatefulWidget {
+  final String documentUrl;
+
+  const VideoPlayerScreen({Key? key, required this.documentUrl})
+      : super(key: key);
+
+  @override
+  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
+}
+
+class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+  late final Player _player;
+  late final VideoController _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = Player();
+    _videoController = VideoController(_player);
+
+    _player.open(Media(widget.documentUrl));
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(''),
+          backgroundColor: AppColors.backgroundDark,
+          iconTheme: IconThemeData(color: AppColors.textLight),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: IconButton(
+                onPressed: () {
+                  Get.back();
+                },
+                icon: Icon(Icons.arrow_back_ios_new_outlined)),
+          ),
+        ),
+        backgroundColor: AppColors.backgroundDark,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Video(controller: _videoController),
           ),
         ),
       ),
