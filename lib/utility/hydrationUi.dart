@@ -239,14 +239,14 @@ class HydrationScreen extends StatelessWidget {
                   String userid =
                       await SharedPrefHelper.getString('userid') ?? '';
                   createWaterDetails(
-                    getx.userdetails[0].userId,
+                    getx.userid.value,
                     context,
                     amount.toString(),
                     DateTime.now().toIso8601String(),
                   ).then((val) {
                     if (val == 409) {
                       updateWaterDetails(
-                        getx.userdetails[0].userId,
+                        getx.userid.value,
                         context,
                         getx.waterList[0].id ?? 0,
                         amount.toString(),
@@ -255,13 +255,12 @@ class HydrationScreen extends StatelessWidget {
                         waterInputController.clear();
 
                         fetchStepAndWaterList(
-                            userId: getx.userdetails[0].userId,
-                            context: context);
+                            userId: getx.userid.value, context: context);
                       });
                     } else {
                       waterInputController.clear();
                       fetchStepAndWaterList(
-                          userId: getx.userdetails[0].userId, context: context);
+                          userId: getx.userid.value, context: context);
 
                       // Get.offAll(() => DashboardBottom());
                     }

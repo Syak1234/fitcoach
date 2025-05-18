@@ -118,10 +118,14 @@ Future signUp(
         autoCloseDuration: const Duration(seconds: 3),
       );
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SignInScreen()),
-      );
+      if (type == 'Credentials') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignInScreen()),
+        );
+      } else {
+        AppRoutes.fingerprintSetup;
+      }
     } else {
       toastification.show(
         context: context,
@@ -459,6 +463,10 @@ Future createUserDetails({
   File? profileImage, // <-- Add this if you want to upload an image
 }) async {
   try {
+    showDialog(
+      context: context,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
     final url = Uri.https(ApiUrl.baseUrl, ApiUrl.createuserdetails);
     String? token = getx.token.value;
 
@@ -498,6 +506,7 @@ Future createUserDetails({
     log(response.body);
 
     if (response.statusCode == 200) {
+      Get.back();
       toastification.show(
         context: context,
         title: const Text('User Details Created'),
@@ -506,6 +515,8 @@ Future createUserDetails({
         style: ToastificationStyle.fillColored,
       );
     } else {
+      Get.back();
+
       var jsondata = jsonDecode(response.body);
       toastification.show(
         context: context,
@@ -517,14 +528,16 @@ Future createUserDetails({
       );
     }
   } catch (e) {
+    Get.back();
+
     log("Error: $e");
-    // toastification.show(
-    //   context: context,
-    //   title: const Text('Error'),
-    //   description: Text("SomeThing went Wrong!!"),
-    //   autoCloseDuration: const Duration(seconds: 3),
-    //   type: ToastificationType.error,
-    // );
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text("SomeThing went Wrong!!"),
+      autoCloseDuration: const Duration(seconds: 3),
+      type: ToastificationType.error,
+    );
   }
 }
 
@@ -658,6 +671,7 @@ Future<bool> getUserDetails() async {
               .map((e) => e.trim())
               .where((String e) => e.isNotEmpty)
               .toList();
+      // getx.userAssessmentDetaiils.value = [];
 
       UserAssessmentDetaiils details = UserAssessmentDetaiils(
           fitnessGoal: result['fitnessGoal'].toString(),

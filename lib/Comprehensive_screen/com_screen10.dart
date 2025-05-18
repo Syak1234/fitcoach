@@ -1,4 +1,5 @@
 import 'package:fitcoach/GetxController/getx.dart';
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/profile_setting/profile_screen/profile_screen1.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -123,11 +124,57 @@ class _ComScreen10State extends State<ComScreen10> {
 
               // Continue button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   _savePreferences(sleepHours.value);
-                  Get.toNamed(
-                    AppRoutes.login,
-                  );
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+
+                  String fitnessGoal =
+                      await SharedPrefHelper.getString('fitness_goal') ?? "";
+                  String gender =
+                      await SharedPrefHelper.getString('selected_gender') ?? "";
+                  int height =
+                      await SharedPrefHelper.getInt('user_height_cm') ?? 0;
+                  String weight = await prefs.getString('weight') ?? "";
+
+                  bool previousFitnessExperience =
+                      await SharedPrefHelper.getBool('isFitnessExp') ?? false;
+                  String specificDiet =
+                      await SharedPrefHelper.getString('diet') ?? "";
+                  int daysCommit =
+                      await SharedPrefHelper.getInt('work_day_commit') ?? 0;
+                  List specificExperiencePreferance =
+                      await prefs.getStringList('excercise_pref') ?? [];
+                  String calorieyGoal =
+                      await SharedPrefHelper.getString('kcal_goal_perday') ??
+                          "";
+                  String sleepQuality =
+                      await SharedPrefHelper.getString('sleep') ?? "";
+                  String age = await SharedPrefHelper.getString('age') ?? "";
+                  String userid =
+                      await SharedPrefHelper.getString("userid") ?? "";
+
+                  createUserDetails(
+                          userId: getx.userid.value,
+                          fitnessGoal: fitnessGoal,
+                          gender: gender,
+                          weight: weight,
+                          height: height,
+                          previousFitnessExperience: previousFitnessExperience,
+                          specificDiet: specificDiet,
+                          daysCommit: daysCommit,
+                          specificExperiencePreferance:
+                              specificExperiencePreferance.toString(),
+                          calorieyGoal: calorieyGoal,
+                          sleepQuality: sleepHours.value,
+                          age: age,
+                          context: context)
+                      .then((val) {
+                    Get.toNamed(
+                      AppRoutes.bottomDashboard,
+                    );
+                  });
+
                   // Get.to(() => ProfileScreen1(),
                   //     transition: Transition.rightToLeft);
                 },

@@ -216,66 +216,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             if (gk.currentState!.validate()) {
                               await signUp(context, _emailController.text,
                                       _passwordController.text, "Credentials")
-                                  .then((val) async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-
-                                String fitnessGoal =
-                                    await SharedPrefHelper.getString(
-                                            'fitness_goal') ??
-                                        "";
-                                String gender =
-                                    await SharedPrefHelper.getString(
-                                            'selected_gender') ??
-                                        "";
-                                int height = await SharedPrefHelper.getInt(
-                                        'user_height_cm') ??
-                                    0;
-                                String weight =
-                                    await prefs.getString('weight') ?? "";
-
-                                bool previousFitnessExperience =
-                                    await SharedPrefHelper.getBool(
-                                            'isFitnessExp') ??
-                                        false;
-                                String specificDiet =
-                                    await SharedPrefHelper.getString('diet') ??
-                                        "";
-                                int daysCommit = await SharedPrefHelper.getInt(
-                                        'work_day_commit') ??
-                                    0;
-                                List specificExperiencePreferance = await prefs
-                                        .getStringList('excercise_pref') ??
-                                    [];
-                                String calorieyGoal =
-                                    await SharedPrefHelper.getString(
-                                            'kcal_goal_perday') ??
-                                        "";
-                                String sleepQuality =
-                                    await SharedPrefHelper.getString('sleep') ??
-                                        "";
-                                String age =
-                                    await SharedPrefHelper.getString('age') ??
-                                        "";
-
-                                await createUserDetails(
-                                  context: context,
-                                  userId: getx.userid.value,
-                                  age: age,
-                                  calorieyGoal: calorieyGoal,
-                                  daysCommit: daysCommit,
-                                  fitnessGoal: fitnessGoal,
-                                  gender: gender,
-                                  height: height,
-                                  weight: weight,
-                                  previousFitnessExperience:
-                                      previousFitnessExperience,
-                                  sleepQuality: sleepQuality,
-                                  specificDiet: specificDiet,
-                                  specificExperiencePreferance:
-                                      specificExperiencePreferance.toString(),
-                                );
-                              });
+                                  .then((val) async {});
                             }
                           },
                           child: Row(

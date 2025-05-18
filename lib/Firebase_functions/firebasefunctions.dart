@@ -194,7 +194,7 @@ Stream<List<Map<String, dynamic>>> fetchPosts() {
 
     // Filter posts by userId
     getx.userPostId.value = allPosts
-        .where((post) => post['userId'] == getx.userdetails[0].userId)
+        .where((post) => post['userId'] == getx.userid.value)
         .map((post) => post['PostId'] as String)
         .toList();
 
@@ -329,7 +329,7 @@ Future<bool> deleteComment(String commentId, String postId) async {
 
 //     // Filter posts by userId (if needed)
 //     getx.userCommentId.value = allPosts
-//         .where((post) => post['userId'] == getx.userdetails[0].userId)
+//         .where((post) => post['userId'] == getx.userid.value)
 //         .map((post) => post['commentId'] as String)
 //         .toList();
 

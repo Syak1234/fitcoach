@@ -29,7 +29,7 @@ class _StepsTakenScreenState extends State<StepsTakenScreen> {
     if (controller.todaySteps.value != 0) {
       await createStepData(
               context: context,
-              userId: getx.userdetails[0].userId, // Replace with dynamic userId
+              userId: getx.userid.value, // Replace with dynamic userId
               date: DateTime.now().toIso8601String(),
               step: controller.todaySteps.value,
               kcal: controller.caloriesBurned.value.toStringAsFixed(1),

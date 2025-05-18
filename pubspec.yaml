@@ -79,8 +79,8 @@ dependencies:
   flutter_vlc_player: ^7.4.2
   media_kit: ^1.2.0
   media_kit_video: ^1.3.0
-  media_kit_libs_video: ^1.0.4
-  # media_kit_video_controls: ^1.1.9
+  # media_kit_libs_video: ^1.0.4
+  media_kit_libs_video: ^1.0.6
   # intl: ^0.18.1
   # flutter_foreground_service: ^0.4.1
   # android_alarm_manager_plus:

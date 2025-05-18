@@ -51,6 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     getx.token.value = await SharedPrefHelper.getString('token') ?? '';
 
+    getx.userid.value = await SharedPrefHelper.getString('userid') ?? '';
+    getx.token.value = await SharedPrefHelper.getString('token') ?? '';
+    getx.username.value = await SharedPrefHelper.getString('username') ?? '';
+
     Userdetails userdetails = Userdetails(
       userId: await SharedPrefHelper.getString('userid') ?? '',
       username: await SharedPrefHelper.getString('username') ?? '',

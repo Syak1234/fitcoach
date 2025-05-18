@@ -12,6 +12,7 @@ import 'package:fitcoach/signup_screen/signup_screen.dart';
 import 'package:fitcoach/theme/app_colors.dart';
 import 'package:fitcoach/theme/font_Size.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -161,72 +162,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                             if (gk.currentState!.validate()) {
                               loginApi(context, _emailController.text,
-                                      _passwordController.text, "Credentials")
-                                  .then((val) async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-
-                                String fitnessGoal =
-                                    await SharedPrefHelper.getString(
-                                            'fitness_goal') ??
-                                        "";
-                                String gender =
-                                    await SharedPrefHelper.getString(
-                                            'selected_gender') ??
-                                        "";
-                                int height = await SharedPrefHelper.getInt(
-                                        'user_height_cm') ??
-                                    0;
-                                String weight =
-                                    await prefs.getString('weight') ?? "";
-
-                                bool previousFitnessExperience =
-                                    await SharedPrefHelper.getBool(
-                                            'isFitnessExp') ??
-                                        false;
-                                String specificDiet =
-                                    await SharedPrefHelper.getString('diet') ??
-                                        "";
-                                int daysCommit = await SharedPrefHelper.getInt(
-                                        'work_day_commit') ??
-                                    0;
-                                List specificExperiencePreferance = await prefs
-                                        .getStringList('excercise_pref') ??
-                                    [];
-                                String calorieyGoal =
-                                    await SharedPrefHelper.getString(
-                                            'kcal_goal_perday') ??
-                                        "";
-                                String sleepQuality =
-                                    await SharedPrefHelper.getString('sleep') ??
-                                        "";
-                                String age =
-                                    await SharedPrefHelper.getString('age') ??
-                                        "";
-                                String userid =
-                                    await SharedPrefHelper.getString(
-                                            "userid") ??
-                                        "";
-
-                                createUserDetails(
-                                  context: context,
-                                  userId: getx.userid.value,
-                                  age: age,
-                                  calorieyGoal: calorieyGoal,
-                                  daysCommit: daysCommit,
-                                  fitnessGoal: fitnessGoal,
-                                  gender: gender,
-                                  height: height,
-                                  weight: weight,
-                                  previousFitnessExperience:
-                                      previousFitnessExperience,
-                                  sleepQuality: sleepQuality,
-                                  specificDiet: specificDiet,
-                                  specificExperiencePreferance:
-                                      specificExperiencePreferance.toString(),
-                                );
-                                // getUserDetails();
-                              });
+                                  _passwordController.text, "Credentials");
                             }
                           },
                           child: Row(
@@ -267,111 +203,36 @@ class _SignInScreenState extends State<SignInScreen> {
                           InkWell(
                             onTap: () async {
                               user = await google_auth.signInWithGoogle();
-
-                              if (user!.email!.isNotEmpty) {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-
-                                String fitnessGoal =
-                                    await SharedPrefHelper.getString(
-                                            'fitness_goal') ??
-                                        "";
-                                String gender =
-                                    await SharedPrefHelper.getString(
-                                            'selected_gender') ??
-                                        "";
-                                int height = await SharedPrefHelper.getInt(
-                                        'user_height_cm') ??
-                                    0;
-                                String weight =
-                                    await prefs.getString('weight') ?? "";
-
-                                bool previousFitnessExperience =
-                                    await SharedPrefHelper.getBool(
-                                            'isFitnessExp') ??
-                                        false;
-                                String specificDiet =
-                                    await SharedPrefHelper.getString('diet') ??
-                                        "";
-                                int daysCommit = await SharedPrefHelper.getInt(
-                                        'work_day_commit') ??
-                                    0;
-                                List specificExperiencePreferance = await prefs
-                                        .getStringList('excercise_pref') ??
-                                    [];
-                                String calorieyGoal =
-                                    await SharedPrefHelper.getString(
-                                            'kcal_goal_perday') ??
-                                        "";
-                                String sleepQuality =
-                                    await SharedPrefHelper.getString('sleep') ??
-                                        "";
-                                String age =
-                                    await SharedPrefHelper.getString('age') ??
-                                        "";
-
-                                checkEmailExistOrNot(
-                                  user!.email.toString(),
-                                  context,
-                                ).then((val) {
-                                  if (val) {
-                                    loginApi(
-                                            context,
-                                            user!.email.toString(),
-                                            passwordGanaretor(
+                              try {
+                                if (user!.email!.isNotEmpty) {
+                                  checkEmailExistOrNot(
+                                    user!.email.toString(),
+                                    context,
+                                  ).then((val) {
+                                    if (val) {
+                                      loginApi(
+                                              context,
                                               user!.email.toString(),
-                                            ),
-                                            "Google")
-                                        .then((onValue) {
-                                      createUserDetails(
-                                        context: context,
-                                        userId: getx.userid.value,
-                                        age: age,
-                                        calorieyGoal: calorieyGoal,
-                                        daysCommit: daysCommit,
-                                        fitnessGoal: fitnessGoal,
-                                        gender: gender,
-                                        height: height,
-                                        weight: weight,
-                                        previousFitnessExperience:
-                                            previousFitnessExperience,
-                                        sleepQuality: sleepQuality,
-                                        specificDiet: specificDiet,
-                                        specificExperiencePreferance:
-                                            specificExperiencePreferance
-                                                .toString(),
-                                      );
-                                    });
-                                  } else {
-                                    signUp(
-                                            context,
-                                            user!.email.toString(),
-                                            passwordGanaretor(
+                                              passwordGanaretor(
+                                                user!.email.toString(),
+                                              ),
+                                              "Google")
+                                          .then((onValue) {});
+                                    } else {
+                                      signUp(
+                                              context,
                                               user!.email.toString(),
-                                            ),
-                                            "Google")
-                                        .then((onValue) {
-                                      createUserDetails(
-                                        context: context,
-                                        userId: getx.userid.value,
-                                        age: age,
-                                        calorieyGoal: calorieyGoal,
-                                        daysCommit: daysCommit,
-                                        fitnessGoal: fitnessGoal,
-                                        gender: gender,
-                                        height: height,
-                                        weight: weight,
-                                        previousFitnessExperience:
-                                            previousFitnessExperience,
-                                        sleepQuality: sleepQuality,
-                                        specificDiet: specificDiet,
-                                        specificExperiencePreferance:
-                                            specificExperiencePreferance
-                                                .toString(),
-                                      );
-                                    });
-                                  }
-                                });
+                                              passwordGanaretor(
+                                                user!.email.toString(),
+                                              ),
+                                              "Google")
+                                          .then((onValue) {});
+                                    }
+                                  });
+                                }
+                              } catch (e) {
+                                Fluttertoast.showToast(
+                                    msg: "faild to login via google!");
                               }
                               // user!.email.toString();
                             },
@@ -453,24 +314,24 @@ class _SignInScreenState extends State<SignInScreen> {
                                             ),
                                             "Facebook")
                                         .then((onValue) {
-                                      createUserDetails(
-                                        context: context,
-                                        userId: getx.userid.value,
-                                        age: age,
-                                        calorieyGoal: calorieyGoal,
-                                        daysCommit: daysCommit,
-                                        fitnessGoal: fitnessGoal,
-                                        gender: gender,
-                                        height: height,
-                                        weight: weight,
-                                        previousFitnessExperience:
-                                            previousFitnessExperience,
-                                        sleepQuality: sleepQuality,
-                                        specificDiet: specificDiet,
-                                        specificExperiencePreferance:
-                                            specificExperiencePreferance
-                                                .toString(),
-                                      );
+                                      // createUserDetails(
+                                      //   context: context,
+                                      //   userId: getx.userid.value,
+                                      //   age: age,
+                                      //   calorieyGoal: calorieyGoal,
+                                      //   daysCommit: daysCommit,
+                                      //   fitnessGoal: fitnessGoal,
+                                      //   gender: gender,
+                                      //   height: height,
+                                      //   weight: weight,
+                                      //   previousFitnessExperience:
+                                      //       previousFitnessExperience,
+                                      //   sleepQuality: sleepQuality,
+                                      //   specificDiet: specificDiet,
+                                      //   specificExperiencePreferance:
+                                      //       specificExperiencePreferance
+                                      //           .toString(),
+                                      // );
                                     });
                                   } else {
                                     signUp(
@@ -480,26 +341,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                               facebookdata!['email'] ?? "",
                                             ),
                                             "Facebook")
-                                        .then((onValue) {
-                                      createUserDetails(
-                                        context: context,
-                                        userId: getx.userid.value,
-                                        age: age,
-                                        calorieyGoal: calorieyGoal,
-                                        daysCommit: daysCommit,
-                                        fitnessGoal: fitnessGoal,
-                                        gender: gender,
-                                        height: height,
-                                        weight: weight,
-                                        previousFitnessExperience:
-                                            previousFitnessExperience,
-                                        sleepQuality: sleepQuality,
-                                        specificDiet: specificDiet,
-                                        specificExperiencePreferance:
-                                            specificExperiencePreferance
-                                                .toString(),
-                                      );
-                                    });
+                                        .then((onValue) {});
                                   }
                                 });
                               }

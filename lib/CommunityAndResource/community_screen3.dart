@@ -1,4 +1,4 @@
-import 'package:chewie/chewie.dart';
+// import 'package:chewie/chewie.dart';
 import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:video_player/video_player.dart';
+// import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class CommunityPostScreen extends StatefulWidget {
   @override
@@ -20,8 +22,8 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
   TextEditingController captionController = TextEditingController();
   String? _textPost;
   bool _isTextPost = false;
-  VideoPlayerController? _videoController;
-  ChewieController? _chewieController;
+  Player? _player;
+  VideoController? _videoController;
 
   void _clearSelections() {
     setState(() {
@@ -29,10 +31,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
       _selectedImage = null;
       _textPost = null;
       _isTextPost = false;
-      _videoController?.dispose();
-      _chewieController?.dispose();
+      _player?.dispose();
       _videoController = null;
-      _chewieController = null;
+      _player = null;
     });
   }
 
@@ -54,15 +55,9 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
 
       setState(() {
         _selectedVideo = file;
-        _videoController = VideoPlayerController.file(_selectedVideo!)
-          ..initialize().then((_) {
-            _chewieController = ChewieController(
-              videoPlayerController: _videoController!,
-              autoPlay: true,
-              looping: true,
-            );
-            setState(() {});
-          });
+        _player = Player();
+        _videoController = VideoController(_player!);
+        _player!.open(Media(file.path));
       });
     }
   }
@@ -97,20 +92,10 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
     });
   }
 
-  void _toggleVideoPlayback() {
-    if (_videoController!.value.isPlaying) {
-      _videoController!.pause();
-    } else {
-      _videoController!.play();
-    }
-    setState(() {});
-  }
-
   @override
   void dispose() {
-    _videoController?.dispose();
+    _player?.dispose();
     super.dispose();
-    _chewieController?.dispose();
   }
 
   @override
@@ -267,13 +252,13 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
                 SizedBox(
                   height: 10,
                 ),
-                if (_selectedVideo != null &&
-                    _chewieController != null &&
-                    _chewieController!
-                        .videoPlayerController.value.isInitialized)
+                if (_selectedVideo != null && _videoController != null)
                   SizedBox(
                     height: 300,
-                    child: Chewie(controller: _chewieController!),
+                    child: Video(
+                      controller: _videoController!,
+                      controls: MaterialVideoControls,
+                    ),
                   ),
                 if (_selectedImage != null)
                   Container(
@@ -340,7 +325,7 @@ class _CommunityPostScreenState extends State<CommunityPostScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
       ),
       onPressed: () {
-        submitPostinfo(captionController.text, getx.userdetails[0].userId,
+        submitPostinfo(captionController.text, getx.userid.value,
             getx.userdetails[0].username);
       },
       child: const Row(

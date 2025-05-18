@@ -47,6 +47,8 @@ class Getx extends GetxController {
   RxList userPostId = [].obs;
   RxList userCommentId = [].obs;
   RxBool forUpdate = false.obs;
+
+  RxBool userassesmentFound = false.obs;
   RxString selectedWeight = "".obs;
   RxString selectedweightUnit = "".obs;
   RxString selectedHeight = "".obs;

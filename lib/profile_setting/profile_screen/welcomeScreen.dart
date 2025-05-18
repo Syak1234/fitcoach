@@ -1,3 +1,4 @@
+import 'package:fitcoach/api/allApi.dart';
 import 'package:fitcoach/home_and_fitnessallUi/dashboard/dashboard_bottom.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
@@ -93,11 +94,16 @@ class WelcomeScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             // color: AppColors.textDark,
             child: ElevatedButton(
-              onPressed: () {
-                Get.offAll(() => DashboardBottom());
-                // Get.toNamed(
-                //   AppRoutes.bottomDashboard,
-                // );
+              onPressed: () async {
+                await getUserDetails().then((val) {
+                  if (val == false) {
+                    Get.offNamed(
+                      AppRoutes.welcomeScreen1,
+                    );
+                  } else {
+                    Get.offAll(() => DashboardBottom());
+                  }
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.backgroundDark,

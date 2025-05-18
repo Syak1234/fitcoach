@@ -53,7 +53,7 @@ class _SpalshState extends State<Spalsh> {
             :
             // Get.off(() => WelcomeScreen1());
             Get.offNamed(
-                AppRoutes.welcomeScreen1,
+                AppRoutes.login,
               );
       }
     });
@@ -72,7 +72,7 @@ class _SpalshState extends State<Spalsh> {
               : Get.toNamed(AppRoutes.login)
           : islogin
               ? Get.toNamed(AppRoutes.bottomDashboard)
-              : Get.toNamed(AppRoutes.welcomeScreen1);
+              : Get.toNamed(AppRoutes.login);
     } catch (e) {
       Get.toNamed(AppRoutes.welcomeScreen1);
     }

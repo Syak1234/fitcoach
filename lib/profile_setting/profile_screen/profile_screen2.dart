@@ -213,7 +213,8 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                     alignment: Alignment.center,
                     children: [
                       Obx(() {
-                        if (getx.profileImage.value != null) {
+                        if (getx.profileImage.value != null &&
+                            getx.profileImage.value != "null") {
                           if (getx.profileImage.value!.existsSync()) {
                             return CircleAvatar(
                               backgroundColor: AppColors.primaryBlue,
@@ -893,7 +894,7 @@ class _ProfileScreen2State extends State<ProfileScreen2> {
                   child: ElevatedButton(
                     onPressed: () {
                       updateUserDetails(
-                              userId: getx.userdetails[0].userId,
+                              userId: getx.userid.value,
                               fitnessGoal: selectedFitnessGoal.value,
                               gender: selectedGender.value,
                               weight: getx.selectedWeight.value,

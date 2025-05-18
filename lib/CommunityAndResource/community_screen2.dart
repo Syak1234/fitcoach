@@ -5,6 +5,7 @@ import 'package:fitcoach/Firebase_functions/firebasefunctions.dart';
 import 'package:fitcoach/GetxController/getx.dart';
 import 'package:fitcoach/routes/app_routes.dart';
 import 'package:fitcoach/theme/app_colors.dart';
+import 'package:fitcoach/utility/videoPlayerUsingMediakit.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -124,28 +125,26 @@ class _PostsScreenState extends State<PostsScreen> {
                   children: posts.map((post) {
                     return Padding(
                       padding: EdgeInsets.only(
-                          left: getx.userdetails[0].userId ==
-                                  post['userId'].toString()
+                          left: getx.userid.value == post['userId'].toString()
                               ? 30
                               : 10,
-                          right: getx.userdetails[0].userId !=
-                                  post['userId'].toString()
+                          right: getx.userid.value != post['userId'].toString()
                               ? 30
                               : 10,
                           top: 15,
                           bottom: 15),
                       child: InkWell(
-                        onLongPress: getx.userdetails[0].userId ==
-                                post['userId'].toString()
-                            ? () {
-                                showDeletePostDialog(
-                                  context: context,
-                                  // commentId: comment['commentId'] ?? "",
-                                  postId: post['PostId'] ?? "",
-                                  // deleteComment: deleteComment,
-                                );
-                              }
-                            : null,
+                        onLongPress:
+                            getx.userid.value == post['userId'].toString()
+                                ? () {
+                                    showDeletePostDialog(
+                                      context: context,
+                                      // commentId: comment['commentId'] ?? "",
+                                      postId: post['PostId'] ?? "",
+                                      // deleteComment: deleteComment,
+                                    );
+                                  }
+                                : null,
                         child: PostCard(
                           content: post["text"] ?? "",
                           caption: post["caption"] ?? "No caption",
@@ -156,8 +155,7 @@ class _PostsScreenState extends State<PostsScreen> {
                           username: post['username'] ?? "name not public",
                           userId: post['userId'] ?? "",
                           postId: post['PostId'] ?? "",
-                          color: getx.userdetails[0].userId ==
-                                  post['userId'].toString()
+                          color: getx.userid.value == post['userId'].toString()
                               ? AppColors.primaryBlue
                               : AppColors.primaryorange,
                           commentId: post['commentId'] ?? [],
@@ -291,66 +289,9 @@ class PostCard extends StatelessWidget {
                 ),
               ),
             if (postType == "video")
-              FutureBuilder(
-                future: _initializeVideo(documenturl),
-                builder: (context, AsyncSnapshot<ChewieController> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container(
-                      height: 200,
-                      alignment: Alignment.center,
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                VideoPlayerScreen(documentUrl: documenturl),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: AppColors.gray80,
-                          border: Border.all(color: AppColors.gray),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.play_circle_fill,
-                          size: 25,
-                          color: AppColors.gray10,
-                        ),
-                      ),
-                    );
-                  } else {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                VideoPlayerScreen(documentUrl: documenturl),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 300,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.gray),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: Chewie(controller: snapshot.data!),
-                        ),
-                      ),
-                    );
-                  }
-                },
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: VideoPlayerWrapper(url: documenturl),
               ),
             if (postType == "text")
               Container(
@@ -374,14 +315,13 @@ class PostCard extends StatelessWidget {
                   children: [
                     InkWell(
                         onTap: () {
-                          if (likeIdList.contains(getx.userdetails[0].userId)) {
-                            removeLikeFromPost(
-                                postId, getx.userdetails[0].userId);
+                          if (likeIdList.contains(getx.userid.value)) {
+                            removeLikeFromPost(postId, getx.userid.value);
                           } else {
-                            addLikeToPost(postId, getx.userdetails[0].userId);
+                            addLikeToPost(postId, getx.userid.value);
                           }
                         },
-                        child: likeIdList.contains(getx.userdetails[0].userId)
+                        child: likeIdList.contains(getx.userid.value)
                             ? Icon(
                                 Icons.favorite_outlined,
                                 color: AppColors.red,
@@ -553,8 +493,8 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       final comment = comments[index];
-                      final isOwnComment = getx.userdetails[0].userId ==
-                          comment['userId'].toString();
+                      final isOwnComment =
+                          getx.userid.value == comment['userId'].toString();
 
                       return Padding(
                         padding: EdgeInsets.only(
@@ -614,11 +554,8 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   onPressed: () {
                     FocusScope.of(context).unfocus();
                     if (_controller.text.trim().isNotEmpty) {
-                      createComment(
-                              getx.userdetails[0].userId,
-                              _controller.text,
-                              getx.userdetails[0].username,
-                              widget.postId)
+                      createComment(getx.userid.value, _controller.text,
+                              getx.userdetails[0].username, widget.postId)
                           .then((val) {
                         if (val != "") {
                           Fluttertoast.showToast(
@@ -712,15 +649,13 @@ class CommentCard extends StatelessWidget {
                   children: [
                     InkWell(
                         onTap: () {
-                          if (likeIdList.contains(getx.userdetails[0].userId)) {
-                            removeLikeFromComment(
-                                commentId, getx.userdetails[0].userId);
+                          if (likeIdList.contains(getx.userid.value)) {
+                            removeLikeFromComment(commentId, getx.userid.value);
                           } else {
-                            addLikeToComment(
-                                commentId, getx.userdetails[0].userId);
+                            addLikeToComment(commentId, getx.userid.value);
                           }
                         },
-                        child: likeIdList.contains(getx.userdetails[0].userId)
+                        child: likeIdList.contains(getx.userid.value)
                             ? Icon(
                                 Icons.favorite_outlined,
                                 color: AppColors.red,
@@ -892,64 +827,6 @@ class FullScreenImage extends StatelessWidget {
                 child: Image.network(imageUrl),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class VideoPlayerScreen extends StatefulWidget {
-  final String documentUrl;
-
-  const VideoPlayerScreen({Key? key, required this.documentUrl})
-      : super(key: key);
-
-  @override
-  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
-}
-
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final Player _player;
-  late final VideoController _videoController;
-
-  @override
-  void initState() {
-    super.initState();
-    _player = Player();
-    _videoController = VideoController(_player);
-
-    _player.open(Media(widget.documentUrl));
-  }
-
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(''),
-          backgroundColor: AppColors.backgroundDark,
-          iconTheme: IconThemeData(color: AppColors.textLight),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: IconButton(
-                onPressed: () {
-                  Get.back();
-                },
-                icon: Icon(Icons.arrow_back_ios_new_outlined)),
-          ),
-        ),
-        backgroundColor: AppColors.backgroundDark,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Video(controller: _videoController),
           ),
         ),
       ),
